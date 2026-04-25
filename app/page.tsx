@@ -1,65 +1,184 @@
-import Image from "next/image";
+import { TopNavBar } from '@/components/church/nav-bar'
+import { HeroSection } from '@/components/church/hero'
+import { AboutSection } from '@/components/church/about-section'
+import { EventsSection } from '@/components/church/events-section'
+import { SermonsSection } from '@/components/church/sermons-section'
+import { SupportSection } from '@/components/church/support-section'
+import { Footer } from '@/components/church/footer'
+import type { ChurchEvent } from '@/components/church/event-card'
+import type { Sermon } from '@/components/church/sermon-card'
+
+const EVENTS: ChurchEvent[] = [
+  {
+    id: 'evt-1',
+    title: 'Sunday Worship Service',
+    date: '2025-08-03',
+    time: '10:00 AM',
+    location: 'Main Sanctuary',
+    description: 'Join us for our weekly Sunday worship service filled with praise, prayer, and the Word of God.',
+    image: 'https://placehold.co/600x400',
+    registrationHref: '',
+  },
+  {
+    id: 'evt-2',
+    title: 'Youth Conference 2025',
+    date: '2025-08-15',
+    time: '9:00 AM',
+    location: 'Fellowship Hall',
+    description: 'A two-day conference empowering the next generation to walk boldly in their faith and purpose.',
+    image: 'https://placehold.co/600x400/1B6D24/ffffff',
+    registrationHref: '#',
+  },
+  {
+    id: 'evt-3',
+    title: 'Community Outreach Day',
+    date: '2025-09-06',
+    time: '8:00 AM',
+    location: 'City Park, Main Street',
+    description: 'Serving our local community through food distribution, prayer, and acts of kindness in the name of Christ.',
+    image: 'https://placehold.co/600x400/1b2277/ffffff',
+    registrationHref: '#',
+  },
+]
+
+const SERMONS: Sermon[] = [
+  {
+    id: 'serm-1',
+    title: 'Finding Hope in Desert Seasons',
+    speaker: 'Pastor John Adeyemi',
+    date: '2025-07-20',
+    series: 'The Wilderness',
+    thumbnailSrc: 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?w=1200&auto=format&fit=crop',
+    videoHref: '#',
+    duration: '52 min',
+    featured: true,
+  },
+  {
+    id: 'serm-2',
+    title: 'The Power of Stillness',
+    speaker: 'Pastor David Reed',
+    date: '2025-07-13',
+    thumbnailSrc: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&auto=format&fit=crop',
+    videoHref: '#',
+    duration: '42 min',
+  },
+  {
+    id: 'serm-3',
+    title: 'Cultivating the Soul',
+    speaker: 'Pastor Sarah Chen',
+    date: '2025-07-06',
+    thumbnailSrc: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800&auto=format&fit=crop',
+    videoHref: '#',
+    duration: '38 min',
+  },
+]
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+    <>
+      <TopNavBar />
+      <HeroSection
+        slides={[
+          {
+            backgroundImage: 'https://images.unsplash.com/photo-1438032005730-c779502df39b?q=80&w=2342&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+            eyebrow: 'Welcome to Our Sanctuary',
+            headline: 'A Place of',
+            headlineAccent: 'Recovery,',
+            headlineLine2: 'Restoration & Revival',
+          },
+          {
+            backgroundImage: 'https://images.unsplash.com/photo-1495582630316-0b481a069ce3?q=80&w=2360&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+            eyebrow: 'Growing in Faith',
+            headline: 'Building a',
+            headlineAccent: 'Community',
+            headlineLine2: 'Rooted in Christ',
+          },
+          {
+            backgroundImage: 'https://images.unsplash.com/photo-1465848059293-208e11dfea17?q=80&w=2832&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+            eyebrow: 'Making Disciples',
+            headline: 'Spreading the',
+            headlineAccent: 'Gospel',
+            headlineLine2: 'to All Nations',
+          },
+        ]}
+        primaryCta={{ label: 'Plan a Visit', href: '/about' }}
+        secondaryCta={{ label: 'Watch Sermons', href: '/sermons' }}
+      />
+      <AboutSection
+        eyebrow="Our Foundation"
+        heading="Resilient Faith for a Modern World."
+        body="At RCCG Glory Tabernacle, we believe that the ancient truths of the Gospel are the firm foundation for navigating today's complexities. We are a community dedicated to the transformative power of grace and the relentless pursuit of spiritual growth."
+        pillars={[
+          {
+            title: 'Restoration',
+            description: 'Healing the broken through the unconditional love of the Father.',
+          },
+          {
+            title: 'Revival',
+            description: 'Awakening the soul to the vibrant presence of the Holy Spirit.',
+          },
+        ]}
+        yearsOfMinistry={25}
+        image={{
+          src: '/fellowship.png',
+          alt: 'RCCG Glory Tabernacle fellowship',
+          width: 600,
+          height: 700,
+        }}
+      />
+      <EventsSection
+        heading="Upcoming Events"
+        events={EVENTS}
+        viewAllHref="/events"
+      />
+      <SermonsSection
+        heading="Recent Sermons"
+        sermons={SERMONS}
+        viewAllHref="/sermons"
+      />
+      <SupportSection
+        heading="Support the Mission"
+        body="Your generosity fuels our community programs, global missions, and the upkeep of this sanctuary. Partner with us as we spread the message of hope."
+        primaryCta={{ label: 'Give Online', href: '/giving' }}
+      />
+      <Footer
+        logo={{ src: '/logo.png', alt: 'RCCG Glory Tabernacle' }}
+        tagline="Recovering the past, restoring the present, and reviving the future of our city through faith and community."
+        columns={[
+          {
+            heading: 'Quick Links',
+            links: [
+              { label: 'Home', href: '/' },
+              { label: 'About', href: '/about' },
+              { label: 'Media', href: '/sermons' },
+              { label: 'Volunteer', href: '/volunteer' },
+              { label: 'Connect', href: '/connect' },
+            ],
+          },
+          {
+            heading: 'Contact',
+            links: [
+              { label: 'Contact Us', href: '/contact' },
+              { label: 'Small Groups', href: '/groups' },
+              { label: 'Prayer Request', href: '/prayer' },
+            ],
+          },
+        ]}
+        socialLinks={[
+          { platform: 'instagram', href: '#' },
+          { platform: 'youtube', href: '#' },
+          { platform: 'facebook', href: '#' },
+          { platform: 'x', href: '#' },
+          { platform: 'tiktok', href: '#' },
+        ]}
+        contactInfo={{
+          address: '123 Church Street, City, State 12345',
+          phone: '+1 (555) 123-4567',
+          email: 'info@rccgglory.org',
+          directionsHref: 'https://maps.google.com',
+        }}
+        copyrightText={`© ${new Date().getFullYear()} RCCG Glory Tabernacle. All rights reserved.`}
+      />
+    </>
+  )
 }

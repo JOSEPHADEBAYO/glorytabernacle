@@ -1,0 +1,295 @@
+# Implementation Plan: RCCG Glory Tabernacle Church Landing Page
+
+## Overview
+
+Implement the RCCG Glory Tabernacle website using Next.js 16 App Router, TypeScript, Tailwind CSS v4, and the existing shadcn/radix-ui foundation. The build proceeds section-by-section, starting with the design system and shared primitives, then each landing page section, then stub pages and error boundaries, and finally property-based tests.
+
+All components are TypeScript. All data is hardcoded static arrays. Placeholder images use `https://placehold.co/`. External images require a `remotePatterns` entry in `next.config.ts`. The `priority` prop on `next/image` is deprecated in Next.js 16 — use `preload={true}` instead. The `error.tsx` boundary uses `unstable_retry` (not `reset`).
+
+---
+
+## Tasks
+
+- [x] 1. Configure `next.config.ts` and design system tokens
+  - [x] 1.1 Add `remotePatterns` for `placehold.co` to `next.config.ts`
+    - Allow `https://placehold.co/**` so `next/image` can optimise placeholder images
+    - _Requirements: 14.3_
+  - [x] 1.2 Extend `app/globals.css` with church design tokens
+    - Add church brand tokens to `:root`: `--church-green`, `--church-navy`, `--church-light-green`, `--church-white-transparent`
+    - Add semantic aliases: `--color-brand-primary`, `--color-brand-secondary`, `--color-brand-accent`
+    - Add spacing tokens: `--section-padding-y`, `--section-padding-x`, `--container-max`
+    - Add shadow tokens: `--shadow-card`, `--shadow-nav`
+    - Add radius tokens: `--radius-card`, `--radius-badge`
+    - Add dark-mode overrides inside `.dark {}` block
+    - Extend the existing `@theme inline` block with `--color-brand-primary`, `--color-brand-secondary`, `--color-brand-accent`
+    - Add `scroll-padding-top` equal to nav height (`4rem`) on `html`
+    - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7, 14.4_
+
+- [x] 2. Shared UI primitives
+  - [x] 2.1 Create `components/ui/badge.tsx`
+    - Implement `Badge` with CVA variants: `default`, `success`, `warning`, `info`, `outline`
+    - Use `--radius-badge` for border radius
+    - _Requirements: 10.2_
+  - [x] 2.2 Create `components/ui/card.tsx`
+    - Implement `Card` with CVA variants: `default`, `elevated`, `outlined`
+    - Export named slots: `CardHeader`, `CardImage`, `CardBody`, `CardFooter`
+    - Use `--radius-card` and `--shadow-card`
+    - _Requirements: 10.1_
+  - [x] 2.3 Create `components/ui/input.tsx`
+    - Implement `Input` supporting types: `text`, `email`, `password`, `textarea`, `select`, `checkbox`, `radio`
+    - In error state set `aria-invalid="true"` and `aria-describedby` referencing the error message element id
+    - All inputs must have an associated `<label>` or `aria-label`
+    - _Requirements: 10.10, 10.11, 11.6_
+  - [x] 2.4 Create `components/ui/modal.tsx`
+    - Build on `@radix-ui/react-dialog` (available via the `radix-ui` package)
+    - Implement variants: `confirmation`, `form`, `alert`
+    - Include `aria-labelledby` and `aria-describedby` on the dialog root
+    - Focus trap is provided by Radix; verify `Escape` closes the dialog
+    - _Requirements: 10.3, 10.4, 10.5, 10.6, 11.5_
+  - [x] 2.5 Create `components/ui/toast.tsx` and `components/ui/toast-provider.tsx`
+    - Build on `@radix-ui/react-toast` (available via the `radix-ui` package)
+    - Implement variants: `success`, `error`, `warning`, `info`
+    - Auto-dismiss after 5000 ms by default
+    - Cap visible toasts at 3; queue additional toasts
+    - Export a `useToast` hook for triggering toasts from client components
+    - _Requirements: 10.7, 10.8, 10.9_
+
+- [x] 3. Providers and root layout wiring
+  - [x] 3.1 Create `components/providers/theme-provider.tsx`
+    - `'use client'` directive
+    - Accept `'light' | 'dark' | 'system'` theme values
+    - On mount, read from `localStorage` and apply `dark` class to `<html>` before first paint (inline script or `suppressHydrationWarning`)
+    - Respect `prefers-color-scheme` when theme is `'system'`
+    - Persist selected theme to `localStorage` on change
+    - Export `ThemeContext` and `useTheme` hook
+    - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7_
+  - [x] 3.2 Update `app/layout.tsx` to wrap body with `ThemeProvider` and `ToastProvider`
+    - Import and render `ThemeProvider` and `ToastProvider` around `{children}`
+    - Keep layout as a Server Component; providers are Client Components
+    - _Requirements: 13.7_
+
+- [x] 4. TopNavBar
+  - [x] 4.1 Create `components/church/nav-bar.tsx`
+    - `'use client'` directive
+    - Implement `NavLink` and `TopNavBarProps` interfaces as defined in the design
+    - Hardcode `NAV_LINKS` array: Home, About, Media (Sermons/Books dropdown), Volunteer, Connect (Contact Us/Small Groups dropdown)
+    - Background: always `--church-navy` (`bg-[var(--church-navy)]`), `sticky top-0 z-50`
+    - Layout: logo far-left, links centered, GIVE button far-right
+    - Use `usePathname()` to apply green bottom-border active indicator to the matching link
+    - Desktop dropdowns: open on hover; chevron (`ChevronDown` from lucide-react) rotates 180° when open
+    - GIVE button: `bg-[var(--church-green)]` text-white `rounded-md`
+    - All links use `next/link`
+    - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.10, 1.11, 1.13_
+  - [x] 4.2 Add mobile hamburger drawer to `nav-bar.tsx`
+    - Show hamburger icon (`Menu` from lucide-react) on viewports narrower than `md`; hide full link row
+    - Toggle a slide-down drawer with all nav links; dropdowns expand inline
+    - Hamburger button sets `aria-expanded` reflecting open/closed state
+    - Closing the drawer restores fully closed state with no residual open classes
+    - _Requirements: 1.6, 1.7, 1.8, 1.9, 1.12, 11.7, 12.2_
+  - [ ]* 4.3 Write property test for NavBar — Property 1: Navigation renders all provided links
+    - **Property 1: Navigation renders all provided links**
+    - Use `@fast-check/vitest` to generate arbitrary `NavLink[]` arrays and assert every label and href appears in the rendered output
+    - **Validates: Requirements 1.1**
+  - [ ]* 4.4 Write property test for NavBar — Property 2: Active link matches current pathname
+    - **Property 2: Active link matches current pathname**
+    - For any `NavLink[]` and any pathname, assert exactly the matching link has the active-indicator class and no other top-level link does
+    - **Validates: Requirements 1.6**
+  - [ ]* 4.5 Write property test for NavBar — Property 3: Mobile menu open/close is a round trip
+    - **Property 3: Mobile menu open/close is a round trip**
+    - Assert that opening then closing the drawer restores the original closed state
+    - **Validates: Requirements 1.4, 1.5**
+
+- [x] 5. HeroSection slideshow
+  - [x] 5.1 Create `components/church/hero.tsx`
+    - `'use client'` directive
+    - Implement `HeroSlide` and `HeroSectionProps` interfaces as defined in the design
+    - Full-width, `min-h-[100svh]`; each slide uses `next/image` with `fill` + `object-cover`
+    - First slide image uses `preload={true}` (NOT the deprecated `priority` prop) and `loading="eager"`
+    - Slides cross-fade with `transition-opacity duration-1000 ease-in-out`; inactive slides `opacity-0`, active slide `opacity-100`
+    - `--church-navy` overlay div at `overlayOpacity` (default 0.5)
+    - Auto-advance every `autoPlayInterval` ms (default 5000); pause on `onMouseEnter`, resume on `onMouseLeave`
+    - Wrap-around: when index is `slides.length - 1`, next index is `0`
+    - Dot indicators at bottom: one per slide, active dot visually distinguished
+    - Slideshow container has `aria-label="Hero slideshow"` and `role="region"`
+    - Each dot has `aria-label="Go to slide N"` and is keyboard-navigable
+    - Primary and secondary CTA buttons overlaid on slide content
+    - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 2.10, 2.11, 11.3, 11.4, 14.2_
+  - [ ]* 5.2 Write property test for HeroSection — Property 4: Dot count equals slide count
+    - **Property 4: Hero dot count equals slide count**
+    - For any `HeroSlide[]`, assert rendered dot count equals `slides.length`
+    - **Validates: Requirements 2.8**
+  - [ ]* 5.3 Write property test for HeroSection — Property 5: Slide index wraps around
+    - **Property 5: Hero slide index wraps around**
+    - For any slides array of length N, assert advancing from index N−1 produces index 0
+    - **Validates: Requirements 2.6**
+
+- [x] 6. AboutSection
+  - [x] 6.1 Create `components/church/about-section.tsx`
+    - Server Component (no `'use client'`)
+    - Implement `AboutSectionProps` interface as defined in the design
+    - Two-column grid on `md+` (`grid-cols-2`), stacked on mobile
+    - Image uses `next/image` with meaningful `alt` text
+    - Render heading, body, mission statement, and vision statement (mission/vision only when provided)
+    - Apply `--section-padding-y` and `--section-padding-x` with `--container-max` max-width
+    - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 11.1, 12.4_
+  - [ ]* 6.2 Write property test for AboutSection — Property 6: Renders all provided fields
+    - **Property 6: AboutSection renders all provided fields**
+    - For any `AboutSectionProps`, assert heading, body, mission (when set), and vision (when set) appear in rendered output
+    - **Validates: Requirements 3.1**
+
+- [x] 7. EventsSection and EventCard
+  - [x] 7.1 Create `components/church/event-card.tsx`
+    - Server Component
+    - Implement `EventCardProps` interface; render date Badge, title, time, location, description excerpt
+    - Render `next/image` when `event.image` is provided
+    - Render registration button (as `next/link`) if and only if `registrationHref` is a non-empty string
+    - _Requirements: 4.6, 4.7, 4.8, 4.9, 11.1_
+  - [x] 7.2 Create `components/church/events-section.tsx`
+    - Server Component
+    - Implement `EventsSectionProps` interface; render one `EventCard` per event
+    - Responsive grid: 1 col mobile, 2 col `sm`, 3 col `lg`
+    - Apply section padding and container max-width
+    - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 12.4_
+  - [ ]* 7.3 Write property test for EventsSection — Property 7: Renders exactly as many cards as events
+    - **Property 7: EventsSection renders exactly as many cards as events**
+    - For any `ChurchEvent[]`, assert rendered card count equals array length
+    - **Validates: Requirements 4.1**
+  - [ ]* 7.4 Write property test for EventCard — Property 8: Renders all required fields
+    - **Property 8: EventCard renders all required fields**
+    - For any `ChurchEvent`, assert date badge, title, time, location, and description excerpt are present
+    - **Validates: Requirements 4.6**
+  - [ ]* 7.5 Write property test for EventCard — Property 9: Registration button presence matches registrationHref
+    - **Property 9: EventCard registration button presence matches registrationHref**
+    - Assert button present iff `registrationHref` is a non-empty string
+    - **Validates: Requirements 4.8, 4.9**
+
+- [x] 8. SermonsSection and SermonCard
+  - [x] 8.1 Create `components/church/sermon-card.tsx`
+    - Server Component
+    - Implement `SermonCardProps` interface; render thumbnail (`next/image`), title, speaker, date
+    - Render series `Badge` if and only if `sermon.series` is set
+    - Render video action button (`<a>`) if and only if `sermon.videoHref` is set
+    - Render audio action button (`<a>`) if and only if `sermon.audioHref` is set
+    - Use `Play` and `Headphones` icons from lucide-react
+    - _Requirements: 5.5, 5.6, 5.7, 5.8, 5.9, 5.10, 5.11, 11.1_
+  - [x] 8.2 Create `components/church/sermons-section.tsx`
+    - Server Component
+    - Implement `SermonsSectionProps` interface; render one `SermonCard` per sermon
+    - Mobile: horizontally scrollable row (`flex overflow-x-auto`)
+    - `lg+`: three-column grid
+    - Apply section padding and container max-width
+    - _Requirements: 5.1, 5.2, 5.3, 5.4, 12.4_
+  - [ ]* 8.3 Write property test for SermonsSection — Property 10: Renders exactly as many cards as sermons
+    - **Property 10: SermonsSection renders exactly as many cards as sermons**
+    - For any `Sermon[]`, assert rendered card count equals array length
+    - **Validates: Requirements 5.1**
+  - [ ]* 8.4 Write property test for SermonCard — Property 11: Optional elements match their data fields
+    - **Property 11: SermonCard optional elements match their data fields**
+    - Assert series Badge present iff `series` set; video button present iff `videoHref` set; audio button present iff `audioHref` set
+    - **Validates: Requirements 5.6, 5.7, 5.8, 5.9, 5.10, 5.11**
+
+- [x] 9. SupportSection
+  - [x] 9.1 Create `components/church/support-section.tsx`
+    - Server Component
+    - Implement `SupportSectionProps` interface
+    - Full-width banner; background colour driven by `backgroundVariant` prop (`green` → `--church-green`, `navy` → `--church-navy`, `light` → `--church-light-green`)
+    - Render heading, body, primary CTA button
+    - Render secondary CTA button if and only if `secondaryCta` is provided
+    - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
+  - [ ]* 9.2 Write property test for SupportSection — Property 12: Secondary CTA presence matches prop
+    - **Property 12: SupportSection secondary CTA presence matches prop**
+    - Assert secondary CTA rendered iff `secondaryCta` is provided
+    - **Validates: Requirements 6.2, 6.3**
+
+- [x] 10. Footer
+  - [x] 10.1 Create `components/church/footer.tsx`
+    - Server Component
+    - Implement `FooterProps` interface; render all `FooterColumn` headings and their `FooterLink` items
+    - Render social icon links for Facebook, X, YouTube, TikTok, Instagram using lucide-react icons
+    - Render `contactInfo`: address, phone, email
+    - Render RCCG logo via `next/image`
+    - Render `copyrightText`
+    - Responsive layout: 4-col `lg+`, 2-col `sm`, stacked mobile
+    - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7, 7.8, 7.9, 12.4_
+  - [ ]* 10.2 Write property test for Footer — Property 13: Renders all columns and their links
+    - **Property 13: Footer renders all columns and their links**
+    - For any `FooterProps`, assert every column heading and every link label appears in rendered output
+    - **Validates: Requirements 7.1**
+  - [ ]* 10.3 Write property test for Footer — Property 14: Renders all social links
+    - **Property 14: Footer renders all social links**
+    - For any `SocialLink[]`, assert every entry produces a rendered `<a>` element
+    - **Validates: Requirements 7.2**
+  - [ ]* 10.4 Write property test for Footer — Property 15: Renders all contact info fields
+    - **Property 15: Footer renders all contact info fields**
+    - For any `contactInfo`, assert address, phone, and email appear in rendered output
+    - **Validates: Requirements 7.3**
+
+- [x] 11. Landing page assembly
+  - [x] 11.1 Replace `app/page.tsx` with the full landing page
+    - Server Component
+    - Import and compose: `TopNavBar`, `HeroSection`, `AboutSection`, `EventsSection`, `SermonsSection`, `SupportSection`, `Footer`
+    - Define hardcoded static data arrays for `events` (3+ items) and `sermons` (3+ items) using placeholder images (`https://placehold.co/600x400`, `https://placehold.co/1920x1080`)
+    - Pass all required props; wire `NAV_LINKS` and logo to `TopNavBar`
+    - _Requirements: 13.1, 14.1_
+
+- [x] 12. Checkpoint — Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 13. Stub pages
+  - [x] 13.1 Create `app/sermons/page.tsx`
+    - Server Component; render a branded placeholder with page title and a `next/link` back to `/`
+    - _Requirements: 13.2_
+  - [x] 13.2 Create `app/giving/page.tsx`
+    - Server Component; render a branded placeholder with page title and a `next/link` back to `/`
+    - _Requirements: 13.3_
+  - [x] 13.3 Create `app/books/page.tsx`
+    - Server Component; render a branded placeholder with page title and a `next/link` back to `/`
+    - _Requirements: 13.4_
+
+- [x] 14. Error and 404 pages
+  - [x] 14.1 Create `app/not-found.tsx`
+    - Server Component
+    - Branded 404 page with church colours, a heading, short message, and a `next/link` CTA back to `/`
+    - _Requirements: 13.5_
+  - [x] 14.2 Create `app/error.tsx`
+    - `'use client'` directive (required by Next.js for error boundaries)
+    - Accept `error: Error & { digest?: string }` and `unstable_retry: () => void` props (Next.js 16 API — `reset` is replaced by `unstable_retry`)
+    - Render a friendly error message with a "Try again" button that calls `unstable_retry()`
+    - _Requirements: 13.6_
+
+- [x] 15. Property-based test infrastructure and remaining properties
+  - [x] 15.1 Install and configure Vitest + React Testing Library + fast-check
+    - Install dev dependencies: `vitest`, `@vitejs/plugin-react`, `jsdom`, `@testing-library/react`, `@testing-library/dom`, `vite-tsconfig-paths`, `@fast-check/vitest`
+    - Create `vitest.config.mts` with `jsdom` environment, `react` plugin, and `tsconfigPaths` plugin
+    - Add `"test": "vitest --run"` script to `package.json`
+    - _Requirements: (test infrastructure)_
+  - [x] 15.2 Write property test for ThemeProvider — Property 16: Persists theme to localStorage (round trip)
+    - **Property 16: ThemeProvider persists theme to localStorage (round trip)**
+    - For any theme value in `{'light', 'dark', 'system'}`, assert `localStorage.getItem('theme')` equals the value after `setTheme` is called
+    - **Validates: Requirements 9.5**
+  - [x] 15.3 Write property test for ToastProvider — Property 17: Queue never exceeds 3 visible toasts
+    - **Property 17: Toast queue never exceeds 3 visible toasts**
+    - For any sequence of toast additions, assert visible toast count never exceeds 3
+    - **Validates: Requirements 10.9**
+  - [x] 15.4 Write property test for Input — Property 18: aria-invalid reflects error state
+    - **Property 18: Input aria-invalid reflects error state**
+    - For any `Input` in error state, assert `aria-invalid="true"` and `aria-describedby` references a non-empty error message element id
+    - **Validates: Requirements 10.11**
+  - [ ]* 15.5 Write property test for all images — Property 19: All images have non-empty alt text
+    - **Property 19: All images have non-empty alt text**
+    - For each rendered page component, assert every `<img>` element has a non-empty `alt` attribute
+    - **Validates: Requirements 11.1**
+
+- [x] 16. Final checkpoint — Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+---
+
+## Notes
+
+- Tasks marked with `*` are optional and can be skipped for a faster MVP
+- Property tests use `@fast-check/vitest` for property-based testing alongside `@testing-library/react` for rendering
+- The `priority` prop on `next/image` is **deprecated** in Next.js 16 — always use `preload={true}` with `loading="eager"` for LCP images
+- The `error.tsx` boundary uses `unstable_retry` (not `reset`) as of Next.js 16.2
+- All external images (placehold.co) require a `remotePatterns` entry in `next.config.ts`
+- All section components except `TopNavBar` and `HeroSection` are Server Components — zero client JS
