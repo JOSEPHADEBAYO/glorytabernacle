@@ -25,6 +25,7 @@ const NAV_LINKS: NavLink[] = [
     label: 'Media',   // no href — dropdown only
     children: [
       { label: 'Sermons', href: '/sermons' },
+      { label: 'Events', href: '/events' },
       { label: 'Books', href: '/books' },
     ],
   },

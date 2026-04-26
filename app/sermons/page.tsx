@@ -261,10 +261,10 @@ export default function SermonsPage() {
       </section>
 
       {/* ── Newsletter CTA ── */}
-      <section className="py-[var(--section-padding-y)] px-6 md:px-16" style={{ backgroundColor: 'rgba(248,250,252,1)' }}>
-        <div className="max-w-[var(--container-max)] mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          <div className="flex flex-col gap-5">
-            <h2 className="text-3xl md:text-4xl font-extrabold leading-tight" style={{ color: 'rgba(27,34,119,1)' }}>
+      <section className="py-10 px-6 md:px-16" style={{ backgroundColor: 'rgba(248,250,252,1)' }}>
+        <div className="max-w-[var(--container-max)] mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+          <div className="flex flex-col gap-4">
+            <h2 className="text-2xl md:text-3xl font-extrabold leading-tight" style={{ color: 'rgba(27,34,119,1)' }}>
               Never Miss a Moment.
             </h2>
             <p className="text-sm text-gray-500 leading-relaxed max-w-sm">
@@ -272,7 +272,7 @@ export default function SermonsPage() {
             </p>
             <NewsletterForm />
           </div>
-          <div className="rounded-2xl overflow-hidden aspect-[4/3] relative">
+          <div className="rounded-2xl overflow-hidden aspect-[16/7] relative">
             <Image
               src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&auto=format&fit=crop&q=80"
               alt="Community gathering"
