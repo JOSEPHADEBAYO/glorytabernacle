@@ -87,14 +87,14 @@ export default function Home() {
             headlineLine2: 'Restoration & Revival',
           },
           {
-            backgroundImage: 'https://images.unsplash.com/photo-1495582630316-0b481a069ce3?q=80&w=2360&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+            backgroundImage: 'https://images.unsplash.com/photo-1674566159068-16fd62db547c?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
             eyebrow: 'Growing in Faith',
             headline: 'Building a',
             headlineAccent: 'Community',
             headlineLine2: 'Rooted in Christ',
           },
           {
-            backgroundImage: 'https://images.unsplash.com/photo-1465848059293-208e11dfea17?q=80&w=2832&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+            backgroundImage: 'https://images.unsplash.com/photo-1519915734606-32d972e3b9b7?w=1200&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8aW1hZ2VzJTIwb2YlMjBwZW9wbGUlMjBwcmF5aW5nJTIwcG93ZXJmdWxseSUyMGl8ZW58MHx8MHx8fDA%3D',
             eyebrow: 'Making Disciples',
             headline: 'Spreading the',
             headlineAccent: 'Gospel',

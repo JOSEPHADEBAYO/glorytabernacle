@@ -122,17 +122,9 @@ export function Footer({
 
         {/* Main grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_auto] gap-10 lg:gap-8">
-
-          {/* Col 1: Logo + tagline */}
           <div className="flex flex-col gap-4">
-            <Link href="/" aria-label="RCCG Glory Tabernacle home">
-              <div className="w-16 h-16 rounded-full flex items-center justify-center text-white text-xs font-bold text-center leading-tight overflow-hidden" style={{ backgroundColor: 'var(--church-green)' }}>
-                {logo.src && logo.src !== '/logo.png' ? (
-                  <Image src={logo.src} alt={logo.alt} width={64} height={64} className="rounded-full object-cover" />
-                ) : (
-                  <span className="text-[9px] font-extrabold uppercase text-center px-1">RCCG Glory</span>
-                )}
-              </div>
+            <Link href="/" aria-label="RCCG Glory Tabernacle home">    
+                  <Image src={logo.src} alt={logo.alt} width={80} height={80} className="rounded-full object-cover" />
             </Link>
             {tagline && (
               <p className="text-sm text-gray-500 leading-relaxed max-w-[200px]">

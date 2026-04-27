@@ -110,7 +110,6 @@ export function TopNavBar() {
         {/* Logo */}
         <div className="flex-none">
           <Link href="/" aria-label="RCCG Glory Tabernacle home">
-            <div className="w-12 h-12 rounded-full flex items-center justify-center overflow-hidden" style={{ backgroundColor: 'var(--church-green)' }}>
               <Image
                 src="/logo.png"
                 alt="RCCG Glory Tabernacle"
@@ -119,7 +118,6 @@ export function TopNavBar() {
                 className="rounded-full object-cover"
                 onError={undefined}
               />
-            </div>
           </Link>
         </div>
 
