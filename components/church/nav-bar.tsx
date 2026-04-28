@@ -111,11 +111,11 @@ export function TopNavBar() {
         <div className="flex-none">
           <Link href="/" aria-label="RCCG Glory Tabernacle home">
               <Image
-                src="/logo.png"
+                src="/logo-white-bg.png"
                 alt="RCCG Glory Tabernacle"
-                width={48}
-                height={48}
-                className="rounded-full object-cover"
+                width={80}
+                height={80}
+                className="rounded-md object-cover"
                 onError={undefined}
               />
           </Link>

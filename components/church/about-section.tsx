@@ -100,8 +100,8 @@ export function AboutSection({
                 src={image.src}
                 alt={image.alt}
                 width={image.width}
-                height={image.height}
-                className="object-cover w-full h-auto"
+                height={300}
+                //className="object-cover w-full h-auto"
                 style={{ filter: 'grayscale(30%) brightness(0.92) contrast(1.05)' }}
               />
             </div>
