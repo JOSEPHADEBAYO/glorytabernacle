@@ -197,6 +197,39 @@ interface HeroSectionProps {
 
 Layout: Full-width (`w-full`), min-height `100svh`. Each slide uses `next/image` with `fill` + `object-cover`. Slides cross-fade using CSS `opacity` transition (`transition-opacity duration-1000 ease-in-out`). Overlay div with `--church-navy` at `overlayOpacity`. Content centered with `flex items-center justify-center`. Dot indicators at bottom for slide position. Auto-advances every `autoPlayInterval` ms, pauses on hover.
 
+### LiveStreamSection
+
+**File**: `components/church/live-stream-section.tsx`  
+**Directive**: `'use client'` (countdown timer requires `useState` + `useEffect`; modal interaction)
+
+```typescript
+interface LiveStreamSectionProps {
+  heading?: string                    // default: "Experience The Hub Live"
+  subtext?: string                    // default: "Join our digital congregation from anywhere in the world. Our next encounter begins in:"
+  thumbnailSrc: string                // image path for the video preview
+  thumbnailAlt: string
+  isLive: boolean                     // controls OFFLINE/LIVE badge and play button behaviour
+  youtubeLiveHref?: string            // YouTube live URL — required when isLive is true
+  nextServiceDate: string             // ISO 8601 datetime string for countdown target
+}
+```
+
+Layout:
+- White/light background card with subtle border and shadow (`--shadow-card`)
+- Two-column layout on `md+`: thumbnail left (roughly 45%), content right (roughly 55%)
+- Stacked vertically on mobile
+- Thumbnail: relative container, `next/image` with `fill` + `object-cover`, rounded corners
+  - Status badge: absolute top-left, red pill for OFFLINE, green pill with pulsing dot for LIVE
+  - Play button: absolute centered, green circle with white `Play` icon from lucide-react; wrapped in `<a>` when `isLive && youtubeLiveHref`, otherwise a non-interactive `<div>`
+- Content side:
+  - Short navy `<hr>` decorative line (width ~3rem, height 3px, `--church-navy` colour)
+  - Heading: bold, `--church-navy` colour
+  - Subtext: muted body text
+  - Countdown: three bordered boxes side-by-side, each showing a number and a label (DAYS / HOURS / MINS)
+  - "GET NOTIFIED" button: full-width outlined variant, navy border and text, `rounded-md`
+- Countdown logic: `useEffect` sets a 1-second interval computing `nextServiceDate - Date.now()`; when diff ≤ 0 renders "We're Live!" text instead
+- "GET NOTIFIED" opens a `Modal` (from `components/ui/modal.tsx`) with a `form` variant containing Name and Email `Input` fields and a Submit button
+
 ### AboutSection
 
 **File**: `components/church/about-section.tsx`  
@@ -537,6 +570,14 @@ All already present in `package.json`:
 *For any* initial closed state of the TopNavBar mobile menu, opening and then closing the menu must restore the drawer to its original closed state with no residual open classes.
 
 **Validates: Requirements 1.4, 1.5**
+
+---
+
+### Property 4a: LiveStreamSection countdown reaches zero correctly
+
+*For any* `nextServiceDate` in the past, the rendered `LiveStreamSection` must display "We're Live!" instead of the countdown timer.
+
+**Validates: Requirements 2b.10**
 
 ---
 

@@ -1,8 +1,13 @@
 import { TopNavBar } from '@/components/church/nav-bar'
 import { HeroSection } from '@/components/church/hero'
+import { LiveStreamSection } from '@/components/church/live-stream-section'
 import { AboutSection } from '@/components/church/about-section'
+import { MinistriesSection } from '@/components/church/ministries-section'
 import { EventsSection } from '@/components/church/events-section'
 import { SermonsSection } from '@/components/church/sermons-section'
+import { UpcomingEncountersSection } from '@/components/church/upcoming-encounters-section'
+import { TestimonialsSection } from '@/components/church/testimonials-section'
+import { GlobalConnectionSection } from '@/components/church/global-connection-section'
 import { SupportSection } from '@/components/church/support-section'
 import { Footer } from '@/components/church/footer'
 import type { ChurchEvent } from '@/components/church/event-card'
@@ -104,6 +109,13 @@ export default function Home() {
         primaryCta={{ label: 'Plan a Visit', href: '/about' }}
         secondaryCta={{ label: 'Watch Sermons', href: '/sermons' }}
       />
+      <LiveStreamSection
+        thumbnailSrc="/livestream.png"
+        thumbnailAlt="RCCG Glory Tabernacle congregation in worship"
+        isLive={false}
+        youtubeLiveHref="https://www.youtube.com/@RCCGGloryTabernacle/live"
+        nextServiceDate="2026-05-10T10:00:00"
+      />
       <AboutSection
         eyebrow="Our Foundation"
         heading="Resilient Faith for a Modern World."
@@ -118,7 +130,7 @@ export default function Home() {
             description: 'Awakening the soul to the vibrant presence of the Holy Spirit.',
           },
         ]}
-        yearsOfMinistry={25}
+        yearsOfMinistry={74}
         image={{
           src: '/fellowship.png',
           alt: 'RCCG Glory Tabernacle fellowship',
@@ -126,6 +138,7 @@ export default function Home() {
           height: 600,
         }}
       />
+      <MinistriesSection />
       <EventsSection
         heading="Upcoming Events"
         events={EVENTS}
@@ -136,6 +149,9 @@ export default function Home() {
         sermons={SERMONS}
         viewAllHref="/sermons"
       />
+      <UpcomingEncountersSection />
+      <TestimonialsSection />
+      <GlobalConnectionSection />
       <SupportSection
         heading="Support the Mission"
         body="Your generosity fuels our community programs, global missions, and the upkeep of this sanctuary. Partner with us as we spread the message of hope."

@@ -4,6 +4,13 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Prevent horizontal overflow on all viewports */
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
 @theme inline {
   --color-brand-primary: var(--color-brand-primary);
   --color-brand-secondary: var(--color-brand-secondary);

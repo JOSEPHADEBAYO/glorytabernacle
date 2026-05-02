@@ -71,6 +71,30 @@ This document defines the functional and non-functional requirements for the RCC
 
 ---
 
+### Requirement 2b: Live Stream Section
+
+**User Story:** As a site visitor, I want to see the church's live stream status and a countdown to the next service, so that I can tune in or get notified when it goes live.
+
+#### Acceptance Criteria
+
+1. THE LiveStreamSection SHALL be placed immediately after the HeroSection on the Landing_Page.
+2. THE LiveStreamSection SHALL display a video thumbnail image on the left and content on the right in a two-column layout on `md+` viewports, stacking vertically on mobile.
+3. THE LiveStreamSection SHALL display a status badge in the top-left corner of the thumbnail: `OFFLINE` (red background) when the stream is not live, and `LIVE` (green background, pulsing indicator) when the stream is active.
+4. THE LiveStreamSection SHALL render a green circular play button overlay centered on the thumbnail.
+5. WHEN the stream is live, THE play button SHALL link to the configured YouTube live URL.
+6. WHEN the stream is offline, THE play button SHALL be non-interactive (no link).
+7. THE LiveStreamSection SHALL render a decorative navy horizontal rule above the section heading.
+8. THE LiveStreamSection SHALL render the heading "Experience The Hub Live" and a configurable subtext.
+9. THE LiveStreamSection SHALL render a countdown timer displaying Days, Hours, and Minutes until the next configured service date/time.
+10. WHEN the countdown reaches zero, THE LiveStreamSection SHALL display a "We're Live!" message in place of the countdown.
+11. THE countdown timer SHALL update every second using a client-side interval.
+12. THE LiveStreamSection SHALL render a "GET NOTIFIED" button with an outlined style (navy border and text).
+13. WHEN a visitor clicks "GET NOTIFIED", THE LiveStreamSection SHALL open a modal containing an email subscription form.
+14. THE email subscription form SHALL include a name field, an email field, and a submit button.
+15. THE LiveStreamSection SHALL be a Client_Component due to the countdown timer and modal interaction.
+
+---
+
 ### Requirement 3: About Section
 
 **User Story:** As a site visitor, I want to learn about the church's mission and vision, so that I can decide whether this community is right for me.

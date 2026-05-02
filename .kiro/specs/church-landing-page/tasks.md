@@ -99,6 +99,26 @@ All components are TypeScript. All data is hardcoded static arrays. Placeholder 
     - Assert that opening then closing the drawer restores the original closed state
     - **Validates: Requirements 1.4, 1.5**
 
+- [x] 5b. LiveStreamSection
+  - [x] 5b.1 Create `components/church/live-stream-section.tsx`
+    - `'use client'` directive
+    - Implement `LiveStreamSectionProps` interface as defined in the design
+    - Two-column layout on `md+` (thumbnail left ~45%, content right ~55%), stacked on mobile
+    - Thumbnail: `next/image` with `fill` + `object-cover`, rounded corners
+      - Status badge: absolute top-left — red pill "OFFLINE" or green pill "● LIVE" with pulsing dot
+      - Play button: absolute centered green circle with `Play` icon; `<a>` linking to `youtubeLiveHref` when `isLive`, non-interactive `<div>` otherwise
+    - Content side:
+      - Short navy decorative `<hr>` (3rem wide, 3px tall)
+      - Heading and subtext
+      - Countdown: three bordered boxes for DAYS / HOURS / MINS, updated every second via `useEffect` interval
+      - When `nextServiceDate` is in the past, render "We're Live!" instead of countdown boxes
+      - "GET NOTIFIED" outlined button (navy border and text, full-width, `rounded-md`)
+    - "GET NOTIFIED" opens a `Modal` (`form` variant) with Name and Email `Input` fields and a Submit button
+    - _Requirements: 2b.1–2b.15_
+  - [x] 5b.2 Add `LiveStreamSection` to `app/page.tsx` immediately after `HeroSection`
+    - Pass hardcoded props: `isLive={false}`, a placeholder `thumbnailSrc`, and a `nextServiceDate` set to the next Sunday at 10:00 AM
+    - _Requirements: 2b.1_
+
 - [x] 5. HeroSection slideshow
   - [x] 5.1 Create `components/church/hero.tsx`
     - `'use client'` directive

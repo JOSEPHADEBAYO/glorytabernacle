@@ -87,9 +87,17 @@ export function AboutSection({
 
         {/* Right: image with badge */}
         <div className="relative flex justify-center md:justify-end">
-          {/* Outer wrapper — overflow visible so badge can bleed outside */}
-          <div className="relative w-full max-w-md">
-            {/* Image card */}
+          {/* Outer wrapper — extra padding to accommodate the offset block and badge bleed */}
+          <div className="relative w-full max-w-md pl-5 pb-5">
+
+            {/* Decorative offset block — bottom-left, behind the image, no border radius, 1/3 height × 1/2 width */}
+            <div
+              className="absolute bottom-0 left-0 w-1/2 h-1/3"
+              style={{ backgroundColor: 'rgba(200, 215, 235, 0.6)' }}
+              aria-hidden="true"
+            />
+
+            {/* Image card — sits on top of the offset block */}
             <div
               className="relative rounded-2xl overflow-hidden w-full bg-white"
               style={{
@@ -101,8 +109,7 @@ export function AboutSection({
                 alt={image.alt}
                 width={image.width}
                 height={300}
-                //className="object-cover w-full h-auto"
-                style={{ filter: 'grayscale(30%) brightness(0.92) contrast(1.05)' }}
+                style={{ filter: 'grayscale(30%) brightness(0.92) contrast(1.05)', width: '100%', height: 'auto' }}
               />
             </div>
 
