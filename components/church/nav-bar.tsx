@@ -27,6 +27,7 @@ const NAV_LINKS: NavLink[] = [
       { label: 'Sermons', href: '/sermons' },
       { label: 'Events', href: '/events' },
       { label: 'Books', href: '/books' },
+      { label: 'Tracts', href: '/tracts' },
     ],
   },
   { label: 'Volunteer', href: '/volunteer' },

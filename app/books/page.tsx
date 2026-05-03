@@ -1,33 +1,145 @@
+import Image from 'next/image'
 import Link from 'next/link'
+import { TopNavBar } from '@/components/church/nav-bar'
+import { Footer } from '@/components/church/footer'
+import { NewsletterForm } from '@/components/church/newsletter-form'
+import { BookLibrary } from './book-library'
 
 export default function BooksPage() {
   return (
-    <main
-      className="min-h-svh flex flex-col items-center justify-center px-6 text-center"
-      style={{ background: 'var(--church-navy)' }}
-    >
-      <p
-        className="text-sm font-semibold uppercase tracking-widest mb-4"
-        style={{ color: 'var(--church-light-green)' }}
+    <>
+      <TopNavBar />
+
+      {/* Hero banner */}
+      <section
+        className="relative w-full pt-16 flex items-center"
+        style={{ backgroundColor: 'rgba(0, 6, 102, 1)', minHeight: '540px' }}
       >
-        RCCG Glory Tabernacle
-      </p>
-      <h1
-        className="text-5xl font-bold mb-6"
-        style={{ color: 'var(--church-light-green)' }}
+        {/* Background image — transparent, no black overlay */}
+        <div className="absolute inset-0 overflow-hidden">
+          <Image
+            src="/books.png"
+            alt=""
+            fill
+            className="object-cover opacity-20"
+            aria-hidden="true"
+          />
+        </div>
+        <div className="relative z-10 mx-auto w-full max-w-[var(--container-max)] px-[var(--section-padding-x)]">
+          {/* Eyebrow */}
+          <p
+            className="mb-4 text-xs font-bold uppercase tracking-[0.2em]"
+            style={{ color: 'var(--church-light-green)' }}
+          >
+            Faith Foundation
+          </p>
+
+          {/* Heading */}
+          <h1 className="text-6xl font-extrabold text-white md:text-7xl">Books</h1>
+
+          {/* Description with left border accent */}
+          <div
+            className="mt-6 max-w-lg border-l-4 pl-4"
+            style={{ borderColor: 'var(--church-light-green)' }}
+          >
+            <p className="text-base leading-relaxed text-white/80">
+              Resources to deepen your faith and strengthen your walk with God.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Library section */}
+      <section
+        className="w-full py-12 px-[var(--section-padding-x)]"
+        style={{ backgroundColor: 'rgba(249, 249, 249, 1)' }}
       >
-        Books
-      </h1>
-      <p className="max-w-md text-lg text-white/80 mb-10">
-        Our bookstore is coming soon. Explore resources that will deepen your walk with God.
-      </p>
-      <Link
-        href="/"
-        className="inline-block px-6 py-3 rounded-md font-semibold text-white transition-opacity hover:opacity-90"
-        style={{ background: 'var(--church-green)' }}
+        <div className="mx-auto max-w-[var(--container-max)]">
+          {/* Header row */}
+          <div className="mb-8 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h2
+                className="text-2xl font-extrabold"
+                style={{ color: 'var(--church-green)' }}
+              >
+                The Library
+              </h2>
+              <p className="mt-1 text-sm text-gray-500">
+                Browse our collection of spirit-filled resources for every season of life.
+              </p>
+            </div>
+            <div className="flex items-center gap-3 text-xs font-semibold text-gray-400">
+              <button className="transition-colors hover:text-gray-700" type="button">Newest First</button>
+              <span className="text-gray-200">|</span>
+              <button className="transition-colors hover:text-gray-700" type="button">This Year</button>
+            </div>
+          </div>
+
+          {/* Client component handles grid + load more */}
+          <BookLibrary />
+        </div>
+      </section>
+
+      {/* Newsletter banner */}
+      <section
+        className="w-full py-12 px-[var(--section-padding-x)]"
+        style={{ backgroundColor: 'rgba(235, 241, 250, 1)' }}
       >
-        Back to Home
-      </Link>
-    </main>
+        <div className="mx-auto max-w-[var(--container-max)]">
+          <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-2">
+            <div className="flex flex-col gap-4">
+              <h2
+                className="text-2xl font-extrabold md:text-3xl"
+                style={{ color: 'rgba(0, 6, 102, 1)' }}
+              >
+                Never Miss a Moment.
+              </h2>
+              <p className="text-sm leading-relaxed text-gray-500">
+                Subscribe to our newsletter for updates on new books, digital resources, and upcoming events.
+              </p>
+              <NewsletterForm />
+            </div>
+            <div className="relative overflow-hidden rounded-2xl" style={{ height: '220px' }}>
+              <Image
+                src="/fellowship.png"
+                alt="Church community"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <Footer
+        logo={{ src: '/logo.png', alt: 'RCCG Glory Tabernacle' }}
+        tagline="Recovering the past, restoring the present, and reviving the future."
+        columns={[
+          {
+            heading: 'Quick Links',
+            links: [
+              { label: 'Home', href: '/' },
+              { label: 'About', href: '/about' },
+              { label: 'Sermons', href: '/sermons' },
+              { label: 'Books', href: '/books' },
+              { label: 'Give', href: '/giving' },
+            ],
+          },
+        ]}
+        socialLinks={[
+          { platform: 'instagram', href: '#' },
+          { platform: 'youtube', href: '#' },
+          { platform: 'facebook', href: '#' },
+        ]}
+        contactInfo={{
+          address: 'North Devon College, Old Sticklepath Hill Barnstaple EX31 2BQ England',
+          phone: '+1 (555) 123-4567',
+          email: 'info@rccgglory.org',
+          directionsHref: 'https://maps.google.com',
+        }}
+        copyrightText={`© ${new Date().getFullYear()} RCCG Glory Tabernacle. All rights reserved.`}
+      />
+    </>
   )
 }
