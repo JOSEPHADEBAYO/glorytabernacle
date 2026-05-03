@@ -3,10 +3,12 @@ import { HeroSection } from '@/components/church/hero'
 import { LiveStreamSection } from '@/components/church/live-stream-section'
 import { AboutSection } from '@/components/church/about-section'
 import { MinistriesSection } from '@/components/church/ministries-section'
+import { ImageGallerySection } from '@/components/church/image-gallery-section'
 import { EventsSection } from '@/components/church/events-section'
 import { SermonsSection } from '@/components/church/sermons-section'
 import { UpcomingEncountersSection } from '@/components/church/upcoming-encounters-section'
 import { TestimonialsSection } from '@/components/church/testimonials-section'
+import { BooksSection } from '@/components/church/books-section'
 import { GlobalConnectionSection } from '@/components/church/global-connection-section'
 import { SupportSection } from '@/components/church/support-section'
 import { Footer } from '@/components/church/footer'
@@ -85,21 +87,21 @@ export default function Home() {
       <HeroSection
         slides={[
           {
-            backgroundImage: 'https://images.unsplash.com/photo-1438032005730-c779502df39b?q=80&w=2342&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+            backgroundImage: '/Carousel%202.png',
             eyebrow: 'Welcome to Our Sanctuary',
             headline: 'A Place of',
             headlineAccent: 'Recovery,',
             headlineLine2: 'Restoration & Revival',
           },
           {
-            backgroundImage: 'https://images.unsplash.com/photo-1674566159068-16fd62db547c?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+            backgroundImage: '/Carousel%203.png',
             eyebrow: 'Growing in Faith',
             headline: 'Building a',
             headlineAccent: 'Community',
             headlineLine2: 'Rooted in Christ',
           },
           {
-            backgroundImage: 'https://images.unsplash.com/photo-1519915734606-32d972e3b9b7?w=1200&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8aW1hZ2VzJTIwb2YlMjBwZW9wbGUlMjBwcmF5aW5nJTIwcG93ZXJmdWxseSUyMGl8ZW58MHx8MHx8fDA%3D',
+            backgroundImage: '/Carousel%204.png',
             eyebrow: 'Making Disciples',
             headline: 'Spreading the',
             headlineAccent: 'Gospel',
@@ -139,6 +141,7 @@ export default function Home() {
         }}
       />
       <MinistriesSection />
+      <ImageGallerySection />
       <EventsSection
         heading="Upcoming Events"
         events={EVENTS}
@@ -151,6 +154,7 @@ export default function Home() {
       />
       <UpcomingEncountersSection />
       <TestimonialsSection />
+      <BooksSection />
       <GlobalConnectionSection />
       <SupportSection
         heading="Support the Mission"

@@ -16,7 +16,7 @@ export function EventsSection({ events }: EventsSectionProps) {
   return (
     <>
       <section
-        className="py-6 px-[var(--section-padding-x)]"
+        className="py-12 px-[var(--section-padding-x)]"
         style={{ backgroundColor: 'rgba(232, 232, 232, 1)' }}
       >
         <div className="max-w-[var(--container-max)] mx-auto">

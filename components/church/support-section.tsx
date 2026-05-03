@@ -14,7 +14,7 @@ export function SupportSection({
   primaryCta,
 }: SupportSectionProps) {
   return (
-    <section className="w-full px-[var(--section-padding-x)] py-[var(--section-padding-y)] bg-white">
+    <section className="w-full px-[var(--section-padding-x)] py-12 bg-white">
       <div
         className="relative overflow-hidden rounded-2xl w-full max-w-[var(--container-max)] mx-auto"
         style={{
@@ -32,7 +32,7 @@ export function SupportSection({
         />
 
         {/* Content */}
-        <div className="relative z-10 px-8 md:px-14 py-12 md:py-16">
+        <div className="relative z-10 px-8 md:px-14 py-12 md:py-12">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-10">
 
             {/* Left */}

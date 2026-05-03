@@ -112,7 +112,7 @@ export function TestimonialsSection({
   return (
     <section
       aria-label="Testimonials"
-      className="relative w-full overflow-hidden py-14 px-[var(--section-padding-x)]"
+      className="relative w-full overflow-hidden py-12 px-[var(--section-padding-x)]"
       style={{ backgroundColor: 'rgba(0, 6, 102, 1)' }}
     >
       {/* Radial glow — top centre */}

@@ -29,7 +29,7 @@ export function AboutSection({
 }: AboutSectionProps) {
   return (
     <section
-      className="py-[var(--section-padding-y)] px-[var(--section-padding-x)]"
+      className="py-12 px-[var(--section-padding-x)]"
       style={{ backgroundColor: 'rgba(249, 249, 249, 1)' }}
     >
       <div className="max-w-[var(--container-max)] mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20 items-center">

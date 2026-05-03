@@ -12,8 +12,8 @@ export function SermonsSection({ sermons, viewAllHref }: SermonsSectionProps) {
   const [featured, ...rest] = sermons
 
   return (
-    <section className="bg-white py-[var(--section-padding-y)] px-[var(--section-padding-x)]">
-      <div className="max-w-[var(--container-max)] mx-auto">
+    <section className="bg-white py-12 px-[var(--section-padding-x)]">
+      <div className="max-w-5xl mx-auto">
 
         {/* Header row */}
         <div className="flex items-end justify-between mb-8 gap-4">

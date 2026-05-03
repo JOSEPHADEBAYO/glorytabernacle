@@ -197,7 +197,7 @@ export function UpcomingEncountersSection({
   return (
     <section
       aria-label="Upcoming encounters"
-      className="w-full py-[var(--section-padding-y)] px-[var(--section-padding-x)]"
+      className="w-full py-12 px-[var(--section-padding-x)]"
       style={{ backgroundColor: 'rgba(249, 249, 249, 1)' }}
     >
       <div className="mx-auto max-w-4xl">

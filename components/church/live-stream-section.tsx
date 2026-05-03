@@ -74,11 +74,11 @@ function useCountdown(targetDate: string): TimeLeft {
 
 function CountdownBox({ value, label }: { value: number; label: string }) {
   return (
-    <div className="flex min-w-[4.5rem] flex-col items-center rounded-md border border-[var(--church-navy)] px-3 py-2">
-      <span className="text-2xl font-bold leading-none text-[var(--church-navy)]">
+    <div className="flex min-w-[3.5rem] flex-col items-center rounded-md border border-[var(--church-navy)] px-2.5 py-1.5">
+      <span className="text-xl font-bold leading-none text-[var(--church-navy)]">
         {String(value).padStart(2, '0')}
       </span>
-      <span className="mt-1 text-[0.6rem] font-semibold uppercase tracking-widest text-muted-foreground">
+      <span className="mt-1 text-[0.55rem] font-semibold uppercase tracking-widest text-muted-foreground">
         {label}
       </span>
     </div>
@@ -278,11 +278,11 @@ export function LiveStreamSection({
   return (
     <section
       aria-label="Live stream section"
-      className="w-full py-[var(--section-padding-y)] px-[var(--section-padding-x)]"
+      className="w-full py-8 px-[var(--section-padding-x)]"
       style={{ backgroundColor: 'rgba(249, 249, 249, 1)' }}
     >
       <div
-        className="mx-auto max-w-5xl rounded-2xl overflow-hidden"
+        className="mx-auto max-w-3xl rounded-2xl overflow-hidden"
         style={{
           backgroundColor: 'rgba(255, 255, 255, 1)',
           boxShadow: '0px 20px 40px 0px rgba(26, 28, 28, 0.06)',
@@ -290,7 +290,7 @@ export function LiveStreamSection({
       >
         <div className="grid grid-cols-1 md:grid-cols-2">
           {/* ── Thumbnail ── */}
-          <div className="relative min-h-[260px] md:min-h-[320px]">
+          <div className="relative min-h-[200px] md:min-h-[240px]">
             <Image
               src={thumbnailSrc}
               alt={thumbnailAlt}
@@ -321,7 +321,7 @@ export function LiveStreamSection({
           </div>
 
           {/* ── Content ── */}
-          <div className="flex flex-col justify-center gap-5 p-8 md:p-10">
+          <div className="flex flex-col justify-center gap-4 p-6 md:p-8">
             {/* Decorative rule */}
             <div
               className="h-[3px] w-12 rounded-full bg-[var(--church-navy)]"
@@ -329,7 +329,7 @@ export function LiveStreamSection({
             />
 
             <div className="flex flex-col gap-2">
-              <h2 className="text-2xl font-bold leading-tight text-[var(--church-navy)] md:text-3xl">
+              <h2 className="text-xl font-bold leading-tight text-[var(--church-navy)] md:text-2xl">
                 {heading}
               </h2>
               <p className="text-sm text-muted-foreground leading-relaxed">{subtext}</p>
