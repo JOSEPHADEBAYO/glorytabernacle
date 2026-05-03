@@ -114,7 +114,7 @@ export default function BooksPage() {
 
       <Footer
         logo={{ src: '/logo.png', alt: 'RCCG Glory Tabernacle' }}
-        tagline="Recovering the past, restoring the present, and reviving the future."
+        tagline="Furnish  ·  Transform  ·  Influence"
         columns={[
           {
             heading: 'Quick Links',
