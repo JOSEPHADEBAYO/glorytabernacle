@@ -1,6 +1,53 @@
+import Image from 'next/image'
+import { Building2, Globe, CreditCard, Landmark, Smartphone, Users } from 'lucide-react'
 import { TopNavBar } from '@/components/church/nav-bar'
 import { Footer } from '@/components/church/footer'
-import { Building2, Globe, CreditCard, Landmark, Smartphone, Users } from 'lucide-react'
+import { NewsletterForm } from '@/components/church/newsletter-form'
+
+// ---------------------------------------------------------------------------
+// Giving method cards
+// ---------------------------------------------------------------------------
+
+function GivingCard({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      className="flex flex-col gap-4 rounded-2xl border border-gray-100 bg-white p-5"
+      style={{ boxShadow: '0px 2px 12px 0px rgba(0,0,0,0.06)' }}
+    >
+      {children}
+    </div>
+  )
+}
+
+function CardHeader({ icon, title, subtitle }: { icon: React.ReactNode; title: string; subtitle: string }) {
+  return (
+    <div className="flex items-center gap-3">
+      <div
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+        style={{ backgroundColor: 'rgba(0,6,102,0.08)' }}
+      >
+        {icon}
+      </div>
+      <div>
+        <h3 className="text-sm font-bold" style={{ color: 'rgba(0,6,102,1)' }}>{title}</h3>
+        <p className="text-[11px] text-gray-400">{subtitle}</p>
+      </div>
+    </div>
+  )
+}
+
+function DetailRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between text-xs">
+      <span className="text-gray-400">{label}</span>
+      <span className="font-semibold" style={{ color: 'rgba(0,6,102,1)' }}>{value}</span>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Page
+// ---------------------------------------------------------------------------
 
 export default function GivingPage() {
   return (
@@ -9,210 +56,225 @@ export default function GivingPage() {
 
       {/* ── Hero ── */}
       <section
-        className="relative w-full flex items-center"
-        style={{
-          background: 'linear-gradient(135deg, rgba(0,6,102,1) 0%, rgba(26,35,126,1) 50%, rgba(27,34,119,0.95) 100%)',
-          minHeight: '45vh',
-        }}
+        className="relative w-full pt-16 flex items-center"
+        style={{ backgroundColor: 'rgba(0,6,102,1)', minHeight: '480px' }}
       >
-        {/* Subtle watermark cross shape */}
-        <div
-          className="absolute inset-0 opacity-5"
-          style={{
-            backgroundImage: 'radial-gradient(circle at 70% 50%, rgba(255,255,255,0.3) 0%, transparent 60%)',
-          }}
-          aria-hidden="true"
-        />
-        <div className="relative z-10 w-full max-w-[var(--container-max)] mx-auto px-6 md:px-16 py-16 md:py-24">
-          <div className="flex items-center gap-3 mb-5">
-            <span className="block w-px h-5 bg-white/50" aria-hidden="true" />
-            <span className="text-xs font-bold uppercase tracking-[0.2em] text-white/70">
-              Worship Through Giving
-            </span>
-          </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight max-w-2xl mb-5">
+        <div className="absolute inset-0 overflow-hidden">
+          <Image
+            src="/imagegallery1.png"
+            alt=""
+            fill
+            className="object-cover opacity-20"
+            aria-hidden="true"
+          />
+          <div
+            className="absolute inset-0"
+            style={{ background: 'linear-gradient(to right, rgba(0,6,102,0.95) 40%, rgba(0,6,102,0.5) 100%)' }}
+            aria-hidden="true"
+          />
+        </div>
+        <div className="relative z-10 mx-auto w-full max-w-[var(--container-max)] px-[var(--section-padding-x)] py-12">
+          <h1 className="text-4xl font-extrabold text-white md:text-5xl">
             Generosity from the Heart
           </h1>
-          <p className="text-sm md:text-base text-white/60 leading-relaxed max-w-md">
-            Your faithfulness fuels the monolith. Partner with us to<br className="hidden md:block" />
+          <p className="mt-3 max-w-md text-sm leading-relaxed text-white/70">
+            Your faithfulness fuels the church. Partner with us to<br />
             build a legacy of hope and light in our community.
           </p>
         </div>
       </section>
 
-      {/* ── Ways to Give ── */}
-      <section className="bg-white py-[var(--section-padding-y)] px-6 md:px-16">
-        <div className="max-w-[var(--container-max)] mx-auto">
-
-          {/* Header */}
-          <div className="mb-8">
-            <h2 className="text-3xl font-extrabold mb-2" style={{ color: 'rgba(27,34,119,1)' }}>
-              Ways to Give
+      {/* ── How to Give ── */}
+      <section
+        className="w-full py-12 px-[var(--section-padding-x)]"
+        style={{ backgroundColor: 'rgba(249,249,249,1)' }}
+      >
+        <div className="mx-auto max-w-[var(--container-max)]">
+          {/* Centered header */}
+          <div className="mb-10 flex flex-col items-center gap-3 text-center">
+            <h2 className="text-2xl font-extrabold md:text-3xl" style={{ color: 'rgba(0,6,102,1)' }}>
+              How to Give
             </h2>
-            <p className="text-sm text-gray-500 max-w-md leading-relaxed">
-              Secure, convenient, and direct methods to support the ministry. Choose the option that best fits your location and preference.
+            <p className="max-w-xl text-sm leading-relaxed text-gray-500">
+              You can now give your tithes, freewill offerings and other kingdom investments here at RCCG Glory Tabernacle to support the work of God. Choose the giving option that best suits your location and preference.
             </p>
           </div>
 
-          {/* 3×2 grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {/* 2×3 grid — 5 cards */}
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
 
-            {/* ── Bank Transfer UK ── */}
-            <div className="rounded-2xl border border-gray-100 bg-white p-5 flex flex-col gap-4 shadow-sm">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(232,232,232,1)' }}>
-                  <Building2 className="size-4 text-gray-600" aria-hidden="true" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold" style={{ color: 'rgba(27,34,119,1)' }}>Bank Transfer (UK)</h3>
-                  <p className="text-[11px] text-gray-400">Direct Deposit</p>
-                </div>
+            {/* Bank Transfer UK */}
+            <GivingCard>
+              <CardHeader
+                icon={<Building2 className="h-4 w-4" style={{ color: 'rgba(0,6,102,1)' }} />}
+                title="Bank Transfer (UK)"
+                subtitle="Wise · Calvary Place"
+              />
+              <div className="flex flex-col gap-1.5 rounded-xl bg-gray-50 p-3">
+                <DetailRow label="Name" value="Calvary Place" />
+                <DetailRow label="Sort Code" value="23-94-64" />
+                <DetailRow label="Account" value="75345144" />
               </div>
-              <div className="rounded-xl border border-gray-100 overflow-hidden text-xs">
-                {[
-                  { label: 'Name', value: 'Calvary Place', highlight: true },
-                  { label: 'Bank', value: 'Wise', highlight: false },
-                  { label: 'Sort Code', value: '23-94-64', highlight: false },
-                  { label: 'Account', value: '75345144', highlight: false },
-                ].map((row, i) => (
-                  <div key={i} className={`flex justify-between px-3 py-2 ${i % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
-                    <span className="text-gray-400">{row.label}</span>
-                    <span className={`font-semibold ${row.highlight ? '' : 'text-gray-700'}`} style={row.highlight ? { color: 'rgba(27,34,119,1)' } : {}}>
-                      {row.value}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            </GivingCard>
 
-            {/* ── Bank Transfer Nigeria ── */}
-            <div className="rounded-2xl border border-gray-100 bg-white p-5 flex flex-col gap-4 shadow-sm">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(163,246,156,0.25)' }}>
-                  <Landmark className="size-4" style={{ color: 'var(--church-green)' }} aria-hidden="true" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold" style={{ color: 'rgba(27,34,119,1)' }}>Bank Transfer (Nigeria)</h3>
-                  <p className="text-[11px] text-gray-400">Premium Trust Bank</p>
-                </div>
-              </div>
-              <div className="rounded-xl border border-gray-100 p-3 flex flex-col gap-2 bg-gray-50">
-                <div className="flex justify-between text-xs">
-                  <span className="text-gray-400">Name</span>
-                  <span className="font-semibold" style={{ color: 'rgba(27,34,119,1)' }}>RCCG Calvary Place</span>
-                </div>
-                <div className="flex flex-col gap-0.5 text-xs">
-                  <span className="text-gray-400">Account Number</span>
-                  <span className="text-xl font-extrabold tracking-wider" style={{ color: 'rgba(27,34,119,1)' }}>
+            {/* Bank Transfer Nigeria */}
+            <GivingCard>
+              <CardHeader
+                icon={<Landmark className="h-4 w-4" style={{ color: 'rgba(0,6,102,1)' }} />}
+                title="Bank Transfer (Nigeria)"
+                subtitle="Premium Trust Bank · Calvary Place"
+              />
+              <div className="flex flex-col gap-1.5 rounded-xl bg-gray-50 p-3">
+                <DetailRow label="Name" value="RCCG Calvary Place" />
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Account Number</span>
+                  <span className="text-xl font-extrabold tracking-wider" style={{ color: 'rgba(0,6,102,1)' }}>
                     0040215084
                   </span>
                 </div>
               </div>
-            </div>
+            </GivingCard>
 
-            {/* ── PayPal ── */}
-            <div className="rounded-2xl border border-gray-100 bg-white p-5 flex flex-col gap-4 shadow-sm">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(232,232,232,1)' }}>
-                  <Globe className="size-4 text-gray-600" aria-hidden="true" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold" style={{ color: 'rgba(27,34,119,1)' }}>PayPal</h3>
-                  <p className="text-[11px] text-gray-400">Quick &amp; Secure Online</p>
-                </div>
-              </div>
-              <div className="rounded-xl border border-gray-100 bg-gray-50 p-4 flex flex-col items-center gap-3">
-                <div className="flex flex-col items-center gap-1">
-                  <svg className="size-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                  <span className="text-xs font-semibold text-gray-600">give@calvary.place</span>
-                </div>
+            {/* PayPal */}
+            <GivingCard>
+              <CardHeader
+                icon={<CreditCard className="h-4 w-4" style={{ color: 'rgba(0,6,102,1)' }} />}
+                title="PayPal"
+                subtitle="Direct Payment"
+              />
+              <div className="flex flex-col items-center gap-3 rounded-xl bg-gray-50 p-4">
+                <p className="text-xs text-gray-500">Email: <span className="font-semibold text-gray-700">give@calvary.place</span></p>
                 <a
                   href="https://paypal.me"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-xs font-bold text-white transition-opacity hover:opacity-90"
-                  style={{ backgroundColor: 'rgba(27,34,119,1)' }}
+                  className="w-full flex items-center justify-center rounded-lg py-2.5 text-xs font-bold text-white transition-opacity hover:opacity-90"
+                  style={{ backgroundColor: 'rgba(0,6,102,1)' }}
                 >
                   Give via PayPal
                 </a>
               </div>
-            </div>
+            </GivingCard>
 
-            {/* ── International ── */}
-            <div className="rounded-2xl border border-gray-100 bg-white p-5 flex flex-col gap-4 shadow-sm">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(232,232,232,1)' }}>
-                  <Globe className="size-4 text-gray-600" aria-hidden="true" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold" style={{ color: 'rgba(27,34,119,1)' }}>International</h3>
-                  <p className="text-[11px] text-gray-400">Global Transfers</p>
-                </div>
-              </div>
-              <p className="text-xs text-gray-500 leading-relaxed">
-                For international transfers, please route payments through{' '}
+            {/* International Transfers */}
+            <GivingCard>
+              <CardHeader
+                icon={<Globe className="h-4 w-4" style={{ color: 'rgba(0,6,102,1)' }} />}
+                title="International Transfers"
+                subtitle="Wise Payments Limited"
+              />
+              <p className="text-xs leading-relaxed text-gray-500">
+                Route payments through{' '}
                 <a
                   href="https://wise.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-semibold underline underline-offset-2 transition-opacity hover:opacity-70"
+                  className="font-semibold underline underline-offset-2 hover:opacity-70 transition-opacity"
                   style={{ color: 'var(--church-green)' }}
                 >
                   Wise Payments Limited
                 </a>{' '}
-                using the UK Account details provided above. Ensure to include your name in the reference.
+                using the UK account details above. Please include your full name in the transaction reference to ensure proper allocation.
               </p>
-            </div>
+            </GivingCard>
 
-            {/* ── Zelle ── */}
-            <div className="rounded-2xl border border-gray-100 bg-white p-5 flex flex-col gap-4 shadow-sm">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(232,232,232,1)' }}>
-                  <Smartphone className="size-4 text-gray-600" aria-hidden="true" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold" style={{ color: 'rgba(27,34,119,1)' }}>Zelle</h3>
-                  <p className="text-[11px] text-gray-400">US Transfers</p>
-                </div>
-              </div>
-              <div className="rounded-xl border border-gray-100 bg-gray-50 p-3 flex flex-col gap-1">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Recipient Email</span>
-                <span className="text-sm font-bold" style={{ color: 'rgba(27,34,119,1)' }}>
+            {/* Zelle */}
+            <GivingCard>
+              <CardHeader
+                icon={<Smartphone className="h-4 w-4" style={{ color: 'rgba(0,6,102,1)' }} />}
+                title="Zelle (US)"
+                subtitle="Recipient Email"
+              />
+              <div className="rounded-xl bg-gray-50 p-3">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Recipient Email</p>
+                <p className="text-sm font-bold" style={{ color: 'rgba(0,6,102,1)' }}>
                   calvaryplace1@gmail.com
-                </span>
+                </p>
               </div>
-            </div>
-
-            {/* ── In-Person ── */}
-            <div className="rounded-2xl border border-gray-100 bg-white p-5 flex flex-col gap-4 shadow-sm relative overflow-hidden">
-              {/* Subtle watermark */}
-              <div className="absolute -right-4 -bottom-4 opacity-5" aria-hidden="true">
-                <Users className="size-32 text-gray-800" />
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(232,232,232,1)' }}>
-                  <Users className="size-4 text-gray-600" aria-hidden="true" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold" style={{ color: 'rgba(27,34,119,1)' }}>In-Person</h3>
-                  <p className="text-[11px] text-gray-400">Sunday Gatherings</p>
-                </div>
-              </div>
-              <p className="text-xs text-gray-500 leading-relaxed relative z-10">
-                We receive tithes and offerings during our regular Sunday morning services. Envelopes are available in the sanctuary seating areas.
-              </p>
-            </div>
+            </GivingCard>
 
           </div>
         </div>
       </section>
 
-      {/* ── Footer ── */}
+      {/* ── In-Person Giving + Scripture ── */}
+      <section
+        className="w-full py-12 px-[var(--section-padding-x)]"
+        style={{ backgroundColor: 'rgba(249,249,249,1)' }}
+      >
+        <div className="mx-auto max-w-[var(--container-max)]">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            {/* In-Person card */}
+            <div
+              className="flex flex-col gap-4 rounded-2xl p-6"
+              style={{ backgroundColor: 'rgba(0,6,102,1)' }}
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+                  style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
+                >
+                  <Users className="h-4 w-4 text-white" />
+                </div>
+                <h3 className="text-sm font-bold text-white">In-Person Giving</h3>
+              </div>
+              <p className="text-xs leading-relaxed text-white/70">
+                Tithes and offerings are received at all regular Sunday morning services during our giving moments and we collect all donations coming from the congregation and guests.
+              </p>
+            </div>
+
+            {/* Scripture quote */}
+            <div
+              className="flex items-center rounded-2xl bg-white p-6 border-l-4"
+              style={{
+                borderColor: 'var(--church-green)',
+                boxShadow: '0px 2px 12px 0px rgba(0,0,0,0.06)',
+              }}
+            >
+              <blockquote className="text-sm italic leading-relaxed text-gray-600">
+                <span className="text-2xl font-black not-italic" style={{ color: 'var(--church-green)' }}>"</span>
+                Bring the whole tithe into the storehouse... and see if I will not throw open the floodgates of heaven.
+                <footer className="mt-2 text-xs font-bold not-italic" style={{ color: 'rgba(0,6,102,1)' }}>
+                  — Malachi 3:10
+                </footer>
+              </blockquote>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Newsletter ── */}
+      <section
+        className="w-full py-12 px-[var(--section-padding-x)]"
+        style={{ backgroundColor: 'rgba(235,241,250,1)' }}
+      >
+        <div className="mx-auto max-w-[var(--container-max)]">
+          <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-2">
+            <div className="flex flex-col gap-4">
+              <h2 className="text-2xl font-extrabold md:text-3xl" style={{ color: 'rgba(0,6,102,1)' }}>
+                Never Miss a Moment.
+              </h2>
+              <p className="text-sm leading-relaxed text-gray-500">
+                Subscribe to our weekly newsletter for liturgical readings, upcoming events, and stories of transformation from our community.
+              </p>
+              <NewsletterForm />
+            </div>
+            <div className="relative overflow-hidden rounded-2xl" style={{ height: '220px' }}>
+              <Image
+                src="/fellowship.png"
+                alt="Church community hands together"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
       <Footer
         logo={{ src: '/logo.png', alt: 'RCCG Glory Tabernacle' }}
-        tagline="Furnish  ·  Transform  ·  Influence"
+        tagline="Recovering the past, restoring the present, and reviving the future."
         columns={[
           {
             heading: 'Quick Links',
@@ -221,15 +283,7 @@ export default function GivingPage() {
               { label: 'About', href: '/about' },
               { label: 'Media', href: '/sermons' },
               { label: 'Volunteer', href: '/volunteer' },
-              { label: 'Connect', href: '/connect' },
-            ],
-          },
-          {
-            heading: 'Contact',
-            links: [
-              { label: 'Contact Us', href: '/contact' },
-              { label: 'Small Groups', href: '/groups' },
-              { label: 'Prayer Request', href: '/prayer' },
+              { label: 'Contact', href: '/contact' },
             ],
           },
         ]}
@@ -237,14 +291,12 @@ export default function GivingPage() {
           { platform: 'instagram', href: '#' },
           { platform: 'youtube', href: '#' },
           { platform: 'facebook', href: '#' },
-          { platform: 'x', href: '#' },
-          { platform: 'tiktok', href: '#' },
         ]}
         contactInfo={{
-          address: '123 Church Street, City, State 12345',
-          phone: '+1 (555) 123-4567',
+          address: 'North Devon College, Old Sticklepath Hill Barnstaple EX31 2BQ England',
+          phone: '+44 (0) 1234 567890',
           email: 'info@rccgglory.org',
-          directionsHref: 'https://maps.google.com',
+          directionsHref: 'https://maps.google.com/?q=North+Devon+College+Barnstaple+EX31+2BQ',
         }}
         copyrightText={`© ${new Date().getFullYear()} RCCG Glory Tabernacle. All rights reserved.`}
       />

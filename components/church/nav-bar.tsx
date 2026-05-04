@@ -35,7 +35,7 @@ const NAV_LINKS: NavLink[] = [
     label: 'Connect',  // no href — dropdown only
     children: [
       { label: 'Contact Us', href: '/contact' },
-      { label: 'Small Groups', href: '/groups' },
+      { label: 'Church Groups', href: '/groups' },
     ],
   },
 ]
