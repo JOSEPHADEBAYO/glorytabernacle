@@ -2,27 +2,17 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { TopNavBar } from '@/components/church/nav-bar'
 import { Footer } from '@/components/church/footer'
+import { RootsVisionClient } from './roots-vision-client'
+import { DNAClient } from './dna-client'
 
 // ─── Data ────────────────────────────────────────────────────────────────────
-
-const DNA_VALUES = [
-  { title: 'Relationship', body: 'Building authentic connections between God, people, and community through love and accountability.' },
-  { title: 'Repentance', body: 'Embracing a lifestyle of turning toward God and away from all that separates us from His best.' },
-  { title: 'Reconciliation', body: 'Restoring broken relationships — with God, with others, and within ourselves through Christ.' },
-  { title: 'Redemption', body: 'Believing in the power of God to redeem every story, every season, and every soul.' },
-  { title: 'Restoration', body: 'Seeing lives, families, and communities made whole through the healing power of the Gospel.' },
-  { title: 'Revival', body: 'Pursuing a fresh outpouring of the Holy Spirit that transforms hearts and ignites the Church.' },
-  { title: 'Righteousness', body: 'Walking in the standards of God\'s Word and reflecting His character in every area of life.' },
-  { title: 'Relevance', body: 'Communicating timeless truth in ways that connect with and speak to our generation.' },
-  { title: 'Reward', body: 'Living with an eternal perspective, knowing that faithfulness to God is never without its reward.' },
-]
 
 const PASTORS = [
   {
     id: 'p1',
     name: 'Pastor E.A Adebayo',
-    title: 'Senior Pastor',
-    bio: 'Pastor Adebayo has led RCCG Glory Tabernacle with vision and passion for over two decades, championing revival across the city.',
+    title: 'General Overseer, RCCG',
+    bio: 'Pastor Adebayo has led RCCG worldwide with vision and passion for over 45 years, championing revival across the globe.',
     image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=80',
   },
   {
@@ -54,7 +44,7 @@ export default function AboutPage() {
         style={{ height: 'calc(100vh - 4rem)', minHeight: 360 }}
       >
         <Image
-          src="https://images.unsplash.com/photo-1438032005730-c779502df39b?w=1920&auto=format&fit=crop&q=80"
+          src="/fellowship.png"
           alt="Church interior"
           fill
           className="object-cover object-center"
@@ -75,114 +65,25 @@ export default function AboutPage() {
           <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-tight max-w-2xl">
             The Glory<br />Tabernacle<br />Story.
           </h1>
-          <p className="mt-4 text-base md:text-lg text-white/70 max-w-xl leading-relaxed">
-            A movement born from a passion for the lost, the broken, and the searching — rooted in the Word and empowered by the Spirit.
+          <p className="mt-4 text-base md:text-lg text-white/70 max-w-5xl leading-relaxed">
+            Every great move of God begins with a question.
+Ours began with this one: What if a church could be more than a Sunday gathering? What if it could be a place where people don't just attend but are furnished unto every good work, transformed within and without, and sent out to Influence the world around them?
+That question became a conviction, that conviction became a calling, and that calling became RCCG Glory Tabernacle - planted in the heart of Barnstaple, North Devon, with a mandate that stretches far beyond its walls.
+We are a people in pursuit of God's presence, His purpose, and His glory. We believe that every person who walks through our doors carries a destiny too significant to be left unfinished. We believe that ordinary people, when they encounter an extraordinary God, become extraordinary themselves.
+We build the Tabernacle God fills it with His Glory, because you are the TABERNACLE.
+From our first gathering to where we stand today, one thing has never changed, our hunger for His presence. Because we have learned that when God's glory rests in a place, atmospheres shift, hearts are healed, and lives are never the same again.
+This is not just our story. It is the beginning of yours.
+You may have come broken. You will not leave broken. You may have come small. You cannot remain small. Nothing small is found in a Tabernacle.
+Welcome home. Welcome to RCCG Glory Tabernacle.
           </p>
         </div>
       </section>
 
       {/* ── Roots & Vision ── */}
-      <section className="bg-white py-[var(--section-padding-y)] px-[var(--section-padding-x)]">
-        <div className="max-w-[var(--container-max)] mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20 items-start">
-
-          {/* Left */}
-          <div className="flex flex-col gap-6">
-            <h2 className="text-3xl md:text-4xl font-extrabold leading-tight" style={{ color: 'rgba(27, 34, 119, 1)' }}>
-              Our Roots &amp; RCCG Vision
-            </h2>
-            <p className="text-sm md:text-base text-gray-500 leading-relaxed">
-              We are a parish of the Redeemed Christian Church of God, one of the fastest-growing churches in the world. Our local expression carries the global mandate:
-            </p>
-            <ul className="flex flex-col gap-2">
-              {[
-                'To make heaven and to take as many people as possible with us.',
-                'To have a member of RCCG in every family in all nations.',
-                'To accomplish these through planting churches within five minutes of every person.',
-              ].map((item, i) => (
-                <li key={i} className="flex items-start gap-3 text-sm text-gray-500">
-                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-none" style={{ backgroundColor: 'var(--church-green)' }} aria-hidden="true" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-
-            {/* Two icon cards */}
-            <div className="grid grid-cols-2 gap-4 mt-2">
-              {[
-                { icon: '🌱', title: 'Our Heritage', body: 'Founded on the principles of holiness, prayer, and evangelism that have defined RCCG for decades.' },
-                { icon: '🎯', title: 'Our Strategy', body: 'Discipleship, community impact, and church planting — reaching every stratum of society with the Gospel.' },
-              ].map((card) => (
-                <div key={card.title} className="rounded-xl p-4 border border-gray-100 bg-gray-50 flex flex-col gap-2">
-                  <span className="text-2xl">{card.icon}</span>
-                  <h3 className="text-sm font-bold" style={{ color: 'rgba(27, 34, 119, 1)' }}>{card.title}</h3>
-                  <p className="text-xs text-gray-500 leading-relaxed">{card.body}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Right: image */}
-          <div className="relative">
-            <div
-              className="rounded-2xl overflow-hidden bg-white"
-              style={{ boxShadow: '0px 25px 50px -12px rgba(0, 0, 0, 0.25)' }}
-            >
-              <Image
-                src="/fellowship.png"
-                alt="RCCG Glory Tabernacle building"
-                width={600}
-                height={500}
-                className="object-cover w-full h-auto"
-                style={{ filter: 'grayscale(20%) brightness(0.95)' }}
-              />
-            </div>
-          </div>
-        </div>
-      </section>
+      <RootsVisionClient />
 
       {/* ── Our DNA ── */}
-      <section className="py-[var(--section-padding-y)] px-[var(--section-padding-x)]" style={{ backgroundColor: 'rgba(248, 250, 252, 1)' }}>
-        <div className="max-w-[var(--container-max)] mx-auto">
-          {/* Header */}
-          <div className="text-center mb-12">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] mb-2" style={{ color: 'var(--church-green)' }}>
-              A Reflection of Our Faith
-            </p>
-            <h2 className="text-4xl md:text-5xl font-extrabold" style={{ color: 'rgba(27, 34, 119, 1)' }}>
-              Our DNA
-            </h2>
-          </div>
-
-          {/* 3-col grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {DNA_VALUES.map((val) => (
-              <div
-                key={val.title}
-                className="group flex flex-col gap-3 rounded-2xl border border-gray-100 bg-white p-6 cursor-default
-                  transition-all duration-300 ease-in-out
-                  hover:scale-[1.04] hover:-translate-y-1
-                  hover:shadow-[0_20px_40px_-8px_rgba(27,34,119,0.15)]
-                  hover:border-[rgba(27,34,119,0.15)]"
-              >
-                <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm font-extrabold flex-none
-                    transition-colors duration-300 group-hover:bg-[rgba(27,34,119,1)]"
-                  style={{ backgroundColor: 'var(--church-green)' }}
-                >
-                  {val.title[0]}
-                </div>
-                <h3
-                  className="text-base font-bold transition-colors duration-300"
-                  style={{ color: 'rgba(27, 34, 119, 1)' }}
-                >
-                  {val.title}
-                </h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{val.body}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <DNAClient />
 
       {/* ── Pastoral Leadership ── */}
       <section className="bg-white py-[var(--section-padding-y)] px-[var(--section-padding-x)]">
@@ -256,7 +157,9 @@ export default function AboutPage() {
             </div>
             <div className="flex flex-col sm:flex-row gap-3 flex-none">
               <Link
-                href="/giving"
+                href="https://www.google.com/maps/place/51.072269,-4.069444"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center justify-center px-8 py-3 rounded-lg font-bold text-white transition-opacity hover:opacity-90"
                 style={{ backgroundColor: 'var(--church-green)' }}
               >
@@ -275,7 +178,7 @@ export default function AboutPage() {
 
       {/* ── Footer ── */}
       <Footer
-        logo={{ src: '/logo.png', alt: 'RCCG Glory Tabernacle' }}
+        logo={{ src: '/logo-with-no-bg.png', alt: 'RCCG Glory Tabernacle' }}
         tagline="Furnish  ·  Transform  ·  Influence"
         columns={[
           {
@@ -305,10 +208,10 @@ export default function AboutPage() {
           { platform: 'tiktok', href: '#' },
         ]}
         contactInfo={{
-          address: '123 Church Street, City, State 12345',
-          phone: '+1 (555) 123-4567',
-          email: 'info@rccgglory.org',
-          directionsHref: 'https://maps.google.com',
+          address: 'North Devon College, Old Sticklepath Hill Barnstaple EX31 2BQ England',
+          phone: '+447478137599',
+          email: 'admin@glorytabernacle.co.uk',
+          directionsHref: 'https://www.google.com/maps/place/51.072269,-4.069444',
         }}
         copyrightText={`© ${new Date().getFullYear()} RCCG Glory Tabernacle. All rights reserved.`}
       />

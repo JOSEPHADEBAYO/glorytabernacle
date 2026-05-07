@@ -1,6 +1,7 @@
 import { TopNavBar } from '@/components/church/nav-bar'
 import { HeroSection } from '@/components/church/hero'
 import { LiveStreamSection } from '@/components/church/live-stream-section'
+import { EventAnnouncementModal } from '@/components/church/event-announcement-modal'
 import { AboutSection } from '@/components/church/about-section'
 import { MinistriesSection } from '@/components/church/ministries-section'
 import { ImageGallerySection } from '@/components/church/image-gallery-section'
@@ -84,28 +85,43 @@ export default function Home() {
   return (
     <>
       <TopNavBar />
+      <EventAnnouncementModal
+        event={{
+          date: '2026-05-18',
+          time: '10:00 AM — 2:00 PM',
+          title: 'The 2026 Hub Leadership Summit',
+          subtitle: 'Special Event',
+          description: 'Join us for a powerful gathering of leaders, believers, and kingdom builders. This summit is designed to equip, inspire, and activate you for greater impact in your sphere of influence.',
+          location: 'North Devon College, Barnstaple EX31 2BQ',
+          imageSrc: '/web.png',
+          ctaLabel: 'Register Now',
+          ctaHref: '#',
+          storageKey: 'hub-summit-2026',
+        }}
+      />
       <HeroSection
         slides={[
           {
             backgroundImage: '/Carousel%202.png',
-            eyebrow: 'Welcome to Our Sanctuary',
+            eyebrow: 'Welcome to Glory Tabernacle',
             headline: 'A Place of',
-            headlineAccent: 'Recovery,',
-            headlineLine2: 'Restoration & Revival',
+            headlineAccent: 'Transformation',
+            headlineLine2: 'Within and Without',
           },
           {
             backgroundImage: '/Carousel%203.png',
-            eyebrow: 'Growing in Faith',
+            eyebrow: 'Furnished unto every good work',
             headline: 'Building a',
-            headlineAccent: 'Community',
-            headlineLine2: 'Rooted in Christ',
+            headlineAccent: 'Transformed',
+            headlineLine2: 'People to Influence the World around them',
           },
+          
           {
             backgroundImage: '/Carousel%204.png',
-            eyebrow: 'Making Disciples',
-            headline: 'Spreading the',
-            headlineAccent: 'Gospel',
-            headlineLine2: 'to All Nations',
+            eyebrow: "A people in pursuit of God's presence",
+            headline: 'His purpose,',
+            headlineAccent: 'And His glory',
+            headlineLine2: 'To Influence All Nations',
           },
         ]}
         primaryCta={{ label: 'Plan a Visit', href: '/about' }}
@@ -120,16 +136,20 @@ export default function Home() {
       />
       <AboutSection
         eyebrow="Our Foundation"
-        heading="Resilient Faith for a Modern World."
-        body="At RCCG Glory Tabernacle, we believe that the ancient truths of the Gospel are the firm foundation for navigating today's complexities. We are a community dedicated to the transformative power of grace and the relentless pursuit of spiritual growth."
+        heading="A Tabernacle is not merely a building."
+        body="It is a life surrendered to God. It is God's dwelling place among His people. When God commanded a Tabernacle to be built, He was asking for a place a life to host His presence"
         pillars={[
           {
-            title: 'Restoration',
-            description: 'Healing the broken through the unconditional love of the Father.',
+            title: 'Furnish',
+            description: 'We equip every believer with the Word, spiritual gifts, and tools for Kingdom living',
           },
           {
-            title: 'Revival',
-            description: 'Awakening the soul to the vibrant presence of the Holy Spirit.',
+            title: 'Transform',
+            description: 'Genuine renewal — in the individual, the family, the community.',
+          },
+          {
+            title: 'Influence',
+            description: 'Influencing every sphere of society with His Kingdom',
           },
         ]}
         yearsOfMinistry={74}
@@ -162,7 +182,7 @@ export default function Home() {
         primaryCta={{ label: 'Give Online', href: '/giving' }}
       />
       <Footer
-        logo={{ src: '/logo.png', alt: 'RCCG Glory Tabernacle' }}
+        logo={{ src: '/logo-with-no-bg.png', alt: 'RCCG Glory Tabernacle' }}
         tagline="Furnish  ·  Transform  ·  Influence"
         columns={[
           {

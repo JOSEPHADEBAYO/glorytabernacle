@@ -247,7 +247,7 @@ export default function EventsPage() {
 
       {/* ── Footer ── */}
       <Footer
-        logo={{ src: '/logo.png', alt: 'RCCG Glory Tabernacle' }}
+        logo={{ src: '/logo-with-no-bg.png', alt: 'RCCG Glory Tabernacle' }}
         tagline="Furnish  ·  Transform  ·  Influence"
         columns={[
           {
@@ -277,7 +277,7 @@ export default function EventsPage() {
           { platform: 'tiktok', href: '#' },
         ]}
         contactInfo={{
-          address: '123 Church Street, City, State 12345',
+          address: 'North Devon College, Old Sticklepath Hill Barnstaple EX31 2BQ England',
           phone: '+1 (555) 123-4567',
           email: 'info@rccgglory.org',
           directionsHref: 'https://maps.google.com',

@@ -112,10 +112,10 @@ export function TopNavBar() {
         <div className="flex-none">
           <Link href="/" aria-label="RCCG Glory Tabernacle home">
               <Image
-                src="/logo-white-bg.png"
+                src="/logo-with-no-bg.png"
                 alt="RCCG Glory Tabernacle"
-                width={80}
-                height={80}
+                width={140}
+                height={140}
                 className="rounded-md object-cover"
                 onError={undefined}
               />
@@ -190,14 +190,41 @@ export function TopNavBar() {
           })}
         </ul>
 
-        {/* Right: GIVE + hamburger */}
+        {/* Right: NEED A RIDE + GIVE + hamburger */}
         <div className="ml-auto flex items-center gap-3">
+          {/* Need a Ride Button - Hidden on mobile */}
+          <Link
+            href="https://chat.whatsapp.com/GkKjHdna7CLC99QvBreWIC?mode=gi_t"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden md:inline-flex items-center gap-2 rounded-md bg-white/10 backdrop-blur-sm px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-white/20 hover:scale-105 border border-white/20 group overflow-hidden relative"
+          >
+            <Image
+              src="/bus.png"
+              alt="Bus"
+              width={16}
+              height={16}
+              className="w-4 h-4 transition-all duration-[1500ms] ease-linear group-hover:translate-x-20 group-hover:opacity-0"
+            />
+            <Image
+              src="/bus.png"
+              alt="Bus"
+              width={16}
+              height={16}
+              className="w-4 h-4 absolute -left-16 transition-all duration-[1500ms] ease-linear group-hover:left-4 opacity-0 group-hover:opacity-100"
+            />
+            NEED A RIDE?
+          </Link>
+
+          {/* Give Button */}
           <Link
             href="/giving"
-            className="rounded-md bg-[var(--church-green)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#155a1d]"
+            className="rounded-md bg-[var(--church-green)] px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-[#155a1d] hover:scale-105"
           >
             GIVE
           </Link>
+
+          {/* Hamburger Menu */}
           <button
             type="button"
             className="flex items-center justify-center text-white md:hidden"
@@ -269,6 +296,33 @@ export function TopNavBar() {
                 </li>
               )
             })}
+
+            {/* Mobile: Need a Ride Button */}
+            <li className="pt-3">
+              <Link
+                href="https://chat.whatsapp.com/GkKjHdna7CLC99QvBreWIC?mode=gi_t"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 w-full rounded-md bg-white/10 backdrop-blur-sm px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-white/20 border border-white/20 group overflow-hidden relative"
+                onClick={() => setDrawerOpen(false)}
+              >
+                <Image
+                  src="/bus.png"
+                  alt="Bus"
+                  width={16}
+                  height={16}
+                  className="w-4 h-4 transition-all duration-[1500ms] ease-linear group-hover:translate-x-20 group-hover:opacity-0"
+                />
+                <Image
+                  src="/bus.png"
+                  alt="Bus"
+                  width={16}
+                  height={16}
+                  className="w-4 h-4 absolute left-0 transition-all duration-[1500ms] ease-linear group-hover:left-16 opacity-0 group-hover:opacity-100"
+                />
+                NEED A RIDE?
+              </Link>
+            </li>
           </ul>
         </div>
       )}

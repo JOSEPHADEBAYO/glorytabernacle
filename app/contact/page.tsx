@@ -18,8 +18,8 @@ function ContactBar() {
         style={{ boxShadow: '0px 8px 32px 0px rgba(0,0,0,0.10)' }}
       >
         {[
-          { icon: <Phone className="h-4 w-4" />, label: 'CALL US', value: '+44 (0) 1234 567890' },
-          { icon: <Mail className="h-4 w-4" />, label: 'EMAIL US', value: 'info@glorytabernacle.org' },
+          { icon: <Phone className="h-4 w-4" />, label: 'CALL US', value: '+447478137599' },
+          { icon: <Mail className="h-4 w-4" />, label: 'EMAIL US', value: 'admin@glorytabernacle.co.uk' },
           { icon: <MapPin className="h-4 w-4" />, label: 'OUR LOCATION', value: 'Barnstaple, EX31 2BQ' },
         ].map(({ icon, label, value }) => (
           <div key={label} className="flex items-center gap-3 px-6 py-5">
@@ -147,9 +147,9 @@ function ContactForm() {
 
 function DepartmentContacts() {
   const departments = [
-    { name: 'General Inquiry', email: 'info@glorytabernacle.org' },
-    { name: 'Prayer Requests', email: 'prayer@glorytabernacle.org' },
-    { name: 'Media Team', email: 'media@glorytabernacle.org' },
+    { name: 'General Inquiry', email: 'admin@glorytabernacle.co.uk' },
+    { name: 'Prayer Requests', email: 'admin@glorytabernacle.co.uk' },
+    { name: 'Media Team', email: 'admin@glorytabernacle.co.uk' },
   ]
 
   return (
@@ -260,7 +260,7 @@ function SocialSection() {
           <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
         </svg>
       ),
-      name: 'Facebook', description: 'Join our group and stay updated', href: '#', bg: '#1877F2',
+      name: 'Facebook', description: 'Join our group and stay updated', href: 'https://www.facebook.com/share/1CDurcWmxG/?mibextid=wwXIfr', bg: '#1877F2',
     },
     {
       icon: (
@@ -270,7 +270,7 @@ function SocialSection() {
           <circle cx="17.5" cy="6.5" r="1" fill="white" stroke="none" />
         </svg>
       ),
-      name: 'Instagram', description: 'Follow our weekly life', href: '#', bg: 'radial-gradient(circle at 30% 107%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285AEB 90%)',
+      name: 'Instagram', description: 'Follow our weekly life', href: 'https://www.instagram.com/glorytabernaclebarnstaple?igsh=MWkxaTF0Yjd1czk3Mg%3D%3D&utm_source=qr', bg: 'radial-gradient(circle at 30% 107%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285AEB 90%)',
     },
     {
       icon: (
@@ -279,7 +279,23 @@ function SocialSection() {
           <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#FF0000" />
         </svg>
       ),
-      name: 'YouTube', description: 'Watch sermons and worship live', href: '#', bg: '#FF0000',
+      name: 'YouTube', description: 'Watch sermons and worship live', href: 'https://www.youtube.com/@glorytabernaclehq', bg: '#FF0000',
+    },
+    {
+      icon: (
+        <svg viewBox="0 0 24 24" fill="white" className="h-7 w-7" aria-hidden="true">
+          <path d="M18.244 13.525L23.475 8h-1.243l-4.549 5.29L13.9 8H9l5.491 7.99L9 24h1.243l4.802-5.583L19.1 24H24l-5.756-10.475zm-1.7 1.977l-.557-.796-4.43-6.334H13.3l3.576 5.113.557.796 4.648 6.647h-1.743l-3.794-5.426z" />
+        </svg>
+      ),
+      name: 'X (Twitter)', description: 'Follow us for updates', href: 'https://x.com/rccggthq', bg: '#000000',
+    },
+    {
+      icon: (
+        <svg viewBox="0 0 24 24" fill="white" className="h-7 w-7" aria-hidden="true">
+          <path d="M21 10.5c-.8-.5-1.4-1.3-1.6-2.2h-2.2v9.4c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2c.2 0 .4 0 .6.1V13.5c-.2 0-.4-.1-.6-.1-2.3 0-4.2 1.9-4.2 4.2s1.9 4.2 4.2 4.2 4.2-1.9 4.2-4.2v-5c.8.6 1.8.9 2.8.9v-2.2c-.5 0-1-.3-1.2-.8z" />
+        </svg>
+      ),
+      name: 'TikTok', description: 'Watch our short videos', href: 'https://www.tiktok.com/@rccgglorytabernaclebarns?_r=1&_t=ZN-965RffiNMP8X', bg: '#000000',
     },
   ]
 
@@ -292,7 +308,7 @@ function SocialSection() {
         <h2 className="mb-10 text-center text-2xl font-extrabold text-white md:text-3xl">
           Join Our Online Community
         </h2>
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
+        <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 md:grid-cols-5">
           {socials.map(social => (
             <a
               key={social.name}
@@ -379,8 +395,8 @@ export default function ContactPage() {
       <SocialSection />
 
       <Footer
-        logo={{ src: '/logo.png', alt: 'RCCG Glory Tabernacle' }}
-        tagline="Recovering the past, restoring the present, and reviving the future."
+        logo={{ src: '/logo-with-no-bg.png', alt: 'RCCG Glory Tabernacle' }}
+        tagline="Furnish · Transform · Influence"
         columns={[
           {
             heading: 'Quick Links',
@@ -395,15 +411,17 @@ export default function ContactPage() {
           },
         ]}
         socialLinks={[
-          { platform: 'instagram', href: '#' },
-          { platform: 'youtube', href: '#' },
-          { platform: 'facebook', href: '#' },
+          { platform: 'instagram', href: 'https://www.instagram.com/glorytabernaclebarnstaple?igsh=MWkxaTF0Yjd1czk3Mg%3D%3D&utm_source=qr' },
+          { platform: 'youtube', href: 'https://www.youtube.com/@glorytabernaclehq' },
+          { platform: 'facebook', href: 'https://www.facebook.com/share/1CDurcWmxG/?mibextid=wwXIfr' },
+          { platform: 'x', href: 'https://x.com/rccggthq' },
+          { platform: 'tiktok', href: 'https://www.tiktok.com/@rccgglorytabernaclebarns?_r=1&_t=ZN-965RffiNMP8X' },
         ]}
         contactInfo={{
           address: 'North Devon College, Old Sticklepath Hill Barnstaple EX31 2BQ England',
-          phone: '+44 (0) 1234 567890',
-          email: 'info@glorytabernacle.org',
-          directionsHref: 'https://maps.google.com/?q=North+Devon+College+Barnstaple+EX31+2BQ',
+          phone: '+447478137599',
+          email: 'admin@glorytabernacle.co.uk',
+          directionsHref: 'https://maps.google.com/?q=North+Devon+College+Old+Sticklepath+Hill+Barnstaple+EX31+2BQ+England',
         }}
         copyrightText={`© ${new Date().getFullYear()} RCCG Glory Tabernacle. All rights reserved.`}
       />

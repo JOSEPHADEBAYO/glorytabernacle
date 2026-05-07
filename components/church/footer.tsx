@@ -74,7 +74,7 @@ function XIcon() {
   return (
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
       <rect width="32" height="32" rx="8" fill="#000000" />
-      <path d="M18.244 13.525L23.475 8h-1.243l-4.549 5.29L13.9 8H9l5.491 7.99L9 24h1.243l4.802-5.583L19.1 24H24l-5.756-10.475zm-1.7 1.977l-.557-.796-4.43-6.334H13.3l3.576 5.113.557.796 4.648 6.647h-1.743l-3.794-5.426z" fill="white" />
+      <path d="M19.244 14.525L24.475 9h-1.243l-4.549 5.29L14.9 9H10l5.491 7.99L10 25h1.243l4.802-5.583L20.1 25H25l-5.756-10.475zm-1.7 1.977l-.557-.796-4.43-6.334H14.3l3.576 5.113.557.796 4.648 6.647h-1.743l-3.794-5.426z" fill="white" />
     </svg>
   )
 }
@@ -83,7 +83,7 @@ function TikTokIcon() {
   return (
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
       <rect width="32" height="32" rx="8" fill="#000000" />
-      <path d="M21 10.5c-.8-.5-1.4-1.3-1.6-2.2h-2.2v9.4c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2c.2 0 .4 0 .6.1V13.5c-.2 0-.4-.1-.6-.1-2.3 0-4.2 1.9-4.2 4.2s1.9 4.2 4.2 4.2 4.2-1.9 4.2-4.2v-5c.8.6 1.8.9 2.8.9v-2.2c-.5 0-1-.3-1.2-.8z" fill="white" />
+      <path d="M22 11.5c-.8-.5-1.4-1.3-1.6-2.2h-2.2v9.4c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2c.2 0 .4 0 .6.1V14.5c-.2 0-.4-.1-.6-.1-2.3 0-4.2 1.9-4.2 4.2s1.9 4.2 4.2 4.2 4.2-1.9 4.2-4.2v-5c.8.6 1.8.9 2.8.9v-2.2c-.5 0-1-.3-1.2-.8z" fill="white" />
     </svg>
   )
 }
@@ -185,23 +185,21 @@ export function Footer({
 
           {/* Col 4: Social icons */}
           <div className="flex flex-row lg:flex-row items-start gap-3">
-            {socialLinks
-              .filter(s => ['instagram', 'youtube', 'facebook'].includes(s.platform))
-              .map(({ platform, href }) => {
-                const Icon = SOCIAL_ICON_MAP[platform]
-                return (
-                  <a
-                    key={platform}
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={SOCIAL_LABELS[platform]}
-                    className="transition-opacity hover:opacity-80"
-                  >
-                    <Icon />
-                  </a>
-                )
-              })}
+            {socialLinks.map(({ platform, href }) => {
+              const Icon = SOCIAL_ICON_MAP[platform]
+              return (
+                <a
+                  key={platform}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={SOCIAL_LABELS[platform]}
+                  className="transition-opacity hover:opacity-80"
+                >
+                  <Icon />
+                </a>
+              )
+            })}
           </div>
 
         </div>
