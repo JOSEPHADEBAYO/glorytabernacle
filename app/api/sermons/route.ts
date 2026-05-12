@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import type { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { getSessionToken, getSessionUser } from '@/lib/auth/session'
 import { createSermonSchema, normalizeSeries, sermonQuerySchema } from '@/lib/validation/sermon'
@@ -18,6 +17,15 @@ type SermonRouteRow = {
   createdBy: string
   createdAt: Date
   updatedAt: Date
+}
+
+type SermonWhere = {
+  published?: boolean
+  series?: string
+  title?: {
+    contains: string
+    mode: 'insensitive'
+  }
 }
 
 async function requireUser() {
@@ -91,7 +99,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const where: Prisma.SermonWhereInput = {}
+    const where: SermonWhere = {}
     if (validation.data.published !== undefined) {
       where.published = validation.data.published === 'true'
     }
