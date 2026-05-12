@@ -75,6 +75,21 @@ type HomepageEventRow = {
   imageSrc: string | null
   registrationHref: string | null
 }
+type HomepageBookRow = {
+  id: string
+  title: string
+  author: string
+  description: string
+  coverImage: string
+  purchaseUrl: string | null
+}
+type MinistryCardRow = {
+  slug: string
+  title: string
+  tag: string | null
+  imageSrc: string
+  imageAlt: string
+}
 async function loadHeroSlides(): Promise<HeroSlide[]> {
   try {
     const images: HeroImageRow[] = await prisma.heroCarouselImage.findMany({
@@ -268,7 +283,7 @@ async function loadHomepageBooks(): Promise<{
   secondary: HomepageBookCard[]
 }> {
   try {
-    const rows = await prisma.book.findMany({
+    const rows: HomepageBookRow[]  = await prisma.book.findMany({
       where: { published: true, featured: true },
       orderBy: [{ featuredOrder: 'asc' }, { createdAt: 'desc' }],
       take: 3,
@@ -312,7 +327,7 @@ async function loadHomepageBooks(): Promise<{
  */
 async function loadMinistryCards(): Promise<MinistryCard[]> {
   try {
-    const rows = await prisma.group.findMany({
+    const rows: MinistryCardRow[]  = await prisma.group.findMany({
       where: { published: true },
       orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
       select: {
