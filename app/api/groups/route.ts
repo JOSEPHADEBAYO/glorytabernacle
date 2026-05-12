@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { Prisma } from '@prisma/client'
+//import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { createGroupSchema, groupQuerySchema } from '@/lib/validation/group'
 import { getSessionToken, getSessionUser } from '@/lib/auth/session'
@@ -20,11 +20,17 @@ function nullIfEmpty(value: string | undefined | null): string | null {
   return value
 }
 
-function dbNullIfMissing(value: unknown): Prisma.InputJsonValue | typeof Prisma.DbNull {
-  if (value === undefined || value === null) return Prisma.DbNull
-  return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue
-}
+// function dbNullIfMissing(value: unknown): Prisma.InputJsonValue | typeof Prisma.DbNull {
+//   if (value === undefined || value === null) return Prisma.DbNull
+//   return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue
+// }
 
+function dbNullIfMissing(value: unknown) {
+  if (value === undefined) return undefined
+  if (value === null) return null
+
+  return JSON.parse(JSON.stringify(value))
+}
 /**
  * Detect Prisma unique-constraint violation (e.g. duplicate slug).
  */

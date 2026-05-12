@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { Prisma } from '@prisma/client'
+//import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { getSessionToken, getSessionUser } from '@/lib/auth/session'
 import { updateGroupSchema } from '@/lib/validation/group'
@@ -17,10 +17,17 @@ function nullIfEmpty(value: string | undefined | null): string | null | undefine
   return value
 }
 
-function dbNullIfMissing(value: unknown): Prisma.InputJsonValue | typeof Prisma.DbNull | undefined {
+// function dbNullIfMissing(value: unknown): Prisma.InputJsonValue | typeof Prisma.DbNull | undefined {
+//   if (value === undefined) return undefined
+//   if (value === null) return Prisma.DbNull
+//   return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue
+// }
+
+function dbNullIfMissing(value: unknown) {
   if (value === undefined) return undefined
-  if (value === null) return Prisma.DbNull
-  return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue
+  if (value === null) return null
+
+  return JSON.parse(JSON.stringify(value))
 }
 
 function isUniqueViolation(error: unknown): boolean {
