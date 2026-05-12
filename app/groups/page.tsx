@@ -14,6 +14,17 @@ interface Group {
   ctaHref?: string
 }
 
+type GroupRow = {
+  id: string
+  slug: string
+  title: string
+  description: string
+  imageSrc: string
+  imageAlt: string
+  ctaLabel: string | null
+  ctaHref: string | null
+}
+
 /**
  * Server-fetch published groups ordered by `order` ascending. Each card's CTA
  * defaults to the new departmental-board detail page at /groups/{slug} unless
@@ -24,33 +35,31 @@ interface Group {
  */
 async function loadPublishedGroups(): Promise<Group[]> {
   try {
-    const rows = await prisma.group.findMany({
-      where: { published: true },
-      orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
-      select: {
-        id: true,
-        slug: true,
-        title: true,
-        description: true,
-        imageSrc: true,
-        imageAlt: true,
-        ctaLabel: true,
-        ctaHref: true,
-      },
-    })
+   
+   const rows: GroupRow[] = await prisma.group.findMany({
+  where: { published: true },
+  orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
+  select: {
+    id: true,
+    slug: true,
+    title: true,
+    description: true,
+    imageSrc: true,
+    imageAlt: true,
+    ctaLabel: true,
+    ctaHref: true,
+  },
+})
 
     return rows.map((g) => ({
-      id: g.id,
-      title: g.title,
-      description: g.description,
-      imageSrc: g.imageSrc,
-      imageAlt: g.imageAlt,
-      // The "Get Involved" button on the listing always routes to the
-      // ministry's detail page so visitors land on the full departmental
-      // board. Admin-set ctaHref values are intentionally ignored here.
-      ctaLabel: g.ctaLabel ?? 'Get Involved',
-      ctaHref: `/groups/${g.slug}`,
-    }))
+  id: g.id,
+  title: g.title,
+  description: g.description,
+  imageSrc: g.imageSrc,
+  imageAlt: g.imageAlt,
+  ctaLabel: g.ctaLabel ?? 'Get Involved',
+  ctaHref: `/groups/${g.slug}`,
+}))
   } catch (err) {
     console.error('Error loading public groups list:', err)
     return []
