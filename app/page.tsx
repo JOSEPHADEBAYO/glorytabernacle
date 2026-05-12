@@ -64,6 +64,17 @@ type GalleryPhotoRow = {
   title: string
   description: string
 }
+
+type HomepageEventRow = {
+  id: string
+  title: string
+  date: Date
+  time: string | null
+  location: string | null
+  description: string
+  imageSrc: string | null
+  registrationHref: string | null
+}
 async function loadHeroSlides(): Promise<HeroSlide[]> {
   try {
     const images: HeroImageRow[] = await prisma.heroCarouselImage.findMany({
@@ -137,7 +148,7 @@ function toIsoDateString(d: Date): string {
  */
 async function loadHomepageEvents(): Promise<ChurchEvent[]> {
   try {
-    const events = await prisma.event.findMany({
+    const events: HomepageEventRow[] = await prisma.event.findMany({
       where: {
         published: true,
         date: { gte: new Date() },
@@ -146,16 +157,16 @@ async function loadHomepageEvents(): Promise<ChurchEvent[]> {
       take: 6,
     })
 
-    return events.map((e) => ({
-      id: e.id,
-      title: e.title,
-      date: toIsoDateString(e.date),
-      time: e.time ?? 'TBA',
-      location: e.location ?? 'TBA',
-      description: e.description,
-      image: e.imageSrc ?? undefined,
-      registrationHref: e.registrationHref ?? undefined,
-    }))
+   return events.map((e) => ({
+  id: e.id,
+  title: e.title,
+  date: toIsoDateString(e.date),
+  time: e.time ?? 'TBA',
+  location: e.location ?? 'TBA',
+  description: e.description,
+  image: e.imageSrc ?? undefined,
+  registrationHref: e.registrationHref ?? undefined,
+}))
   } catch (err) {
     console.error('Error loading homepage events:', err)
     return []
