@@ -12,6 +12,8 @@ export interface GalleryItem {
   imageAlt: string
   date: string   // e.g. "26/04/2026"
   title: string
+  /** Optional short blurb shown under the title on the card. */
+  description?: string
 }
 
 interface ImageGallerySectionProps {
@@ -101,6 +103,11 @@ function GalleryCard({ item }: { item: GalleryItem }) {
         >
           {item.title}
         </h3>
+        {item.description && (
+          <p className="text-sm leading-snug text-gray-500 line-clamp-3">
+            {item.description}
+          </p>
+        )}
       </div>
     </div>
   )

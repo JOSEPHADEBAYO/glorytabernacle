@@ -1,13 +1,16 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { useRef, useEffect } from 'react'
 
-interface MinistryCard {
+export interface MinistryCard {
   imageSrc: string
   imageAlt: string
   tag: string
   title: string
+  /** Optional internal href — when present, the card becomes a Next.js Link. */
+  href?: string
 }
 
 interface MinistriesSectionProps {
@@ -190,52 +193,77 @@ export function MinistriesSection({
             className="flex will-change-transform"
             style={{ gap: `${GAP}px` }}
           >
-            {looped.map((ministry, i) => (
-              <div
-                key={`${ministry.tag}-${i}`}
-                className="group relative shrink-0 cursor-pointer overflow-hidden rounded-xl"
-                style={{
-                  width: `${CARD_W}px`,
-                  // height: aspect ratio 3:4 of card width minus ~10px
-                  height: `${Math.round(CARD_W * (4 / 3)) - 10}px`,
-                }}
-                role="button"
-                tabIndex={0}
-                aria-label={ministry.title}
-              >
-                {/* Background image */}
-                <Image
-                  src={ministry.imageSrc}
-                  alt={ministry.imageAlt}
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  sizes="220px"
-                />
+            {looped.map((ministry, i) => {
+              const cardClassName =
+                'group relative shrink-0 cursor-pointer overflow-hidden rounded-xl block'
+              const cardStyle = {
+                width: `${CARD_W}px`,
+                // height: aspect ratio 3:4 of card width minus ~10px
+                height: `${Math.round(CARD_W * (4 / 3)) - 10}px`,
+              }
+              const inner = (
+                <>
+                  {/* Background image */}
+                  <Image
+                    src={ministry.imageSrc}
+                    alt={ministry.imageAlt}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    sizes="220px"
+                  />
 
-                {/* Gradient overlay */}
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    background:
-                      'linear-gradient(to top, rgba(0,6,102,1) 0%, rgba(0,6,102,0.2) 55%, rgba(0,6,102,0) 100%)',
-                  }}
-                  aria-hidden="true"
-                />
+                  {/* Gradient overlay */}
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      background:
+                        'linear-gradient(to top, rgba(0,6,102,1) 0%, rgba(0,6,102,0.2) 55%, rgba(0,6,102,0) 100%)',
+                    }}
+                    aria-hidden="true"
+                  />
 
-                {/* Text */}
-                <div className="absolute bottom-0 left-0 p-4">
-                  <p
-                    className="mb-1 text-[0.55rem] font-bold uppercase tracking-widest"
-                    style={{ color: 'rgba(163, 246, 156, 1)' }}
+                  {/* Text */}
+                  <div className="absolute bottom-0 left-0 p-4">
+                    <p
+                      className="mb-1 text-[0.55rem] font-bold uppercase tracking-widest"
+                      style={{ color: 'rgba(163, 246, 156, 1)' }}
+                    >
+                      {ministry.tag}
+                    </p>
+                    <h3 className="text-sm font-bold leading-snug text-white">
+                      {ministry.title}
+                    </h3>
+                  </div>
+                </>
+              )
+
+              if (ministry.href) {
+                return (
+                  <Link
+                    key={`${ministry.tag}-${i}`}
+                    href={ministry.href}
+                    className={cardClassName}
+                    style={cardStyle}
+                    aria-label={ministry.title}
                   >
-                    {ministry.tag}
-                  </p>
-                  <h3 className="text-sm font-bold leading-snug text-white">
-                    {ministry.title}
-                  </h3>
+                    {inner}
+                  </Link>
+                )
+              }
+
+              return (
+                <div
+                  key={`${ministry.tag}-${i}`}
+                  className={cardClassName}
+                  style={cardStyle}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={ministry.title}
+                >
+                  {inner}
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </div>

@@ -1,0 +1,444 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// User Management
+//
+// Two distinct user types share this table, distinguished by `role`:
+//   - Admin users (SUPER_ADMIN / CONTENT_EDITOR / VIEWER) authenticate via the
+//     existing cookie-based admin login and have a `passwordHash`.
+//   - Parent users (PARENT) authenticate via Google OAuth (Auth.js) and have
+//     no `passwordHash`. They get a profile `image` from Google.
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String?
+  name          String
+  image         String?
+  emailVerified DateTime?
+  role          UserRole  @default(VIEWER)
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  sessions       Session[]
+  twoFactorCodes TwoFactorCode[]
+  auditLogs      AuditLog[]
+
+  // Auth.js (NextAuth v5) relations — populated for OAuth-authenticated
+  // parents. Empty for admin-cookie users.
+  accounts     Account[]
+  authSessions AuthSession[]
+
+  // Many-to-many: a parent can have multiple children; a child can belong
+  // to multiple parents (typically two: married couple).
+  children       Child[]       @relation("ParentToChild")
+  // Check-in audit trail: records the parent who signed a child in/out.
+  checkInsCreated  ChildCheckIn[] @relation("CheckInSignedInBy")
+  checkInsClosed   ChildCheckIn[] @relation("CheckInSignedOutBy")
+
+  @@index([email])
+  @@index([role])
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  CONTENT_EDITOR
+  VIEWER
+  PARENT
+}
+
+// =========================================================================
+// Auth.js (NextAuth v5) tables — required by @auth/prisma-adapter
+// =========================================================================
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+// Auth.js session table. Distinct from the existing `Session` model used
+// by the legacy admin login flow.
+model AuthSession {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// =========================================================================
+// Children Ministry — registration + check-in / check-out
+// =========================================================================
+
+model Child {
+  id                       String    @id @default(cuid())
+  firstName                String
+  lastName                 String
+  dateOfBirth              DateTime  @db.Date
+  gender                   Gender
+  // Free-text duty-of-care fields. Empty string is normalized to null.
+  allergies                String?   @db.Text
+  medicalNotes             String?   @db.Text
+  specialNeeds             String?   @db.Text
+  // Optional Cloudinary URL for the child's photo.
+  photoUrl                 String?
+  emergencyContactName     String
+  emergencyContactPhone    String
+  emergencyContactRelation String
+
+  parents   User[]         @relation("ParentToChild")
+  checkIns  ChildCheckIn[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([lastName, firstName])
+}
+
+// One row per drop-off / pick-up cycle. `signedOutAt` and `signedOutById`
+// are null while the child is still in the children's-ministry care.
+model ChildCheckIn {
+  id            String    @id @default(cuid())
+  childId       String
+  signedInAt    DateTime  @default(now())
+  signedInById  String
+  signedOutAt   DateTime?
+  signedOutById String?
+
+  child       Child @relation(fields: [childId], references: [id], onDelete: Cascade)
+  signedInBy  User  @relation("CheckInSignedInBy", fields: [signedInById], references: [id], onDelete: Restrict)
+  signedOutBy User? @relation("CheckInSignedOutBy", fields: [signedOutById], references: [id], onDelete: Restrict)
+
+  @@index([childId])
+  @@index([signedInAt])
+  @@index([signedOutAt])
+  @@index([signedInById])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+}
+
+model TwoFactorCode {
+  id        String   @id @default(cuid())
+  userId    String
+  code      String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([code])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String
+  action     String // CREATE, UPDATE, DELETE
+  entityType String // Book, Event, Group, etc.
+  entityId   String
+  changes    Json? // Store before/after values
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
+
+// Books Management
+model Book {
+  id            String   @id @default(cuid())
+  title         String
+  author        String
+  category      String
+  description   String   @db.Text
+  coverImage    String // URL to image
+  purchaseUrl   String?
+  published     Boolean  @default(false)
+  // Book-of-the-Month: when `featured` is true, the book appears in the
+  // homepage BooksSection. `featuredOrder` controls position
+  // (1 = big featured slot, 2-3 = small secondary slots).
+  featured      Boolean  @default(false)
+  featuredOrder Int      @default(0)
+  createdBy     String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([published])
+  @@index([category])
+  @@index([featured])
+  @@index([featuredOrder])
+}
+
+// Events Management
+model Event {
+  id               String   @id @default(cuid())
+  title            String
+  description      String   @db.Text
+  date             DateTime
+  time             String?
+  location         String?
+  imageSrc         String?
+  imageAlt         String?
+  registrationHref String?
+  published        Boolean  @default(false)
+  createdBy        String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  notifications EventNotification[]
+
+  @@index([published])
+  @@index([date])
+}
+
+// Event-notification subscriptions (visitors who clicked "Get Notified")
+model EventNotification {
+  id         String    @id @default(cuid())
+  eventId    String
+  name       String
+  email      String
+  // Set when the reminder email was successfully sent.
+  // Null means "not yet notified".
+  notifiedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, email])
+  @@index([eventId])
+  @@index([notifiedAt])
+}
+
+// Groups Management — represents a ministry/unit/department with full
+// "departmental board" content (scripture banner, head responsibilities,
+// programmes & sub-units, optional special-role callout, three vision-pillar
+// statements). Every group follows the same template; each fills its own data.
+model Group {
+  id                 String   @id @default(cuid())
+  // URL-safe slug used by the public detail page at /groups/[slug].
+  slug               String   @unique
+  title              String
+  // Short tag/category shown on the homepage MinistriesSection card
+  // (e.g. "KING'S CLUB", "HOUSE FELLOWSHIPS"). Falls back to uppercased title.
+  tag                String?
+  // Short blurb shown on the listing card.
+  description        String   @db.Text
+  imageSrc           String
+  imageAlt           String
+  ctaLabel           String?
+  ctaHref            String?
+  order              Int      @default(0)
+  published          Boolean  @default(false)
+
+  // Departmental-board fields (all optional — the detail page conditionally
+  // renders sections that are filled in).
+  scripture          String?  @db.Text
+  headTitle          String?
+  // string[] — numbered responsibilities of the Head.
+  responsibilities   Json?
+  // { title: string, schedule?: string }[] — programmes & sub-units.
+  programmes         Json?
+  // { title: string, body: string } | null — single highlighted callout.
+  specialRole        Json?
+  furnishStatement   String?  @db.Text
+  transformStatement String?  @db.Text
+  influenceStatement String?  @db.Text
+
+  members     GroupMember[]
+
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([published])
+  @@index([order])
+}
+
+// Testimonials — short member quotes shown on the homepage TestimonialsSection.
+model Testimonial {
+  id          String   @id @default(cuid())
+  quote       String   @db.Text
+  name        String
+  memberSince Int
+  order       Int      @default(0)
+  published   Boolean  @default(false)
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([published])
+  @@index([order])
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum MaritalStatus {
+  SINGLE
+  ENGAGED
+  MARRIED
+  SEPARATED
+  DIVORCED
+  WIDOWED
+}
+
+// New-member submissions from the public "Get Involved" form on
+// /groups/[slug]. Captured here so the admin team can review and follow up.
+model GroupMember {
+  id                  String        @id @default(cuid())
+  groupId             String
+  firstName           String
+  lastName            String
+  email               String
+  phoneNumber         String
+  birthDay            Int           // 1-31
+  birthMonth          Int           // 1-12
+  gender              Gender
+  maritalStatus       MaritalStatus
+  address             String        @db.Text
+  filledWithHolyGhost Boolean
+  createdAt           DateTime      @default(now())
+
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@index([groupId])
+  @@index([createdAt])
+  @@index([email])
+}
+
+// Adult Attendance — public walk-up form at /attendance, used to track
+// who's at each service. The `service` field is a free-text string but is
+// validated against a fixed list (see lib/types/attendance.ts) so reports
+// can compare like-for-like.
+model AdultAttendance {
+  id         String   @id @default(cuid())
+  name       String
+  email      String
+  service    String
+  attendedAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+
+  @@index([email])
+  @@index([service])
+  @@index([attendedAt])
+}
+
+// Sermons Management
+model Sermon {
+  id          String   @id @default(cuid())
+  title       String
+  description String?  @db.Text
+  preacher    String
+  date        DateTime
+  videoUrl    String?
+  audioUrl    String?
+  thumbnail   String?
+  published   Boolean  @default(false)
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([published])
+  @@index([date])
+}
+
+// Media Library
+model Media {
+  id         String   @id @default(cuid())
+  filename   String
+  url        String
+  publicId   String // Cloudinary public ID
+  format     String // jpg, png, pdf, etc.
+  size       Int // bytes
+  width      Int?
+  height     Int?
+  uploadedBy String
+  createdAt  DateTime @default(now())
+
+  @@index([uploadedBy])
+  @@index([createdAt])
+}
+
+// Tracts Management
+model Tract {
+  id          String   @id @default(cuid())
+  title       String
+  category    String
+  description String   @db.Text
+  coverImage  String // Cloudinary URL
+  documentUrl String // Cloudinary URL for PDF
+  published   Boolean  @default(false)
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([published])
+  @@index([category])
+}
+
+// Image Gallery Management
+model Gallery {
+  id          String   @id @default(cuid())
+  title       String
+  description String   @db.Text
+  imageUrl    String // Cloudinary URL
+  imageAlt    String
+  dateTaken   DateTime
+  published   Boolean  @default(false)
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([published])
+  @@index([dateTaken])
+}

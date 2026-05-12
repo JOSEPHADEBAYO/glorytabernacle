@@ -2,6 +2,7 @@ import Image from 'next/image'
 import { TopNavBar } from '@/components/church/nav-bar'
 import { Footer } from '@/components/church/footer'
 import { GroupsClient } from './groups-client'
+import { prisma } from '@/lib/prisma'
 
 interface Group {
   id: string
@@ -11,6 +12,49 @@ interface Group {
   imageAlt: string
   ctaLabel?: string
   ctaHref?: string
+}
+
+/**
+ * Server-fetch published groups ordered by `order` ascending. Each card's CTA
+ * defaults to the new departmental-board detail page at /groups/{slug} unless
+ * the admin explicitly set ctaLabel + ctaHref in the dashboard.
+ *
+ * Falls back to an empty array on DB error so the rest of the page (hero,
+ * highlights, footer) still renders.
+ */
+async function loadPublishedGroups(): Promise<Group[]> {
+  try {
+    const rows = await prisma.group.findMany({
+      where: { published: true },
+      orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        description: true,
+        imageSrc: true,
+        imageAlt: true,
+        ctaLabel: true,
+        ctaHref: true,
+      },
+    })
+
+    return rows.map((g) => ({
+      id: g.id,
+      title: g.title,
+      description: g.description,
+      imageSrc: g.imageSrc,
+      imageAlt: g.imageAlt,
+      // The "Get Involved" button on the listing always routes to the
+      // ministry's detail page so visitors land on the full departmental
+      // board. Admin-set ctaHref values are intentionally ignored here.
+      ctaLabel: g.ctaLabel ?? 'Get Involved',
+      ctaHref: `/groups/${g.slug}`,
+    }))
+  } catch (err) {
+    console.error('Error loading public groups list:', err)
+    return []
+  }
 }
 
 interface HighlightCard {
@@ -182,7 +226,12 @@ const HIGHLIGHT_CARDS: HighlightCard[] = [
   }
 ]
 
-export default function GroupsPage() {
+export default async function GroupsPage() {
+  const liveGroups = await loadPublishedGroups()
+  // Fall back to the hardcoded GROUPS array if no published groups exist yet,
+  // so the page still has content while admins are populating the database.
+  const groupsToRender = liveGroups.length > 0 ? liveGroups : GROUPS
+
   return (
     <>
       <TopNavBar />
@@ -245,7 +294,7 @@ export default function GroupsPage() {
             {/* Section heading for accessibility */}
             <h2 className="sr-only">Our Ministry Groups</h2>
 
-            <GroupsClient groups={GROUPS} highlightCards={HIGHLIGHT_CARDS} />
+            <GroupsClient groups={groupsToRender} highlightCards={HIGHLIGHT_CARDS} />
           </div>
         </section>
       </main>

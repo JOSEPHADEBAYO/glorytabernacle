@@ -3,54 +3,58 @@
 import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { Download } from 'lucide-react'
+import type { Tract } from '@/lib/types/tract'
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-export interface Tract {
+// For display purposes, we'll map the database Tract to a display format
+interface DisplayTract {
   id: string
   imageSrc: string
   imageAlt: string
-  category: 'theology' | 'evangelism' | 'christian-life'
+  category: string
   title: string
   description: string
-  readHref: string
-  downloadHref: string
+  documentUrl: string
 }
 
-// ---------------------------------------------------------------------------
-// Data — 12 tracts
-// ---------------------------------------------------------------------------
-
-export const TRACTS: Tract[] = [
-  { id: 't1',  imageSrc: '/imagegallery1.png', imageAlt: 'The Hope of Glory',       category: 'theology',       title: 'The Hope of Glory',       description: 'A profound exploration of eternal life and the promises God has prepared for those who love Him.',         readHref: '#', downloadHref: '#' },
-  { id: 't2',  imageSrc: '/imagegallery2.png', imageAlt: 'Finding True Peace',      category: 'evangelism',     title: 'Finding True Peace',      description: 'In a chaotic world, discover the biblical path to an untroubled heart and lasting inner peace.',           readHref: '#', downloadHref: '#' },
-  { id: 't3',  imageSrc: '/imagegallery3.png', imageAlt: 'The Narrow Gate',         category: 'evangelism',     title: 'The Narrow Gate',         description: 'A clear, uncompromising presentation of the Gospel and the call to follow Jesus wholeheartedly.',          readHref: '#', downloadHref: '#' },
-  { id: 't4',  imageSrc: '/imagegallery1.png', imageAlt: 'Grace Unmeasured',        category: 'theology',       title: 'Grace Unmeasured',        description: 'Understanding the boundless nature of God\'s forgiveness and how it transforms the human heart.',           readHref: '#', downloadHref: '#' },
-  { id: 't5',  imageSrc: '/imagegallery2.png', imageAlt: 'Walking in Light',        category: 'christian-life', title: 'Walking in Light',        description: 'A guide to Christian ethics and daily devotion in an increasingly dark and confused world.',                readHref: '#', downloadHref: '#' },
-  { id: 't6',  imageSrc: '/imagegallery3.png', imageAlt: 'The Ancient Paths',       category: 'theology',       title: 'The Ancient Paths',       description: 'Recovering the historical foundations of our faith and applying them to the challenges of modern life.',    readHref: '#', downloadHref: '#' },
-  { id: 't7',  imageSrc: '/imagegallery1.png', imageAlt: 'Unity in Spirit',         category: 'christian-life', title: 'Unity in Spirit',         description: 'Strengthening the bonds of the church through biblical principles of love, forgiveness, and fellowship.',   readHref: '#', downloadHref: '#' },
-  { id: 't8',  imageSrc: '/imagegallery2.png', imageAlt: 'Crucial Questions',       category: 'evangelism',     title: 'Crucial Questions',       description: 'Direct answers to the most common objections and questions people raise about the Christian faith.',         readHref: '#', downloadHref: '#' },
-  { id: 't9',  imageSrc: '/imagegallery3.png', imageAlt: 'The Resurrection Truth',  category: 'theology',       title: 'The Resurrection Truth',  description: 'Examining the historical and spiritual evidence for the resurrection of Jesus Christ.',                     readHref: '#', downloadHref: '#' },
-  { id: 't10', imageSrc: '/imagegallery1.png', imageAlt: 'Born Again',              category: 'evangelism',     title: 'Born Again',              description: 'What does it truly mean to be born again? A simple, clear explanation for seekers and new believers.',       readHref: '#', downloadHref: '#' },
-  { id: 't11', imageSrc: '/imagegallery2.png', imageAlt: 'The Fruit of the Spirit', category: 'christian-life', title: 'The Fruit of the Spirit', description: 'How the Holy Spirit produces lasting character change in the life of every surrendered believer.',            readHref: '#', downloadHref: '#' },
-  { id: 't12', imageSrc: '/imagegallery3.png', imageAlt: 'Eternity Matters',        category: 'evangelism',     title: 'Eternity Matters',        description: 'A sobering and compassionate look at what the Bible says about heaven, hell, and the choices we make now.',  readHref: '#', downloadHref: '#' },
-]
+/**
+ * Maps a database Tract record to the DisplayTract format used by the UI
+ */
+function mapTractToDisplay(tract: Tract): DisplayTract {
+  return {
+    id: tract.id,
+    imageSrc: tract.coverImage,
+    imageAlt: tract.title,
+    category: tract.category,
+    title: tract.title,
+    description: tract.description,
+    documentUrl: tract.documentUrl,
+  }
+}
 
 const CATEGORY_LABELS: Record<string, string> = {
   all: 'All Tracts',
-  theology: 'Theology',
-  evangelism: 'Evangelism',
-  'christian-life': 'Christian Life',
+  Theology: 'Theology',
+  Evangelism: 'Evangelism',
+  Discipleship: 'Discipleship',
+  'Prayer & Intercession': 'Prayer & Intercession',
+  'Christian Living': 'Christian Living',
+  Salvation: 'Salvation',
+  'Faith & Doctrine': 'Faith & Doctrine',
+  'End Times': 'End Times',
+  Other: 'Other',
 }
 
 // ---------------------------------------------------------------------------
 // Single tract card
 // ---------------------------------------------------------------------------
 
-function TractCard({ tract, index }: { tract: Tract; index: number }) {
+function TractCard({ tract, index }: { tract: DisplayTract; index: number }) {
   const [visible, setVisible] = useState(false)
+  const [imageError, setImageError] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
   // Staggered slide-in on mount via IntersectionObserver
@@ -81,13 +85,35 @@ function TractCard({ tract, index }: { tract: Tract; index: number }) {
     >
       {/* Image */}
       <div className="relative w-full overflow-hidden rounded-t-2xl" style={{ height: '180px' }}>
-        <Image
-          src={tract.imageSrc}
-          alt={tract.imageAlt}
-          fill
-          className="object-cover transition-transform duration-500 hover:scale-105"
-          sizes="(max-width: 768px) 100vw, 25vw"
-        />
+        {imageError ? (
+          <div className="w-full h-full flex flex-col items-center justify-center bg-gray-200">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-12 h-12 text-gray-400 mb-1"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+              />
+            </svg>
+            <span className="text-gray-400 text-xs">Image unavailable</span>
+          </div>
+        ) : (
+          <Image
+            src={tract.imageSrc}
+            alt={tract.imageAlt}
+            fill
+            className="object-cover transition-transform duration-500 hover:scale-105"
+            sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            priority={index < 4}
+            onError={() => setImageError(true)}
+          />
+        )}
       </div>
 
       {/* Content */}
@@ -102,24 +128,28 @@ function TractCard({ tract, index }: { tract: Tract; index: number }) {
           {tract.description}
         </p>
 
-        {/* Read Online button */}
+        {/* View PDF button */}
         <a
-          href={tract.readHref}
+          href={tract.documentUrl}
+          target="_blank"
+          rel="noopener noreferrer"
           className="group/read mt-3 flex items-center justify-center gap-2 overflow-hidden rounded-md py-1 text-xs font-bold uppercase tracking-widest text-white transition-all duration-300 hover:gap-3"
           style={{ backgroundColor: 'var(--church-green)' }}
         >
           <span className="transition-all duration-300 group-hover/read:opacity-0 group-hover/read:w-0 group-hover/read:overflow-hidden">
-            Read Online
+            View PDF
           </span>
           <span className="w-0 overflow-hidden opacity-0 transition-all duration-300 group-hover/read:w-auto group-hover/read:opacity-100">
-            📖 Read Online
+            📖 View PDF
           </span>
         </a>
 
         {/* Download PDF */}
         <a
-          href={tract.downloadHref}
+          href={tract.documentUrl}
           download
+          target="_blank"
+          rel="noopener noreferrer"
           className="group/dl mt-1 flex items-center justify-center gap-1.5 py-1.5 text-xs font-semibold transition-all duration-300"
           style={{ color: 'var(--church-green)' }}
         >
@@ -139,16 +169,87 @@ function TractCard({ tract, index }: { tract: Tract; index: number }) {
 // Grid with filter tabs
 // ---------------------------------------------------------------------------
 
-export function TractGrid() {
+interface TractGridProps {
+  tracts: Tract[]
+}
+
+export function TractGrid({ tracts }: TractGridProps) {
   const [activeCategory, setActiveCategory] = useState<string>('all')
   const [sort, setSort] = useState<string>('newest')
+  const [searchQuery, setSearchQuery] = useState<string>('')
 
-  const filtered = activeCategory === 'all'
-    ? TRACTS
-    : TRACTS.filter((t) => t.category === activeCategory)
+  // Map database tracts to display format
+  const displayTracts = tracts.map(mapTractToDisplay)
+
+  // Apply category and search filters
+  const filtered = displayTracts.filter((t) => {
+    const matchesCategory = activeCategory === 'all' || t.category === activeCategory
+    const matchesSearch = searchQuery === '' || 
+      t.title.toLowerCase().includes(searchQuery.toLowerCase())
+    return matchesCategory && matchesSearch
+  })
+
+  // Handle empty state
+  if (displayTracts.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-gray-500">No tracts available at the moment. Check back soon!</p>
+      </div>
+    )
+  }
 
   return (
     <>
+      {/* Search Bar */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Search Tracts
+        </label>
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="w-5 h-5 text-gray-400"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+              />
+            </svg>
+          </div>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search by title..."
+            className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+              aria-label="Clear search"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+                className="w-5 h-5"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* Filter bar */}
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-gray-200 pb-4">
         {/* Category tabs */}

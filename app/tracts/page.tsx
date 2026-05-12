@@ -3,8 +3,24 @@ import { TopNavBar } from '@/components/church/nav-bar'
 import { Footer } from '@/components/church/footer'
 import { NewsletterForm } from '@/components/church/newsletter-form'
 import { TractGrid } from './tract-grid'
+import { prisma } from '@/lib/prisma'
+import type { Tract } from '@/lib/types/tract'
 
-export default function TractsPage() {
+export default async function TractsPage() {
+  // Fetch published tracts from database
+  let tracts: Tract[] = []
+  let error: string | null = null
+
+  try {
+    tracts = await prisma.tract.findMany({
+      where: { published: true },
+      orderBy: { createdAt: 'desc' }
+    }) as Tract[]
+  } catch (err) {
+    console.error('Error fetching tracts:', err)
+    error = 'Failed to load tracts. Please try again later.'
+  }
+
   return (
     <>
       <TopNavBar />
@@ -63,7 +79,17 @@ export default function TractsPage() {
         style={{ backgroundColor: 'rgba(249, 249, 249, 1)' }}
       >
         <div className="mx-auto max-w-[var(--container-max)]">
-          <TractGrid />
+          {error ? (
+            <div className="text-center py-12">
+              <p className="text-red-600 font-semibold">{error}</p>
+            </div>
+          ) : tracts.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500">No tracts available at the moment. Check back soon!</p>
+            </div>
+          ) : (
+            <TractGrid tracts={tracts} />
+          )}
         </div>
       </section>
 

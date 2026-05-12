@@ -99,7 +99,7 @@ Welcome home. Welcome to RCCG Glory Tabernacle.
               </h2>
             </div>
             <p className="text-sm text-gray-500 max-w-sm leading-relaxed">
-              Our pastors are committed to serving with humility, integrity, and a deep love for God and people.
+              Our pastors are committed to serving with humility, integrity, and a deep love for God and the people.
             </p>
           </div>
 

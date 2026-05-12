@@ -29,6 +29,12 @@ export interface LiveStreamSectionProps {
   youtubeLiveHref?: string
   /** ISO 8601 datetime string — countdown target */
   nextServiceDate: string
+  /**
+   * Optional event id used by the "Get Notified" form to subscribe the
+   * visitor to a reminder. When omitted, the modal shows but submission
+   * is disabled (subscriptions need a target event).
+   */
+  eventId?: string
 }
 
 // ---------------------------------------------------------------------------
@@ -89,21 +95,67 @@ function CountdownBox({ value, label }: { value: number; label: string }) {
 // Notify modal form
 // ---------------------------------------------------------------------------
 
-function NotifyModal() {
+function NotifyModal({ eventId }: { eventId?: string }) {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [nameError, setNameError] = useState('')
   const [emailError, setEmailError] = useState('')
   const [submitted, setSubmitted] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const canSubmit = Boolean(eventId) && !isSubmitting
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setSubmitError(null)
+
     let valid = true
-    if (!name.trim()) { setNameError('Name is required'); valid = false } else setNameError('')
+    if (!name.trim()) {
+      setNameError('Name is required')
+      valid = false
+    } else {
+      setNameError('')
+    }
     if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setEmailError('A valid email is required'); valid = false
-    } else setEmailError('')
-    if (valid) setSubmitted(true)
+      setEmailError('A valid email is required')
+      valid = false
+    } else {
+      setEmailError('')
+    }
+    if (!valid) return
+
+    if (!eventId) {
+      setSubmitError(
+        "We can't subscribe you right now — there's no upcoming event scheduled."
+      )
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      const res = await fetch(`/api/events/${eventId}/notify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name.trim(), email: email.trim() }),
+      })
+
+      if (res.ok) {
+        setSubmitted(true)
+      } else {
+        const data = await res.json().catch(() => ({}))
+        setSubmitError(
+          data.error ?? 'Something went wrong. Please try again in a moment.'
+        )
+      }
+    } catch (err) {
+      console.error('Notify subscribe error:', err)
+      setSubmitError(
+        'Unable to reach the server. Please check your connection and try again.'
+      )
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -202,20 +254,31 @@ function NotifyModal() {
               )}
             </div>
 
+            {submitError && (
+              <p
+                role="alert"
+                className="rounded-lg bg-red-50 border border-red-200 text-red-700 px-3 py-2 text-xs"
+              >
+                {submitError}
+              </p>
+            )}
+
             <ModalFooter className="pt-2">
               <ModalClose asChild>
                 <button
                   type="button"
-                  className="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-900"
+                  disabled={isSubmitting}
+                  className="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-900 disabled:opacity-50"
                 >
                   Cancel
                 </button>
               </ModalClose>
               <button
                 type="submit"
-                className="rounded-lg bg-[var(--church-green)] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--church-green)]/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--church-green)]/50"
+                disabled={!canSubmit}
+                className="rounded-lg bg-[var(--church-green)] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--church-green)]/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--church-green)]/50 disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                Notify Me
+                {isSubmitting ? 'Submitting…' : 'Notify Me'}
               </button>
             </ModalFooter>
           </form>
@@ -237,6 +300,7 @@ export function LiveStreamSection({
   isLive,
   youtubeLiveHref,
   nextServiceDate,
+  eventId,
 }: LiveStreamSectionProps) {
   const { days, hours, minutes, expired } = useCountdown(nextServiceDate)
 
@@ -353,7 +417,7 @@ export function LiveStreamSection({
             )}
 
             {/* CTA */}
-            <NotifyModal />
+            <NotifyModal eventId={eventId} />
           </div>
         </div>
       </div>

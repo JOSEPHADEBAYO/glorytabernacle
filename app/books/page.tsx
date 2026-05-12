@@ -4,8 +4,23 @@ import { TopNavBar } from '@/components/church/nav-bar'
 import { Footer } from '@/components/church/footer'
 import { NewsletterForm } from '@/components/church/newsletter-form'
 import { BookLibrary } from './book-library'
+import { prisma } from '@/lib/prisma'
+import type { Book } from '@/lib/types/book'
 
-export default function BooksPage() {
+export default async function BooksPage() {
+  // Fetch published books from database
+  let books: Book[] = []
+  let error: string | null = null
+
+  try {
+    books = await prisma.book.findMany({
+      where: { published: true },
+      orderBy: { createdAt: 'desc' }
+    }) as Book[]
+  } catch (err) {
+    console.error('Error fetching books:', err)
+    error = 'Failed to load books. Please try again later.'
+  }
   return (
     <>
       <TopNavBar />
@@ -76,7 +91,17 @@ export default function BooksPage() {
           </div>
 
           {/* Client component handles grid + load more */}
-          <BookLibrary />
+          {error ? (
+            <div className="text-center py-12">
+              <p className="text-red-600 font-semibold">{error}</p>
+            </div>
+          ) : books.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500">No books available at the moment. Check back soon!</p>
+            </div>
+          ) : (
+            <BookLibrary books={books} />
+          )}
         </div>
       </section>
 

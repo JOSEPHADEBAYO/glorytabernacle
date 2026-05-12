@@ -1,10 +1,19 @@
 import { TopNavBar } from '@/components/church/nav-bar'
 import { HeroSection } from '@/components/church/hero'
 import { LiveStreamSection } from '@/components/church/live-stream-section'
-import { EventAnnouncementModal } from '@/components/church/event-announcement-modal'
+import {
+  EventAnnouncementModal,
+  type AnnouncementEvent,
+} from '@/components/church/event-announcement-modal'
 import { AboutSection } from '@/components/church/about-section'
-import { MinistriesSection } from '@/components/church/ministries-section'
-import { ImageGallerySection } from '@/components/church/image-gallery-section'
+import {
+  MinistriesSection,
+  type MinistryCard,
+} from '@/components/church/ministries-section'
+import {
+  ImageGallerySection,
+  type GalleryItem,
+} from '@/components/church/image-gallery-section'
 import { EventsSection } from '@/components/church/events-section'
 import { SermonsSection } from '@/components/church/sermons-section'
 import { UpcomingEncountersSection } from '@/components/church/upcoming-encounters-section'
@@ -13,41 +22,275 @@ import { BooksSection } from '@/components/church/books-section'
 import { GlobalConnectionSection } from '@/components/church/global-connection-section'
 import { SupportSection } from '@/components/church/support-section'
 import { Footer } from '@/components/church/footer'
+import { prisma } from '@/lib/prisma'
 import type { ChurchEvent } from '@/components/church/event-card'
 import type { Sermon } from '@/components/church/sermon-card'
 
-const EVENTS: ChurchEvent[] = [
-  {
-    id: 'evt-1',
-    title: 'Sunday Worship Service',
-    date: '2025-08-03',
-    time: '10:00 AM',
-    location: 'Main Sanctuary',
-    description: 'Join us for our weekly Sunday worship service filled with praise, prayer, and the Word of God.',
-    image: 'https://placehold.co/600x400',
-    registrationHref: '',
-  },
-  {
-    id: 'evt-2',
-    title: 'Youth Conference 2025',
-    date: '2025-08-15',
-    time: '9:00 AM',
-    location: 'Fellowship Hall',
-    description: 'A two-day conference empowering the next generation to walk boldly in their faith and purpose.',
-    image: 'https://placehold.co/600x400/1B6D24/ffffff',
-    registrationHref: '#',
-  },
-  {
-    id: 'evt-3',
-    title: 'Community Outreach Day',
-    date: '2025-09-06',
-    time: '8:00 AM',
-    location: 'City Park, Main Street',
-    description: 'Serving our local community through food distribution, prayer, and acts of kindness in the name of Christ.',
-    image: 'https://placehold.co/600x400/1b2277/ffffff',
-    registrationHref: '#',
-  },
-]
+/**
+ * Format a Date as DD/MM/YYYY for the gallery card.
+ */
+function formatGalleryDate(d: Date): string {
+  const dd = String(d.getDate()).padStart(2, '0')
+  const mm = String(d.getMonth() + 1).padStart(2, '0')
+  const yyyy = d.getFullYear()
+  return `${dd}/${mm}/${yyyy}`
+}
+
+/**
+ * Server-fetch published gallery photos and map them to GalleryItem shape.
+ * Failures are swallowed (logged) so a DB outage cannot break the homepage —
+ * the gallery section will simply be hidden in that case.
+ */
+async function loadGalleryItems(): Promise<GalleryItem[]> {
+  try {
+    const photos = await prisma.gallery.findMany({
+      where: { published: true },
+      orderBy: [{ dateTaken: 'desc' }, { createdAt: 'desc' }],
+    })
+
+    return photos.map((p) => ({
+      imageSrc: p.imageUrl,
+      imageAlt: p.imageAlt,
+      date: formatGalleryDate(p.dateTaken),
+      title: p.title,
+      description: p.description,
+    }))
+  } catch (err) {
+    console.error('Error loading homepage gallery items:', err)
+    return []
+  }
+}
+
+/**
+ * Format a Date as YYYY-MM-DD (the format event-card.tsx expects).
+ */
+function toIsoDateString(d: Date): string {
+  const yyyy = d.getFullYear()
+  const mm = String(d.getMonth() + 1).padStart(2, '0')
+  const dd = String(d.getDate()).padStart(2, '0')
+  return `${yyyy}-${mm}-${dd}`
+}
+
+/**
+ * Server-fetch the next 6 upcoming published events for the homepage strip.
+ * Returns an empty array on error so the homepage cannot crash.
+ */
+async function loadHomepageEvents(): Promise<ChurchEvent[]> {
+  try {
+    const events = await prisma.event.findMany({
+      where: {
+        published: true,
+        date: { gte: new Date() },
+      },
+      orderBy: { date: 'asc' },
+      take: 6,
+    })
+
+    return events.map((e) => ({
+      id: e.id,
+      title: e.title,
+      date: toIsoDateString(e.date),
+      time: e.time ?? 'TBA',
+      location: e.location ?? 'TBA',
+      description: e.description,
+      image: e.imageSrc ?? undefined,
+      registrationHref: e.registrationHref ?? undefined,
+    }))
+  } catch (err) {
+    console.error('Error loading homepage events:', err)
+    return []
+  }
+}
+
+/**
+ * Minimal shape of an Event row used by both the announcement modal
+ * and the live-stream section.
+ */
+interface NextUpcomingEvent {
+  id: string
+  title: string
+  description: string
+  date: Date
+  time: string | null
+  location: string | null
+  imageSrc: string | null
+  registrationHref: string | null
+}
+
+/**
+ * Find the next upcoming published event (any future date).
+ * Returns null when none exist or on DB error.
+ *
+ * Both the EventAnnouncementModal (which only renders if the event is within
+ * 14 days) and the LiveStreamSection (which counts down to the next event)
+ * derive from this single fetch.
+ */
+async function loadNextUpcomingEvent(): Promise<NextUpcomingEvent | null> {
+  try {
+    const event = await prisma.event.findFirst({
+      where: {
+        published: true,
+        date: { gte: new Date() },
+      },
+      orderBy: { date: 'asc' },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        date: true,
+        time: true,
+        location: true,
+        imageSrc: true,
+        registrationHref: true,
+      },
+    })
+    return event
+  } catch (err) {
+    console.error('Error loading next upcoming event:', err)
+    return null
+  }
+}
+
+/**
+ * Server-fetch published testimonials for the homepage TestimonialsSection.
+ * Returns an empty array on DB error so the homepage can't crash.
+ */
+async function loadHomepageTestimonials(): Promise<
+  Array<{ quote: string; name: string; memberSince: number }>
+> {
+  try {
+    const rows = await prisma.testimonial.findMany({
+      where: { published: true },
+      orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
+      select: { quote: true, name: true, memberSince: true },
+    })
+    return rows
+  } catch (err) {
+    console.error('Error loading homepage testimonials:', err)
+    return []
+  }
+}
+
+/**
+ * Shape consumed by the homepage BooksSection (matches the component's
+ * existing props rather than the raw Prisma row).
+ */
+interface HomepageBookCard {
+  imageSrc: string
+  imageAlt: string
+  title: string
+  author: string
+  description: string
+  purchaseHref: string
+}
+
+/**
+ * Server-fetch up to 3 published books that admins have flagged as
+ * featured ("Books of the Month"). Returns:
+ *   { featured, secondary }  where featured is the slot-1 book (or null
+ *   if there are none) and secondary is the next two books.
+ *
+ * Falls back to empty/null on DB error so the homepage can't crash.
+ */
+async function loadHomepageBooks(): Promise<{
+  featured: HomepageBookCard | null
+  secondary: HomepageBookCard[]
+}> {
+  try {
+    const rows = await prisma.book.findMany({
+      where: { published: true, featured: true },
+      orderBy: [{ featuredOrder: 'asc' }, { createdAt: 'desc' }],
+      take: 3,
+      select: {
+        id: true,
+        title: true,
+        author: true,
+        description: true,
+        coverImage: true,
+        purchaseUrl: true,
+      },
+    })
+
+    const cards: HomepageBookCard[] = rows.map((b) => ({
+      imageSrc: b.coverImage,
+      imageAlt: `${b.title} book cover`,
+      title: b.title,
+      author: b.author,
+      description: b.description,
+      // Prefer the admin-set purchase URL, otherwise link to the public
+      // /books page where the visitor can find it.
+      purchaseHref: b.purchaseUrl ?? '/books',
+    }))
+
+    return {
+      featured: cards[0] ?? null,
+      secondary: cards.slice(1, 3),
+    }
+  } catch (err) {
+    console.error('Error loading homepage featured books:', err)
+    return { featured: null, secondary: [] }
+  }
+}
+
+/**
+ * Server-fetch published groups for the homepage MinistriesSection carousel.
+ * Each card links to /groups/[slug]. Tag falls back to uppercased title when
+ * the admin hasn't set an explicit tag.
+ *
+ * Returns an empty array on DB error so the homepage cannot crash.
+ */
+async function loadMinistryCards(): Promise<MinistryCard[]> {
+  try {
+    const rows = await prisma.group.findMany({
+      where: { published: true },
+      orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
+      select: {
+        slug: true,
+        title: true,
+        tag: true,
+        imageSrc: true,
+        imageAlt: true,
+      },
+    })
+
+    return rows.map((g) => ({
+      imageSrc: g.imageSrc,
+      imageAlt: g.imageAlt,
+      tag: g.tag ?? g.title.toUpperCase(),
+      title: g.title,
+      href: `/groups/${g.slug}`,
+    }))
+  } catch (err) {
+    console.error('Error loading homepage ministry cards:', err)
+    return []
+  }
+}
+
+/**
+ * Map a NextUpcomingEvent to AnnouncementEvent shape, but only if the
+ * event is within the next 14 days. Returns null otherwise so the modal
+ * stays hidden for events that are too far out.
+ */
+function toAnnouncementEvent(
+  event: NextUpcomingEvent | null
+): AnnouncementEvent | null {
+  if (!event) return null
+  const fourteenDaysFromNow = Date.now() + 14 * 24 * 60 * 60 * 1000
+  if (event.date.getTime() > fourteenDaysFromNow) return null
+
+  return {
+    date: event.date.toISOString(),
+    time: event.time ?? 'TBA',
+    title: event.title,
+    description: event.description,
+    location: event.location ?? 'TBA',
+    imageSrc: event.imageSrc ?? undefined,
+    ctaLabel: event.registrationHref ? 'Register Now' : undefined,
+    ctaHref: event.registrationHref ?? undefined,
+    // Stable per-event storage key so dismissals don't carry across events.
+    storageKey: `event-announcement-${event.id}`,
+  }
+}
 
 const SERMONS: Sermon[] = [
   {
@@ -81,24 +324,29 @@ const SERMONS: Sermon[] = [
   },
 ]
 
-export default function Home() {
+export default async function Home() {
+  const [
+    galleryItems,
+    homepageEvents,
+    nextEvent,
+    ministryCards,
+    testimonials,
+    homepageBooks,
+  ] = await Promise.all([
+    loadGalleryItems(),
+    loadHomepageEvents(),
+    loadNextUpcomingEvent(),
+    loadMinistryCards(),
+    loadHomepageTestimonials(),
+    loadHomepageBooks(),
+  ])
+
+  const announcementEvent = toAnnouncementEvent(nextEvent)
+
   return (
     <>
       <TopNavBar />
-      <EventAnnouncementModal
-        event={{
-          date: '2026-05-18',
-          time: '10:00 AM — 2:00 PM',
-          title: 'The 2026 Hub Leadership Summit',
-          subtitle: 'Special Event',
-          description: 'Join us for a powerful gathering of leaders, believers, and kingdom builders. This summit is designed to equip, inspire, and activate you for greater impact in your sphere of influence.',
-          location: 'North Devon College, Barnstaple EX31 2BQ',
-          imageSrc: '/web.png',
-          ctaLabel: 'Register Now',
-          ctaHref: '#',
-          storageKey: 'hub-summit-2026',
-        }}
-      />
+      {announcementEvent && <EventAnnouncementModal event={announcementEvent} />}
       <HeroSection
         slides={[
           {
@@ -127,17 +375,21 @@ export default function Home() {
         primaryCta={{ label: 'Plan a Visit', href: '/about' }}
         secondaryCta={{ label: 'Watch Sermons', href: '/sermons' }}
       />
-      <LiveStreamSection
-        thumbnailSrc="/livestream.png"
-        thumbnailAlt="RCCG Glory Tabernacle congregation in worship"
-        isLive={false}
-        youtubeLiveHref="https://www.youtube.com/@RCCGGloryTabernacle/live"
-        nextServiceDate="2026-05-10T10:00:00"
-      />
+      {nextEvent && (
+        <LiveStreamSection
+          thumbnailSrc={nextEvent.imageSrc ?? '/livestream.png'}
+          thumbnailAlt={`${nextEvent.title} thumbnail`}
+          isLive={false}
+          youtubeLiveHref="https://www.youtube.com/@RCCGGloryTabernacle/live"
+          nextServiceDate={nextEvent.date.toISOString()}
+          subtext={`${nextEvent.title} begins in:`}
+          eventId={nextEvent.id}
+        />
+      )}
       <AboutSection
         eyebrow="Our Foundation"
         heading="A Tabernacle is not merely a building."
-        body="It is a life surrendered to God. It is God's dwelling place among His people. When God commanded a Tabernacle to be built, He was asking for a place a life to host His presence"
+        body="It is a life surrendered to God. It is God's dwelling place among His people. When God commanded a Tabernacle to be built, He was asking for a place, and a life to host His presence"
         pillars={[
           {
             title: 'Furnish',
@@ -160,21 +412,30 @@ export default function Home() {
           height: 600,
         }}
       />
-      <MinistriesSection />
-      <ImageGallerySection />
-      <EventsSection
-        heading="Upcoming Events"
-        events={EVENTS}
-        viewAllHref="/events"
-      />
+      {ministryCards.length > 0 && <MinistriesSection ministries={ministryCards} />}
+      {galleryItems.length > 0 && <ImageGallerySection items={galleryItems} />}
+      {homepageEvents.length > 0 && (
+        <EventsSection
+          heading="Upcoming Events"
+          events={homepageEvents}
+          viewAllHref="/events"
+        />
+      )}
       <SermonsSection
         heading="Recent Sermons"
         sermons={SERMONS}
         viewAllHref="/sermons"
       />
       <UpcomingEncountersSection />
-      <TestimonialsSection />
-      <BooksSection />
+      {testimonials.length > 0 && (
+        <TestimonialsSection testimonials={testimonials} />
+      )}
+      {homepageBooks.featured && (
+        <BooksSection
+          featured={homepageBooks.featured}
+          secondary={homepageBooks.secondary}
+        />
+      )}
       <GlobalConnectionSection />
       <SupportSection
         heading="Support the Mission"

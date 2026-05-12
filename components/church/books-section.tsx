@@ -67,7 +67,7 @@ function FeaturedBookCard({ book }: { book: Book }) {
       style={{ boxShadow: '0px 4px 24px 0px rgba(0, 0, 0, 0.07)' }}
     >
       {/* Book cover */}
-      <div className="shrink-0 self-start">
+      <div className="shrink-0 self-center">
         <div className="relative overflow-hidden rounded-xl" style={{ width: '160px', height: '220px' }}>
           <Image
             src={book.imageSrc}
@@ -93,7 +93,9 @@ function FeaturedBookCard({ book }: { book: Book }) {
         >
           by {book.author}
         </p>
-        <p className="text-sm leading-relaxed text-gray-500">{book.description}</p>
+        <p className="text-sm leading-relaxed text-gray-500 line-clamp-4">
+          {book.description}
+        </p>
         <Link
           href={book.purchaseHref}
           className="mt-2 inline-flex w-fit items-center justify-center rounded-md px-6 py-2.5 text-xs font-bold uppercase tracking-widest text-white transition-opacity hover:opacity-90"
