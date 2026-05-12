@@ -377,18 +377,20 @@ model AdultAttendance {
 model Sermon {
   id          String   @id @default(cuid())
   title       String
-  description String?  @db.Text
-  preacher    String
+  series      String?
+  speaker     String
   date        DateTime
-  videoUrl    String?
-  audioUrl    String?
-  thumbnail   String?
+  duration    String
+  description String   @db.Text
+  thumbnail   String
+  videoUrl    String
   published   Boolean  @default(false)
   createdBy   String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   @@index([published])
+  @@index([series])
   @@index([date])
 }
 

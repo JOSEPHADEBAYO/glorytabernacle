@@ -20,8 +20,8 @@ export default function AttendancePage() {
         <div className="mx-auto max-w-md">
           <div className="text-center mb-8">
             <p
-              className="text-xs font-bold uppercase tracking-[0.2em]"
-              style={{ color: 'var(--church-light-green, rgb(27, 109, 36))' }}
+              className="text-xs font-bold uppercase tracking-[0.2em] pt-5"
+              style={{ color: 'var(--church-red, rgba(230, 17, 17, 1))' }}
             >
               We&apos;re glad you&apos;re here
             </p>

@@ -64,6 +64,7 @@ body {
   --church-navy: rgba(27, 34, 119, 0.85);
   --church-light-green: rgba(163, 246, 156, 1);
   --church-white-transparent: rgba(255, 255, 255, 0.8);
+  --church-red: rgba(230, 17, 17, 1);
 
   /* Semantic aliases */
   --color-brand-primary: var(--church-green);
