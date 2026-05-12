@@ -2,6 +2,21 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { sendEventNotification } from '@/lib/email/send-event-notification'
 
+type PendingEventNotification = {
+  id: string
+  name: string
+  email: string
+  event: {
+    id: string
+    title: string
+    description: string
+    date: Date
+    time: string | null
+    location: string | null
+    registrationHref: string | null
+  }
+}
+
 /**
  * Window: how far in the future an event must start to be eligible for a
  * "starting soon" notification. We use 35 minutes so that a cron firing every
@@ -47,7 +62,7 @@ async function handle(request: NextRequest) {
   const now = new Date()
   const cutoff = new Date(now.getTime() + NOTIFY_WINDOW_MS)
 
-  let pending
+  let pending: PendingEventNotification[]
   try {
     pending = await prisma.eventNotification.findMany({
       where: {

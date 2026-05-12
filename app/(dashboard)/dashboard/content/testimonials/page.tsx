@@ -1,7 +1,10 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
-import { TestimonialsManager } from '@/components/dashboard/testimonials-manager'
+import {
+  TestimonialsManager,
+  type DashboardTestimonial,
+} from '@/components/dashboard/testimonials-manager'
 
 export default async function TestimonialsDashboardPage() {
   const cookieStore = await cookies()
@@ -10,7 +13,7 @@ export default async function TestimonialsDashboardPage() {
     redirect('/login')
   }
 
-  const testimonials = await prisma.testimonial.findMany({
+  const testimonials: DashboardTestimonial[] = await prisma.testimonial.findMany({
     orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
   })
 

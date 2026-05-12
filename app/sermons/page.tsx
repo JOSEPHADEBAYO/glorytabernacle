@@ -6,7 +6,19 @@ import { NewsletterForm } from '@/components/church/newsletter-form'
 import { prisma } from '@/lib/prisma'
 import { SermonGrid, type PublicSermon } from './sermon-grid'
 
-function serializeSermon(sermon: any): PublicSermon {
+type SermonRow = {
+  id: string
+  title: string
+  series: string | null
+  speaker: string
+  date: Date
+  duration: string
+  description: string
+  thumbnail: string
+  videoUrl: string
+}
+
+function serializeSermon(sermon: SermonRow): PublicSermon {
   return {
     id: sermon.id,
     title: sermon.title,
@@ -95,7 +107,7 @@ export default async function SermonsPage() {
   let loadError: string | null = null
 
   try {
-    const rows = await (prisma.sermon as any).findMany({
+    const rows: SermonRow[] = await prisma.sermon.findMany({
       where: { published: true },
       orderBy: { date: 'desc' },
     })

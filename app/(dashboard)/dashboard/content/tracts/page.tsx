@@ -3,6 +3,17 @@ import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { TractsManager } from '@/components/dashboard/tracts-manager'
 
+type DashboardTract = {
+  id: string
+  title: string
+  category: string
+  description: string
+  coverImage: string
+  documentUrl: string
+  published: boolean
+  createdAt: Date
+}
+
 export default async function TractsPage() {
   // Server-side auth check
   const cookieStore = await cookies()
@@ -13,7 +24,7 @@ export default async function TractsPage() {
   }
 
   // Fetch tracts from database
-  const tracts = await prisma.tract.findMany({
+  const tracts: DashboardTract[] = await prisma.tract.findMany({
     orderBy: {
       createdAt: 'desc',
     },

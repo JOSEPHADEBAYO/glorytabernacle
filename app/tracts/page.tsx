@@ -12,10 +12,11 @@ export default async function TractsPage() {
   let error: string | null = null
 
   try {
-    tracts = await prisma.tract.findMany({
+    const rows: Tract[] = await prisma.tract.findMany({
       where: { published: true },
       orderBy: { createdAt: 'desc' }
     }) as Tract[]
+    tracts = rows
   } catch (err) {
     console.error('Error fetching tracts:', err)
     error = 'Failed to load tracts. Please try again later.'

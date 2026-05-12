@@ -1,7 +1,10 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
-import { EventsManager } from '@/components/dashboard/events-manager'
+import {
+  EventsManager,
+  type DashboardEvent,
+} from '@/components/dashboard/events-manager'
 
 export default async function EventsDashboardPage() {
   // Server-side auth check — same pattern as the books / gallery dashboard pages
@@ -14,7 +17,7 @@ export default async function EventsDashboardPage() {
 
   // Fetch all events (drafts and published, past and upcoming) for the dashboard.
   // Newest first by date so the editor sees fresh entries at the top.
-  const events = await prisma.event.findMany({
+  const events: DashboardEvent[] = await prisma.event.findMany({
     orderBy: [{ date: 'desc' }, { createdAt: 'desc' }],
   })
 

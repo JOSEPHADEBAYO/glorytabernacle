@@ -53,6 +53,7 @@ enum UserRole {
   CONTENT_EDITOR
   VIEWER
   PARENT
+  YOUTH
 }
 
 // =========================================================================

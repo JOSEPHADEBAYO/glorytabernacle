@@ -3,6 +3,12 @@ import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { SermonsManager, type DashboardSermon } from '@/components/dashboard/sermons-manager'
 
+type SermonRow = Omit<DashboardSermon, 'date' | 'createdAt' | 'updatedAt'> & {
+  date: Date
+  createdAt: Date
+  updatedAt: Date
+}
+
 export default async function SermonsDashboardPage() {
   const cookieStore = await cookies()
   const sessionToken = cookieStore.get('session_token')?.value
@@ -11,9 +17,9 @@ export default async function SermonsDashboardPage() {
     redirect('/login')
   }
 
-  const sermons = (await (prisma.sermon as any).findMany({
+  const sermons: SermonRow[] = await prisma.sermon.findMany({
     orderBy: { date: 'desc' },
-  })) as DashboardSermon[]
+  })
 
   const serializedSermons = sermons.map((sermon) => ({
     ...sermon,

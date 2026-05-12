@@ -7,6 +7,25 @@ import {
   type ChildrenAdminRole,
 } from '@/lib/types/child'
 
+type AdminCheckInRow = {
+  id: string
+  childId: string
+  signedInAt: Date
+  signedInById: string
+  signedOutAt: Date | null
+  signedOutById: string | null
+  child: {
+    id: string
+    firstName: string
+    lastName: string
+    photoUrl: string | null
+    allergies: string | null
+    specialNeeds: string | null
+  }
+  signedInBy: { id: string; name: string; email: string }
+  signedOutBy: { id: string; name: string; email: string } | null
+}
+
 function isAdmin(role: string | undefined): role is ChildrenAdminRole {
   return CHILDREN_ADMIN_ROLES.includes(role as ChildrenAdminRole)
 }
@@ -55,32 +74,31 @@ export async function GET(request: NextRequest) {
       ? { signedOutAt: null }
       : { signedInAt: { gte: startOfToday } }
 
-    const checkIns: Awaited<ReturnType<typeof prisma.childCheckIn.findMany>> =
-  await prisma.childCheckIn.findMany({
-    where,
-    orderBy: { signedInAt: 'desc' },
-    take: 200,
-    include: {
-      child: {
-        select: {
-          id: true,
-          firstName: true,
-          lastName: true,
-          photoUrl: true,
-          allergies: true,
-          specialNeeds: true,
+    const checkIns: AdminCheckInRow[] = await prisma.childCheckIn.findMany({
+      where,
+      orderBy: { signedInAt: 'desc' },
+      take: 200,
+      include: {
+        child: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            photoUrl: true,
+            allergies: true,
+            specialNeeds: true,
+          },
         },
+        signedInBy: { select: { id: true, name: true, email: true } },
+        signedOutBy: { select: { id: true, name: true, email: true } },
       },
-      signedInBy: { select: { id: true, name: true, email: true } },
-      signedOutBy: { select: { id: true, name: true, email: true } },
-    },
-  })
+    })
 
     // Also surface a simple summary the live-board UI can show without an
     // additional fetch.
     const activeCount = onlyActive
-  ? checkIns.length
-  : checkIns.filter((c: typeof checkIns[number]) => c.signedOutAt === null).length
+      ? checkIns.length
+      : checkIns.filter((c) => c.signedOutAt === null).length
 
     return NextResponse.json(
       {

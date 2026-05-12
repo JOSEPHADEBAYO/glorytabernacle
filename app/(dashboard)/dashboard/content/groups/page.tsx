@@ -1,7 +1,10 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
-import { GroupsManager } from '@/components/dashboard/groups-manager'
+import {
+  GroupsManager,
+  type DashboardGroup,
+} from '@/components/dashboard/groups-manager'
 
 export default async function GroupsDashboardPage() {
   const cookieStore = await cookies()
@@ -11,7 +14,7 @@ export default async function GroupsDashboardPage() {
     redirect('/login')
   }
 
-  const groups = await prisma.group.findMany({
+  const groups: DashboardGroup[] = await prisma.group.findMany({
     orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
   })
 

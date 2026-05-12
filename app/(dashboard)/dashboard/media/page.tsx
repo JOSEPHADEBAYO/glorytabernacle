@@ -2,6 +2,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { HeroCarouselManager } from '@/components/dashboard/hero-carousel-manager'
+import type { HeroCarouselImage } from '@/lib/types/hero-carousel'
 
 export default async function MediaDashboardPage() {
   const cookieStore = await cookies()
@@ -11,7 +12,7 @@ export default async function MediaDashboardPage() {
     redirect('/login')
   }
 
-  const images = await prisma.heroCarouselImage.findMany({
+  const images: HeroCarouselImage[] = await prisma.heroCarouselImage.findMany({
     orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
   })
 

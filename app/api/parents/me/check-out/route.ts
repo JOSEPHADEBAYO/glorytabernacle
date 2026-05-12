@@ -3,6 +3,14 @@ import { prisma } from '@/lib/prisma'
 import { getParentUser } from '@/lib/auth/parent-session'
 import { checkOutSchema } from '@/lib/validation/child'
 
+type CheckOutCandidate = {
+  id: string
+  signedOutAt: Date | null
+  child: {
+    parents: Array<{ id: string }>
+  }
+}
+
 /**
  * POST /api/parents/me/check-out
  *
@@ -38,32 +46,30 @@ export async function POST(request: NextRequest) {
 
     // Pull the check-ins along with the child's parent list. We only allow
     // the close if the requester is one of that child's registered parents.
-    const checkIns = await prisma.childCheckIn.findMany({
+    const checkIns: CheckOutCandidate[] = await prisma.childCheckIn.findMany({
       where: { id: { in: requestedIds } },
       include: { child: { select: { parents: { select: { id: true } } } } },
     })
 
-    
-
     const allowed = checkIns.filter(
-  (c: any) => c.child.parents.some((p: any) => p.id === parent.id)
-)
+      (c) => c.child.parents.some((p) => p.id === parent.id)
+    )
 
-const skipped = requestedIds.length - allowed.length
+    const skipped = requestedIds.length - allowed.length
 
-const open = allowed.filter((c: any) => c.signedOutAt === null)
+    const open = allowed.filter((c) => c.signedOutAt === null)
 
-const alreadyOut = allowed.length - open.length
+    const alreadyOut = allowed.length - open.length
 
-if (open.length > 0) {
-  await prisma.childCheckIn.updateMany({
-    where: { id: { in: open.map((c: any) => c.id) } },
-    data: {
-      signedOutAt: new Date(),
-      signedOutById: parent.id,
-    },
-  })
-}
+    if (open.length > 0) {
+      await prisma.childCheckIn.updateMany({
+        where: { id: { in: open.map((c) => c.id) } },
+        data: {
+          signedOutAt: new Date(),
+          signedOutById: parent.id,
+        },
+      })
+    }
 
     return NextResponse.json(
       { signedOut: open.length, alreadyOut, skipped },

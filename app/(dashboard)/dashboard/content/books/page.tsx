@@ -3,6 +3,20 @@ import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { BooksManager } from '@/components/dashboard/books-manager'
 
+type DashboardBook = {
+  id: string
+  title: string
+  author: string
+  category: string
+  description: string
+  coverImage: string
+  purchaseUrl: string | null
+  published: boolean
+  featured: boolean
+  featuredOrder: number
+  createdAt: Date
+}
+
 export default async function BooksPage() {
   // Server-side auth check
   const cookieStore = await cookies()
@@ -13,7 +27,7 @@ export default async function BooksPage() {
   }
 
   // Fetch books from database
-  const books = await prisma.book.findMany({
+  const books: DashboardBook[] = await prisma.book.findMany({
     orderBy: {
       createdAt: 'desc',
     },

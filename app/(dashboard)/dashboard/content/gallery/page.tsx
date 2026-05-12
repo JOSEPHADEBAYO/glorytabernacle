@@ -1,7 +1,10 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
-import { GalleryManager } from '@/components/dashboard/gallery-manager'
+import {
+  GalleryManager,
+  type GalleryPhoto,
+} from '@/components/dashboard/gallery-manager'
 
 export default async function GalleryDashboardPage() {
   // Server-side auth check — same pattern as the books dashboard page
@@ -13,7 +16,7 @@ export default async function GalleryDashboardPage() {
   }
 
   // Fetch all gallery photos (drafts and published) for the dashboard view
-  const photos = await prisma.gallery.findMany({
+  const photos: GalleryPhoto[] = await prisma.gallery.findMany({
     orderBy: [{ dateTaken: 'desc' }, { createdAt: 'desc' }],
   })
 

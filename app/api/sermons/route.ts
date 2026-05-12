@@ -1,7 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
+import type { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { getSessionToken, getSessionUser } from '@/lib/auth/session'
 import { createSermonSchema, normalizeSeries, sermonQuerySchema } from '@/lib/validation/sermon'
+
+type SermonRouteRow = {
+  id: string
+  title: string
+  series: string | null
+  speaker: string
+  date: Date
+  duration: string
+  description: string
+  thumbnail: string
+  videoUrl: string
+  published: boolean
+  createdBy: string
+  createdAt: Date
+  updatedAt: Date
+}
 
 async function requireUser() {
   const token = await getSessionToken()
@@ -74,7 +91,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const where: Record<string, unknown> = {}
+    const where: Prisma.SermonWhereInput = {}
     if (validation.data.published !== undefined) {
       where.published = validation.data.published === 'true'
     }
@@ -88,7 +105,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const sermons = await (prisma.sermon as any).findMany({
+    const sermons: SermonRouteRow[] = await prisma.sermon.findMany({
       where,
       orderBy: { date: 'desc' },
     })

@@ -6,6 +6,17 @@ import {
   type ChildRow,
 } from '@/components/parents/children-checkin-panel'
 
+type ParentDashboardChild = {
+  id: string
+  firstName: string
+  lastName: string
+  photoUrl: string | null
+  checkIns: Array<{
+    id: string
+    signedInAt: Date
+  }>
+}
+
 /**
  * Parent dashboard. Server-fetches the parent's children with their open
  * (unsigned-out) check-in if any, then hands off to a client panel that
@@ -14,7 +25,7 @@ import {
 export default async function ParentDashboardPage() {
   const parent = await requireParent()
 
-  const childrenRaw = await prisma.child.findMany({
+  const childrenRaw: ParentDashboardChild[] = await prisma.child.findMany({
     where: { parents: { some: { id: parent.id } } },
     orderBy: { firstName: 'asc' },
     include: {

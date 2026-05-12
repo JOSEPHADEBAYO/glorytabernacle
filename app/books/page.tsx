@@ -13,10 +13,11 @@ export default async function BooksPage() {
   let error: string | null = null
 
   try {
-    books = await prisma.book.findMany({
+    const rows: Book[] = await prisma.book.findMany({
       where: { published: true },
       orderBy: { createdAt: 'desc' }
     }) as Book[]
+    books = rows
   } catch (err) {
     console.error('Error fetching books:', err)
     error = 'Failed to load books. Please try again later.'

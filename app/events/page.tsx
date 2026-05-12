@@ -40,13 +40,14 @@ function formatLongDate(d: Date): string {
  */
 async function loadUpcomingEvents(): Promise<PublicEvent[]> {
   try {
-    return await prisma.event.findMany({
+    const events: PublicEvent[] = await prisma.event.findMany({
       where: {
         published: true,
         date: { gte: new Date() },
       },
       orderBy: { date: 'asc' },
     })
+    return events
   } catch (err) {
     console.error('Error loading public events:', err)
     return []
