@@ -2,36 +2,6 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { ChildrenAdminPanel } from '@/components/dashboard/children-admin-panel'
-import { Prisma } from '@prisma/client'
-
-type ActiveCheckIn = Prisma.ChildCheckInGetPayload<{
-  include: {
-    child: {
-      select: {
-        id: true
-        firstName: true
-        lastName: true
-        photoUrl: true
-        allergies: true
-        specialNeeds: true
-      }
-    }
-    signedInBy: {
-      select: {
-        id: true
-        name: true
-        email: true
-      }
-    }
-    signedOutBy: {
-      select: {
-        id: true
-        name: true
-        email: true
-      }
-    }
-  }
-}>
 export default async function ChildrenDashboardPage() {
   const cookieStore = await cookies()
   const sessionToken = cookieStore.get('session_token')?.value
@@ -75,7 +45,7 @@ export default async function ChildrenDashboardPage() {
   // }))
 
   const serializedActiveCheckIns = activeCheckIns.map(
-  (checkIn: typeof activeCheckIns[number]) => ({
+  (checkIn: (typeof activeCheckIns)[number]) => ({
     ...checkIn,
     signedInAt: checkIn.signedInAt.toISOString(),
     signedOutAt: checkIn.signedOutAt?.toISOString() ?? null,
