@@ -36,14 +36,14 @@ export async function POST(request: NextRequest) {
     const requestedIds = Array.from(new Set(validation.data.childIds))
 
     // Authorization: only this parent's children can be acted on.
-    const owned = await prisma.child.findMany({
-      where: {
-        id: { in: requestedIds },
-        parents: { some: { id: parent.id } },
-      },
-      select: { id: true },
-    })
-    const ownedIds = owned.map((c) => c.id)
+    const owned: { id: string }[] = await prisma.child.findMany({
+  where: {
+    id: { in: requestedIds },
+    parents: { some: { id: parent.id } },
+  },
+  select: { id: true },
+})
+    const ownedIds = owned.map((c: { id: string }) => c.id)
     const skipped = requestedIds.length - ownedIds.length
 
     if (ownedIds.length === 0) {
@@ -54,11 +54,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Skip children who already have an open check-in.
-    const alreadyOpen = await prisma.childCheckIn.findMany({
-      where: { childId: { in: ownedIds }, signedOutAt: null },
-      select: { childId: true },
-    })
-    const alreadyOpenIds = new Set(alreadyOpen.map((c) => c.childId))
+    const alreadyOpen: { childId: string }[] =
+  await prisma.childCheckIn.findMany({
+    where: { childId: { in: ownedIds }, signedOutAt: null },
+    select: { childId: true },
+  })
+    const alreadyOpenIds = new Set(
+  alreadyOpen.map((c: { childId: string }) => c.childId)
+)
     const toSignIn = ownedIds.filter((id) => !alreadyOpenIds.has(id))
 
     if (toSignIn.length > 0) {
