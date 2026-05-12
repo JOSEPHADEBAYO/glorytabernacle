@@ -57,6 +57,13 @@ type HeroImageRow = {
   imageUrl: string
   imageAlt: string
 }
+type GalleryPhotoRow = {
+  imageUrl: string
+  imageAlt: string
+  dateTaken: Date
+  title: string
+  description: string
+}
 async function loadHeroSlides(): Promise<HeroSlide[]> {
   try {
     const images: HeroImageRow[] = await prisma.heroCarouselImage.findMany({
@@ -96,18 +103,18 @@ function formatGalleryDate(d: Date): string {
  */
 async function loadGalleryItems(): Promise<GalleryItem[]> {
   try {
-    const photos = await prisma.gallery.findMany({
+    const photos: GalleryPhotoRow[] = await prisma.gallery.findMany({
       where: { published: true },
       orderBy: [{ dateTaken: 'desc' }, { createdAt: 'desc' }],
     })
 
     return photos.map((p) => ({
-      imageSrc: p.imageUrl,
-      imageAlt: p.imageAlt,
-      date: formatGalleryDate(p.dateTaken),
-      title: p.title,
-      description: p.description,
-    }))
+  imageSrc: p.imageUrl,
+  imageAlt: p.imageAlt,
+  date: formatGalleryDate(p.dateTaken),
+  title: p.title,
+  description: p.description,
+}))
   } catch (err) {
     console.error('Error loading homepage gallery items:', err)
     return []
