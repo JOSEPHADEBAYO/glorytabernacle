@@ -13,7 +13,6 @@ import { GoogleSignInButton } from '@/components/parents/google-sign-in-button'
  */
 export default async function ParentLoginPage() {
   const session = await auth()
-  console.log(":::::;>>>>>", session);
   if (session?.user?.id && session.user.role === 'PARENT') {
     redirect('/parents')
   }
