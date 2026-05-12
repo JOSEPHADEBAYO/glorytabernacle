@@ -6,6 +6,7 @@ import Link from 'next/link'
 
 export interface HeroSlide {
   backgroundImage: string
+  backgroundAlt?: string
   eyebrow?: string
   headline: string
   headlineAccent?: string
@@ -67,7 +68,7 @@ export function HeroSection({
         >
           <Image
             src={slide.backgroundImage}
-            alt={slide.headline}
+            alt={slide.backgroundAlt ?? slide.headline}
             fill
             className="object-cover object-center"
             {...(index === 0 ? { loading: 'eager' } : { loading: 'lazy' })}

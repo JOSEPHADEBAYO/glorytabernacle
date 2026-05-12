@@ -28,6 +28,7 @@ export function DashboardHeader() {
     if (pathname.includes('/groups')) return 'Groups & Ministries'
     if (pathname.includes('/sermons')) return 'Sermons'
     if (pathname.includes('/books')) return 'Books'
+    if (pathname.includes('/new-members')) return 'New Member'
     if (pathname.includes('/media')) return 'Media Library'
     if (pathname.includes('/users')) return 'User Management'
     if (pathname.includes('/settings')) return 'Settings'

@@ -117,7 +117,7 @@ export function Footer({
   const locationCol = columns.find(c => c.heading.toLowerCase().includes('contact') || c.heading.toLowerCase().includes('location'))
 
   return (
-    <footer style={{ backgroundColor: 'rgba(248, 250, 252, 1)' }}>
+    <footer style={{ backgroundColor: 'rgba(14, 21, 115, 1)' }}>
       <div className="max-w-[var(--container-max)] mx-auto px-[var(--section-padding-x)] py-12">
 
         {/* Main grid */}
@@ -127,7 +127,7 @@ export function Footer({
                   <Image src={logo.src} alt={logo.alt} width={80} height={80} className="rounded-full object-cover" />
             </Link>
             {tagline && (
-              <p className="text-sm text-gray-500 leading-relaxed max-w-[200px]">
+              <p className="text-sm text-white leading-relaxed max-w-[200px]">
                 {tagline}
               </p>
             )}
@@ -138,7 +138,7 @@ export function Footer({
             <div className="flex flex-col gap-4">
               <h3
                 className="text-xs font-extrabold uppercase tracking-[0.18em]"
-                style={{ color: 'rgba(27, 34, 119, 1)' }}
+                style={{ color: 'rgba(255, 255, 255, 1)' }}
               >
                 {quickLinksCol.heading}
               </h3>
@@ -147,7 +147,7 @@ export function Footer({
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-sm text-gray-500 transition-colors hover:text-gray-800"
+                      className="text-sm text-white transition-colors hover:text-gray-800"
                     >
                       {link.label}
                     </Link>
@@ -161,12 +161,12 @@ export function Footer({
           <div className="flex flex-col gap-4">
             <h3
               className="text-xs font-extrabold uppercase tracking-[0.18em]"
-              style={{ color: 'rgba(27, 34, 119, 1)' }}
+              style={{ color: 'rgba(255, 255, 255, 1)' }}
             >
               Location
             </h3>
             <address className="not-italic flex flex-col gap-1">
-              <p className="text-sm text-gray-500 leading-relaxed">
+              <p className="text-sm text-white leading-relaxed">
                 {contactInfo.address}
               </p>
               {contactInfo.directionsHref && (
@@ -207,7 +207,7 @@ export function Footer({
 
       {/* Bottom bar */}
       <div className="border-t border-gray-300">
-        <p className="py-4 text-center text-xs text-gray-400">
+        <p className="py-4 text-center text-xs text-white">
           {copyrightText.replace('2025', new Date().getFullYear().toString())}
         </p>
       </div>

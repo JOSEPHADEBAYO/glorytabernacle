@@ -356,6 +356,28 @@ model GroupMember {
   @@index([email])
 }
 
+model MembershipApplication {
+  id              String        @id @default(cuid())
+  membershipClass String
+  firstName       String
+  lastName        String
+  email           String        @unique
+  phoneNumber     String
+  gender          Gender
+  maritalStatus   MaritalStatus
+  streetAddress   String
+  city            String
+  stateProvince   String
+  country         String
+  rccgMember      Boolean
+  saved           Boolean
+  expectations    String?       @db.Text
+  createdAt       DateTime      @default(now())
+
+  @@index([createdAt])
+  @@index([membershipClass])
+}
+
 // Adult Attendance — public walk-up form at /attendance, used to track
 // who's at each service. The `service` field is a free-text string but is
 // validated against a fixed list (see lib/types/attendance.ts) so reports
@@ -408,6 +430,29 @@ model Media {
   createdAt  DateTime @default(now())
 
   @@index([uploadedBy])
+  @@index([createdAt])
+}
+
+// Hero Carousel Media
+model HeroCarouselImage {
+  id        String   @id @default(cuid())
+  title     String
+  imageUrl  String
+  imageAlt  String
+  publicId  String?
+  filename  String?
+  format    String?
+  size      Int?
+  width     Int?
+  height    Int?
+  order     Int      @default(0)
+  published Boolean  @default(false)
+  createdBy String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([published])
+  @@index([order])
   @@index([createdAt])
 }
 

@@ -64,6 +64,16 @@ const NAV_ITEMS: NavItem[] = [
     ),
   },
   {
+    id: 'new-members',
+    label: 'New Member',
+    href: '/dashboard/new-members',
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4.5 19.125a7.125 7.125 0 0114.25 0v.375H4.5v-.375z" />
+      </svg>
+    ),
+  },
+  {
     id: 'groups',
     label: 'Groups & Ministries',
     href: '/dashboard/content/groups',

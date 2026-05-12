@@ -4,6 +4,7 @@ import { TopNavBar } from '@/components/church/nav-bar'
 import { Footer } from '@/components/church/footer'
 import { RootsVisionClient } from './roots-vision-client'
 import { DNAClient } from './dna-client'
+import { OurStorySection } from './our-story-section'
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -65,19 +66,15 @@ export default function AboutPage() {
           <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-tight max-w-2xl">
             The Glory<br />Tabernacle<br />Story.
           </h1>
-          <p className="mt-4 text-base md:text-lg text-white/70 max-w-5xl leading-relaxed">
-            Every great move of God begins with a question.
-Ours began with this one: What if a church could be more than a Sunday gathering? What if it could be a place where people don't just attend but are furnished unto every good work, transformed within and without, and sent out to Influence the world around them?
-That question became a conviction, that conviction became a calling, and that calling became RCCG Glory Tabernacle - planted in the heart of Barnstaple, North Devon, with a mandate that stretches far beyond its walls.
-We are a people in pursuit of God's presence, His purpose, and His glory. We believe that every person who walks through our doors carries a destiny too significant to be left unfinished. We believe that ordinary people, when they encounter an extraordinary God, become extraordinary themselves.
-We build the Tabernacle God fills it with His Glory, because you are the TABERNACLE.
-From our first gathering to where we stand today, one thing has never changed, our hunger for His presence. Because we have learned that when God's glory rests in a place, atmospheres shift, hearts are healed, and lives are never the same again.
-This is not just our story. It is the beginning of yours.
-You may have come broken. You will not leave broken. You may have come small. You cannot remain small. Nothing small is found in a Tabernacle.
-Welcome home. Welcome to RCCG Glory Tabernacle.
+          <p className="mt-4 text-base md:text-lg text-white/70 max-w-2xl leading-relaxed">
+          A resilient foundation built upon the weight of history and the ethereal light of
+eternal hope. Discover where we came from and where God is leading us.
           </p>
         </div>
       </section>
+
+      {/* Our Story */}
+      <OurStorySection />
 
       {/* ── Roots & Vision ── */}
       <RootsVisionClient />
@@ -91,9 +88,6 @@ Welcome home. Welcome to RCCG Glory Tabernacle.
           {/* Header row */}
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-12">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.18em] mb-1" style={{ color: 'var(--church-green)' }}>
-                Ordained By
-              </p>
               <h2 className="text-4xl md:text-5xl font-extrabold leading-tight" style={{ color: 'rgba(27, 34, 119, 1)' }}>
                 Pastoral Leadership
               </h2>

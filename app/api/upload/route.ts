@@ -87,11 +87,24 @@ export async function POST(request: NextRequest) {
       uploadStream.end(buffer)
     })
 
-    const uploadResult = result as { secure_url: string; public_id: string }
+    const uploadResult = result as {
+      secure_url: string
+      public_id: string
+      original_filename?: string
+      format?: string
+      bytes?: number
+      width?: number
+      height?: number
+    }
 
     return NextResponse.json({
       url: uploadResult.secure_url,
       publicId: uploadResult.public_id,
+      filename: uploadResult.original_filename,
+      format: uploadResult.format,
+      size: uploadResult.bytes,
+      width: uploadResult.width,
+      height: uploadResult.height,
     })
   } catch (error) {
     console.error('Upload error:', error)

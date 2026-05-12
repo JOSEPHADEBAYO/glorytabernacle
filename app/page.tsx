@@ -16,8 +16,10 @@ import {
 } from '@/components/church/image-gallery-section'
 import { EventsSection } from '@/components/church/events-section'
 import { SermonsSection } from '@/components/church/sermons-section'
+import { ServiceDaysSection } from '@/components/church/service-days-section'
 import { UpcomingEncountersSection } from '@/components/church/upcoming-encounters-section'
 import { TestimonialsSection } from '@/components/church/testimonials-section'
+import { MembershipSection } from '@/components/church/membership-section'
 import { BooksSection } from '@/components/church/books-section'
 import { GlobalConnectionSection } from '@/components/church/global-connection-section'
 import { SupportSection } from '@/components/church/support-section'
@@ -25,6 +27,53 @@ import { Footer } from '@/components/church/footer'
 import { prisma } from '@/lib/prisma'
 import type { ChurchEvent } from '@/components/church/event-card'
 import type { Sermon } from '@/components/church/sermon-card'
+import type { HeroSlide } from '@/components/church/hero'
+
+const FALLBACK_HERO_SLIDES: HeroSlide[] = [
+  {
+    backgroundImage: '/Carousel%202.png',
+    eyebrow: 'Welcome to Glory Tabernacle',
+    headline: 'A Place of',
+    headlineAccent: 'Transformation',
+    headlineLine2: 'Within and Without',
+  },
+  {
+    backgroundImage: '/Carousel%203.png',
+    eyebrow: 'Furnished unto every good work',
+    headline: 'Building a',
+    headlineAccent: 'Transformed',
+    headlineLine2: 'People to Influence the World around them',
+  },
+  {
+    backgroundImage: '/Carousel%204.png',
+    eyebrow: "A people in pursuit of God's presence",
+    headline: 'His purpose,',
+    headlineAccent: 'And His glory',
+    headlineLine2: 'To Influence All Nations',
+  },
+]
+
+async function loadHeroSlides(): Promise<HeroSlide[]> {
+  try {
+    const images = await prisma.heroCarouselImage.findMany({
+      where: { published: true },
+      orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
+    })
+
+    if (images.length === 0) {
+      return FALLBACK_HERO_SLIDES
+    }
+
+    return images.map((image, index) => ({
+      ...FALLBACK_HERO_SLIDES[index % FALLBACK_HERO_SLIDES.length],
+      backgroundImage: image.imageUrl,
+      backgroundAlt: image.imageAlt,
+    }))
+  } catch (err) {
+    console.error('Error loading hero carousel images:', err)
+    return FALLBACK_HERO_SLIDES
+  }
+}
 
 /**
  * Format a Date as DD/MM/YYYY for the gallery card.
@@ -326,6 +375,7 @@ const SERMONS: Sermon[] = [
 
 export default async function Home() {
   const [
+    heroSlides,
     galleryItems,
     homepageEvents,
     nextEvent,
@@ -333,6 +383,7 @@ export default async function Home() {
     testimonials,
     homepageBooks,
   ] = await Promise.all([
+    loadHeroSlides(),
     loadGalleryItems(),
     loadHomepageEvents(),
     loadNextUpcomingEvent(),
@@ -348,30 +399,7 @@ export default async function Home() {
       <TopNavBar />
       {announcementEvent && <EventAnnouncementModal event={announcementEvent} />}
       <HeroSection
-        slides={[
-          {
-            backgroundImage: '/Carousel%202.png',
-            eyebrow: 'Welcome to Glory Tabernacle',
-            headline: 'A Place of',
-            headlineAccent: 'Transformation',
-            headlineLine2: 'Within and Without',
-          },
-          {
-            backgroundImage: '/Carousel%203.png',
-            eyebrow: 'Furnished unto every good work',
-            headline: 'Building a',
-            headlineAccent: 'Transformed',
-            headlineLine2: 'People to Influence the World around them',
-          },
-          
-          {
-            backgroundImage: '/Carousel%204.png',
-            eyebrow: "A people in pursuit of God's presence",
-            headline: 'His purpose,',
-            headlineAccent: 'And His glory',
-            headlineLine2: 'To Influence All Nations',
-          },
-        ]}
+        slides={heroSlides}
         primaryCta={{ label: 'Plan a Visit', href: '/about' }}
         secondaryCta={{ label: 'Watch Sermons', href: '/sermons' }}
       />
@@ -426,10 +454,12 @@ export default async function Home() {
         sermons={SERMONS}
         viewAllHref="/sermons"
       />
+      <ServiceDaysSection />
       <UpcomingEncountersSection />
       {testimonials.length > 0 && (
         <TestimonialsSection testimonials={testimonials} />
       )}
+      <MembershipSection />
       {homepageBooks.featured && (
         <BooksSection
           featured={homepageBooks.featured}
