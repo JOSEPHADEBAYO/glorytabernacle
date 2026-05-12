@@ -370,7 +370,7 @@ export function JoinGroupForm({ groupId, groupTitle }: JoinGroupFormProps) {
               {isSubmitting ? 'Submitting…' : `Join ${groupTitle}`}
             </button>
             <p className="mt-3 text-xs text-gray-500 text-center">
-              By submitting, your details will be shared with the {groupTitle} follow-up team.
+              By submitting, your details will be shared with the {groupTitle} department.
             </p>
           </div>
         </form>

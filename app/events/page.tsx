@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { TopNavBar } from '@/components/church/nav-bar'
 import { Footer } from '@/components/church/footer'
 import { NewsletterForm } from '@/components/church/newsletter-form'
-import { Calendar, Clock, MapPin } from 'lucide-react'
+import { Calendar, Clock, MapPin, Church, CalendarRange, Users, Dumbbell, Info, PersonStanding } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -102,6 +102,367 @@ export default async function EventsPage() {
             <br />
             Find your place in our upcoming rhythms.
           </p>
+        </div>
+      </section>
+
+      {/* ── Weekly Rhythm & Services ── */}
+      <section className="bg-white py-14 px-6 md:px-16">
+        <div className="max-w-[var(--container-max)] mx-auto">
+
+          {/* Heading */}
+          <div className="mb-10">
+            <h2
+              className="text-2xl md:text-3xl font-extrabold"
+              style={{ color: 'rgba(27,34,119,1)' }}
+            >
+              Our Weekly Rhythm &amp; Services
+            </h2>
+            <div
+              className="mt-2 h-[3px] w-12 rounded-full"
+              style={{ backgroundColor: 'var(--church-red)' }}
+              aria-hidden="true"
+            />
+          </div>
+
+          {/* 3-column grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8">
+
+            {/* ── Column 1: Sunday Services ── */}
+            <div>
+              <div className="flex items-center gap-2 mb-5">
+                <Church
+                  className="size-5 flex-none"
+                  style={{ color: 'var(--church-green)' }}
+                  aria-hidden="true"
+                />
+                <h3
+                  className="text-base font-extrabold"
+                  style={{ color: 'var(--church-green)' }}
+                >
+                  Sunday Services
+                </h3>
+              </div>
+              <div className="flex flex-col gap-3">
+                {[
+                  { label: 'Weekly Services', detail: '2 Services held every Sunday.', accent: 'green' },
+                  { label: '2nd Service', detail: 'Dedicated Business Service.', accent: 'red' },
+                  { label: 'First Sunday', detail: 'Celebration Service.', accent: 'green' },
+                  { label: 'Last Sunday', detail: 'Anointing and Healing Service.', accent: 'red' },
+                ].map((item) => (
+                  <div
+                    key={item.label}
+                    className="rounded-lg bg-gray-50 px-4 py-3 border border-gray-100"
+                    style={{
+                      borderLeft: `3px solid ${item.accent === 'green' ? 'var(--church-green)' : 'var(--church-red)'}`,
+                    }}
+                  >
+                    <p
+                      className="text-sm font-bold"
+                      style={{ color: 'rgba(27,34,119,1)' }}
+                    >
+                      {item.label}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-0.5">{item.detail}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ── Column 2: Weekly Activities ── */}
+            <div>
+              <div className="flex items-center gap-2 mb-5">
+                <CalendarRange
+                  className="size-5 flex-none"
+                  style={{ color: 'var(--church-green)' }}
+                  aria-hidden="true"
+                />
+                <h3
+                  className="text-base font-extrabold"
+                  style={{ color: 'var(--church-green)' }}
+                >
+                  Weekly Activities
+                </h3>
+              </div>
+              <div className="flex flex-col gap-5">
+                {[
+                  {
+                    icon: <PersonStanding className="size-5 flex-none text-gray-400" aria-hidden="true" />,
+                    label: 'Mount Up',
+                    detail: 'Daily: 12:00 am – 12:30 am',
+                  },
+                  {
+                    icon: <Users className="size-5 flex-none text-gray-400" aria-hidden="true" />,
+                    label: 'S2S & Prayer Walk',
+                    detail: 'Scripts2Streets & Prayer Walk. Every Saturday.',
+                  },
+                  {
+                    icon: <Dumbbell className="size-5 flex-none text-gray-400" aria-hidden="true" />,
+                    label: 'Physical Exercise',
+                    detail: 'Every Saturday.',
+                  },
+                  {
+                    icon: <Info className="size-5 flex-none text-gray-400" aria-hidden="true" />,
+                    label: 'Information Center',
+                    detail: 'Weekly Information for Immigration and Jobs.',
+                  },
+                ].map((item) => (
+                  <div key={item.label} className="flex items-start gap-3">
+                    <div className="mt-0.5 flex-none">{item.icon}</div>
+                    <div>
+                      <p
+                        className="text-sm font-bold"
+                        style={{ color: 'rgba(27,34,119,1)' }}
+                      >
+                        {item.label}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">
+                        {item.detail}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ── Column 3: Special Gatherings ── */}
+            <div>
+              <div className="flex items-center gap-2 mb-5">
+                <Users
+                  className="size-5 flex-none"
+                  style={{ color: 'var(--church-green)' }}
+                  aria-hidden="true"
+                />
+                <h3
+                  className="text-base font-extrabold"
+                  style={{ color: 'var(--church-green)' }}
+                >
+                  Special Gatherings
+                </h3>
+              </div>
+
+              {/* Card with double-border effect */}
+              <div className="relative">
+                {/* Offset shadow border */}
+                <div
+                  className="absolute inset-0 rounded-2xl translate-x-2 translate-y-2"
+                  style={{ border: '2px solid rgba(27,34,119,0.25)', borderRadius: '1rem' }}
+                  aria-hidden="true"
+                />
+                {/* Main card */}
+                <div
+                  className="relative rounded-2xl bg-white p-6 flex flex-col gap-3"
+                  style={{ border: '2px solid rgba(27,34,119,1)' }}
+                >
+                  <span
+                    className="text-[10px] font-extrabold uppercase tracking-[0.18em]"
+                    style={{ color: 'var(--church-green)' }}
+                  >
+                    Quarterly Event
+                  </span>
+                  <h4
+                    className="text-xl font-extrabold leading-tight"
+                    style={{ color: 'rgba(27,34,119,1)' }}
+                  >
+                    Gathering of Worshippers
+                  </h4>
+                  <p className="text-xs text-gray-500 leading-relaxed">
+                    A profound spiritual experience occurring quarterly. Join us for a powerful time of
+                    deep worship and connection.
+                  </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Calendar
+                      className="size-4 flex-none"
+                      style={{ color: 'rgba(27,34,119,1)' }}
+                      aria-hidden="true"
+                    />
+                    <span
+                      className="text-sm font-bold"
+                      style={{ color: 'rgba(27,34,119,1)' }}
+                    >
+                      Friday Evenings
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ── Special Programmes & Initiatives ── */}
+      <section className="py-14 px-6 md:px-16" style={{ backgroundColor: 'rgba(10,12,40,1)' }}>
+        <div className="max-w-[var(--container-max)] mx-auto">
+
+          {/* Heading */}
+          <div className="mb-10">
+            <h2 className="text-2xl md:text-3xl font-extrabold text-white">
+              Special Programmes &amp; Initiatives
+            </h2>
+            <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.22em] text-white/40">
+              Purposeful&nbsp;•&nbsp;Consistent&nbsp;•&nbsp;Anointed&nbsp;•&nbsp;Vision-Aligned
+            </p>
+          </div>
+
+          {/* 4-column card grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              {
+                accent: 'navy',
+                title: 'Mount Up',
+                scripture: 'Isaiah 40:28-31',
+                description:
+                  'A midnight prayer surge focused on spiritual renewal. Everyone prays in the Holy Ghost, setting the day on fire. Signs and wonders follow.',
+                tag: 'Daily 00:00 – 00:30',
+                tagIcon: '⏱',
+              },
+              {
+                accent: 'red',
+                title: 'I Crusade Against Drug',
+                scripture: 'Matt 18:12-14',
+                description:
+                  'Reaching the addicted and broken. Pursuing every lost sheep until found, restored and commissioned into a new life of purpose.',
+                tag: 'Outreach Initiative',
+                tagIcon: '👥',
+              },
+              {
+                accent: 'green',
+                title: 'Business Service',
+                scripture: 'Proverbs 22:29',
+                description:
+                  '2nd service for entrepreneurs, professionals, job seekers and students. Focused on marketplace wisdom and divine empowerment.',
+                tag: 'Weekly 2nd Service',
+                tagIcon: '📅',
+              },
+              {
+                accent: 'navy',
+                title: 'Gathering of Worshippers',
+                scripture: 'Phil 3:3',
+                description:
+                  'Quarterly choir-led worship encounter by the Tabernacle Worship Team. Carries the congregation deep into God\'s glory.',
+                tag: 'Quarterly Encounter',
+                tagIcon: '♪',
+              },
+              {
+                accent: 'red',
+                title: 'When Family Prays',
+                scripture: 'Joshua 24:15',
+                description:
+                  'Going from family to family, praying the will of God into reality. The family unit is sacred and spiritually fortified through collective prayer.',
+                tag: 'Family Unit Prayer',
+                tagIcon: '🏠',
+              },
+              {
+                accent: 'green',
+                title: 'Anointing & Miracle Service',
+                scripture: 'James 5:14',
+                description:
+                  'A set time for miracles, healing and divine encounter. Preceded by a 3-day prayer meeting for focused spiritual preparation.',
+                tag: 'Last Sunday Monthly',
+                tagIcon: '✦',
+              },
+              {
+                accent: 'navy',
+                title: 'Mentorship Programme',
+                scripture: '2 Timothy 2:2',
+                description:
+                  'Bridging gaps: skilled/unskilled, experienced/inexperienced, career leaders and emerging talent. Raising future giants.',
+                tag: 'Career & Leadership',
+                tagIcon: '◎',
+              },
+              {
+                accent: 'red',
+                title: 'Readers Club',
+                scripture: 'Hosea 4:6',
+                description:
+                  'Building a culture of readers, thinkers and leaders who are sharp, equipped and growing. One life-changing book per month.',
+                tag: 'Monthly Review',
+                tagIcon: '📖',
+              },
+              {
+                accent: 'green',
+                title: 'Saturday Prayer Walk',
+                scripture: 'Joshua 1:3',
+                description:
+                  'Exercise and prayer walk through the community. Declaring God\'s counsel over the land and breaking new grounds physically and spiritually.',
+                tag: 'Every Saturday',
+                tagIcon: '🚶',
+              },
+              {
+                accent: 'navy',
+                title: 'Capacity Development',
+                scripture: 'Ephesians 4:12',
+                description:
+                  'Aggressive training and raising of workers and leaders according to God\'s pattern. Nobody stagnates in our community.',
+                tag: "Worker's Training",
+                tagIcon: '↗',
+              },
+              {
+                accent: 'red',
+                title: 'Interdenominational Revival',
+                scripture: 'Acts 2:17',
+                description:
+                  'A movement beyond walls. Causing revival in the land and uniting the Body of Christ across denominations for a global harvest.',
+                tag: 'City-Wide Event',
+                tagIcon: '🌐',
+              },
+              {
+                accent: 'green',
+                title: 'Retreats',
+                scripture: 'Mark 6:31',
+                description:
+                  'Church, departmental and family retreats. Time away to hear God, build bonds and return refreshed with renewed vision.',
+                tag: 'Seasonal Rhythms',
+                tagIcon: '⛺',
+              },
+            ].map((card) => {
+              const borderColor =
+                card.accent === 'navy'
+                  ? 'rgba(27,34,119,1)'
+                  : card.accent === 'red'
+                  ? 'var(--church-red)'
+                  : 'var(--church-green)'
+              const scriptureColor =
+                card.accent === 'navy'
+                  ? 'rgba(27,34,119,1)'
+                  : card.accent === 'red'
+                  ? 'var(--church-red)'
+                  : 'var(--church-green)'
+              return (
+                <div
+                  key={card.title}
+                  className="bg-white rounded-xl p-5 flex flex-col gap-3"
+                  style={{ borderLeft: `4px solid ${borderColor}` }}
+                >
+                  <div>
+                    <h3
+                      className="text-xs font-extrabold uppercase tracking-wide leading-tight"
+                      style={{ color: 'rgba(27,34,119,1)' }}
+                    >
+                      {card.title}
+                    </h3>
+                    <p
+                      className="text-xs font-bold mt-0.5"
+                      style={{ color: scriptureColor }}
+                    >
+                      {card.scripture}
+                    </p>
+                  </div>
+                  <p className="text-xs text-gray-600 leading-relaxed flex-1">
+                    {card.description}
+                  </p>
+                  <div className="flex items-center gap-1.5 mt-auto pt-2 border-t border-gray-100">
+                    <span className="text-[10px]" aria-hidden="true">{card.tagIcon}</span>
+                    <span
+                      className="text-[9px] font-extrabold uppercase tracking-[0.15em] text-gray-400"
+                    >
+                      {card.tag}
+                    </span>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
         </div>
       </section>
 

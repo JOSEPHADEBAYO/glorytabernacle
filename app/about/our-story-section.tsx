@@ -1,12 +1,12 @@
 import Image from 'next/image'
 
 const STORY_PARAGRAPHS = [
-  "Ours began with this one: What if a church could be more than a Sunday gathering? What if it could be a place where people don't just attend but are furnished unto every good work, transformed within and without, and sent out to influence the world around them?",
-  'That question became a conviction, that conviction became a calling, and that calling became RCCG Glory Tabernacle, planted in the heart of Barnstaple, North Devon, with a mandate that stretches far beyond its walls.',
-  "We are a people in pursuit of God's presence, His purpose, and His glory. We believe that every person who walks through our doors carries a destiny too significant to be left unfinished. We believe that ordinary people, when they encounter an extraordinary God, become extraordinary themselves.",
-  "From our first gathering to where we stand today, one thing has never changed, our hunger for His presence. Because we have learned that when God's glory rests in a place, atmospheres shift, hearts are healed, and lives are never the same again.",
-  'This is not just our story. It is the beginning of yours.',
-  'You may have come broken. You will not leave broken. You may have come small. You cannot remain small. Nothing small is found in a Tabernacle.',
+  "Ours began with this one: What if a church could be more than a Sunday gathering? What if it could be a place where people don't just attend but are furnished unto every good work, transformed within and without, and sent out to influence the world around them for Jesus Christ?",
+  "That question became a conviction, that conviction became a calling, and that calling became The RCCG Glory Tabernacle, planted in the heart of Barnstaple, North Devon, with a mandate to liberate God's people, thereby walking in absolute victory.",
+  "We are a people in pursuit of God's presence, His purpose, and His glory. We believe that every person who walks through our door carries a destiny too significant to be left unfinished. We believe that ordinary people, when they encounter an extraordinary God, they become extraordinary themselves.",
+  "From our first gathering to where we stand today, one thing has never changed, our hunger for His presence. Because we have learned that when God's glory rests in a place, atmospheres shift, hearts are convicted unto conversion, thereby resulting to salvation and discipleship of many.",
+  'This is not just our story, it is the beginning of yours.',
+  'You may have come broken, but you will not leave broken. You may have come small, but you cannot remain small because nothing small is found in the Tabernacle.',
 ]
 
 export function OurStorySection() {
@@ -61,9 +61,8 @@ export function OurStorySection() {
               {STORY_PARAGRAPHS.slice(3).map((paragraph) => (
                 <p key={paragraph}>{paragraph}</p>
               ))}
-
               <p className="font-extrabold" style={{ color: 'rgba(0, 6, 102, 1)' }}>
-                Welcome home. Welcome to RCCG Glory Tabernacle.
+                Welcome to RCCG GLORY TABERNACLE, Barnstaple
               </p>
             </div>
           </div>

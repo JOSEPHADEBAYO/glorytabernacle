@@ -50,7 +50,7 @@ export function RootsVisionClient() {
             {[
               'To make heaven and to take as many people as possible with us.',
               'To have a member of RCCG in every family in all nations.',
-              'To accomplish these through planting churches within five minutes of every person.',
+              'To accomplish these through planting churches within five minutes drive.',
             ].map((item, i) => (
               <li key={i} className="flex items-start gap-3 text-sm text-gray-500">
                 <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-none" style={{ backgroundColor: 'var(--church-green)' }} aria-hidden="true" />
@@ -62,7 +62,7 @@ export function RootsVisionClient() {
           {/* Two icon cards */}
           <div className="grid grid-cols-2 gap-4 mt-2">
             {[
-              { icon: '🌱', title: 'Our Heritage', body: 'Founded on the principles of holiness, prayer, and evangelism that have defined RCCG for decades.' },
+              { icon: '🌱', title: 'Our Heritage', body: 'Founded on the principles of holiness, prayer, the Word of God, and evangelism that have defined RCCG for decades.' },
               { icon: '🎯', title: 'Our Strategy', body: "We are a people called to build according to God's specification — furnishing lives unto good works with His Word, transforming hearts by His Spirit, and influencing every sphere of society with His Kingdom." },
             ].map((card) => (
               <div key={card.title} className="rounded-xl p-4 border border-gray-100 bg-gray-50 flex flex-col gap-2">

@@ -32,7 +32,7 @@ import type { HeroSlide } from '@/components/church/hero'
 const FALLBACK_HERO_SLIDES: HeroSlide[] = [
   {
     backgroundImage: '/Carousel%202.png',
-    eyebrow: 'Welcome to Glory Tabernacle',
+    eyebrow: 'Welcome to RCCG Glory Tabernacle',
     headline: 'A Place of',
     headlineAccent: 'Transformation',
     headlineLine2: 'Within and Without',
@@ -53,9 +53,13 @@ const FALLBACK_HERO_SLIDES: HeroSlide[] = [
   },
 ]
 
+type HeroImageRow = {
+  imageUrl: string
+  imageAlt: string
+}
 async function loadHeroSlides(): Promise<HeroSlide[]> {
   try {
-    const images = await prisma.heroCarouselImage.findMany({
+    const images: HeroImageRow[] = await prisma.heroCarouselImage.findMany({
       where: { published: true },
       orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
     })
@@ -65,10 +69,10 @@ async function loadHeroSlides(): Promise<HeroSlide[]> {
     }
 
     return images.map((image, index) => ({
-      ...FALLBACK_HERO_SLIDES[index % FALLBACK_HERO_SLIDES.length],
-      backgroundImage: image.imageUrl,
-      backgroundAlt: image.imageAlt,
-    }))
+  ...FALLBACK_HERO_SLIDES[index % FALLBACK_HERO_SLIDES.length],
+  backgroundImage: image.imageUrl,
+  backgroundAlt: image.imageAlt,
+}))
   } catch (err) {
     console.error('Error loading hero carousel images:', err)
     return FALLBACK_HERO_SLIDES
