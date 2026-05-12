@@ -5,6 +5,7 @@ import { createGroupSchema, groupQuerySchema } from '@/lib/validation/group'
 import { getSessionToken, getSessionUser } from '@/lib/auth/session'
 import { GROUP_ADMIN_ROLES, type GroupAdminRole } from '@/lib/types/group'
 
+
 function isGroupAdmin(role: string | undefined): role is GroupAdminRole {
   return GROUP_ADMIN_ROLES.includes(role as GroupAdminRole)
 }
