@@ -43,23 +43,27 @@ export async function POST(request: NextRequest) {
       include: { child: { select: { parents: { select: { id: true } } } } },
     })
 
-    const allowed = checkIns.filter((c) =>
-      c.child.parents.some((p) => p.id === parent.id)
-    )
-    const skipped = requestedIds.length - allowed.length
+    
 
-    const open = allowed.filter((c) => c.signedOutAt === null)
-    const alreadyOut = allowed.length - open.length
+    const allowed = checkIns.filter(
+  (c: any) => c.child.parents.some((p: any) => p.id === parent.id)
+)
 
-    if (open.length > 0) {
-      await prisma.childCheckIn.updateMany({
-        where: { id: { in: open.map((c) => c.id) } },
-        data: {
-          signedOutAt: new Date(),
-          signedOutById: parent.id,
-        },
-      })
-    }
+const skipped = requestedIds.length - allowed.length
+
+const open = allowed.filter((c: any) => c.signedOutAt === null)
+
+const alreadyOut = allowed.length - open.length
+
+if (open.length > 0) {
+  await prisma.childCheckIn.updateMany({
+    where: { id: { in: open.map((c: any) => c.id) } },
+    data: {
+      signedOutAt: new Date(),
+      signedOutById: parent.id,
+    },
+  })
+}
 
     return NextResponse.json(
       { signedOut: open.length, alreadyOut, skipped },
