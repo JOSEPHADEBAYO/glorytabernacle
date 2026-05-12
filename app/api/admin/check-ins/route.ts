@@ -55,31 +55,32 @@ export async function GET(request: NextRequest) {
       ? { signedOutAt: null }
       : { signedInAt: { gte: startOfToday } }
 
-    const checkIns = await prisma.childCheckIn.findMany({
-      where,
-      orderBy: { signedInAt: 'desc' },
-      take: 200,
-      include: {
-        child: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            photoUrl: true,
-            allergies: true,
-            specialNeeds: true,
-          },
+    const checkIns: Awaited<ReturnType<typeof prisma.childCheckIn.findMany>> =
+  await prisma.childCheckIn.findMany({
+    where,
+    orderBy: { signedInAt: 'desc' },
+    take: 200,
+    include: {
+      child: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          photoUrl: true,
+          allergies: true,
+          specialNeeds: true,
         },
-        signedInBy: { select: { id: true, name: true, email: true } },
-        signedOutBy: { select: { id: true, name: true, email: true } },
       },
-    })
+      signedInBy: { select: { id: true, name: true, email: true } },
+      signedOutBy: { select: { id: true, name: true, email: true } },
+    },
+  })
 
     // Also surface a simple summary the live-board UI can show without an
     // additional fetch.
     const activeCount = onlyActive
-      ? checkIns.length
-      : checkIns.filter((c) => c.signedOutAt === null).length
+  ? checkIns.length
+  : checkIns.filter((c: typeof checkIns[number]) => c.signedOutAt === null).length
 
     return NextResponse.json(
       {
