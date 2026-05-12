@@ -21,6 +21,7 @@ interface NavLink {
 const NAV_LINKS: NavLink[] = [
   { label: 'Home', href: '/' },
   { label: 'About', href: '/about' },
+  { label: 'Information', href: '/information' },
   {
     label: 'Media',   // no href — dropdown only
     children: [
@@ -29,6 +30,7 @@ const NAV_LINKS: NavLink[] = [
       { label: 'Books', href: '/books' },
       { label: 'Tracts', href: '/tracts' },
       { label: 'Gallery', href: '/gallery' },
+      { label: 'Information Hub', href: '/information' },
     ],
   },
   { label: 'Volunteer', href: '/volunteer' },

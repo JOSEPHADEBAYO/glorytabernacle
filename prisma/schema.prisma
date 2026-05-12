@@ -44,6 +44,9 @@ model User {
   checkInsCreated  ChildCheckIn[] @relation("CheckInSignedInBy")
   checkInsClosed   ChildCheckIn[] @relation("CheckInSignedOutBy")
 
+  // Youth ministry check-ins
+  youthCheckIns    YouthCheckIn[]
+
   @@index([email])
   @@index([role])
 }
@@ -417,7 +420,37 @@ model Sermon {
   @@index([date])
 }
 
-// Media Library
+// Youth Ministry — check-in / check-out (mirrors Children Ministry)
+model YouthCheckIn {
+  id            String    @id @default(cuid())
+  userId        String
+  signedInAt    DateTime  @default(now())
+  signedOutAt   DateTime?
+  createdAt     DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([signedInAt])
+  @@index([signedOutAt])
+}
+
+// Daily Scripture — posted by admins, visible to youth members
+model DailyScripture {
+  id          String   @id @default(cuid())
+  date        DateTime @db.Date
+  reference   String   // e.g. "John 3:16"
+  text        String   @db.Text
+  videoUrl    String?  // YouTube URL (optional)
+  published   Boolean  @default(false)
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([date])
+  @@index([published])
+}
+
 model Media {
   id         String   @id @default(cuid())
   filename   String
@@ -489,4 +522,26 @@ model Gallery {
 
   @@index([published])
   @@index([dateTaken])
+}
+
+// Information Hub
+// Publicly submitted immigration notes, job posts, and other practical
+// community information. Visitor submissions stay unpublished until an admin
+// accepts them in the dashboard.
+model InformationItem {
+  id             String   @id @default(cuid())
+  title          String
+  description    String   @db.Text
+  linkUrl        String
+  category       String
+  submittedBy    String?
+  submitterEmail String?
+  published      Boolean  @default(false)
+  createdBy      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([published])
+  @@index([category])
+  @@index([createdAt])
 }

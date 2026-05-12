@@ -34,6 +34,16 @@ const NAV_ITEMS: NavItem[] = [
     ),
   },
   {
+    id: 'information',
+    label: 'Information Hub',
+    href: '/dashboard/content/information',
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 7.5h6m-6 4.5h6m-6 4.5h6M6 7.5h.008v.008H6V7.5zm0 4.5h.008v.008H6V12zm0 4.5h.008v.008H6V16.5zM4.5 3.75h15A1.5 1.5 0 0121 5.25v13.5a1.5 1.5 0 01-1.5 1.5h-15A1.5 1.5 0 013 18.75V5.25a1.5 1.5 0 011.5-1.5z" />
+      </svg>
+    ),
+  },
+  {
     id: 'attendance',
     label: 'Attendance',
     href: '/dashboard/attendance',

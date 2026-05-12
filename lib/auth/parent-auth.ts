@@ -25,7 +25,7 @@ import GoogleProvider from 'next-auth/providers/google'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import { prisma } from '@/lib/prisma'
 
-type ParentRole = 'SUPER_ADMIN' | 'CONTENT_EDITOR' | 'VIEWER' | 'PARENT'
+type ParentRole = 'SUPER_ADMIN' | 'CONTENT_EDITOR' | 'VIEWER' | 'PARENT' | 'YOUTH'
 
 declare module 'next-auth' {
   interface Session {
