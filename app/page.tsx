@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { TopNavBar } from '@/components/church/nav-bar'
 import { HeroSection } from '@/components/church/hero'
 import { LiveStreamSection } from '@/components/church/live-stream-section'
