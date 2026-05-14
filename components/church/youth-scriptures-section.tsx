@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Play, ChevronLeft, ChevronRight } from 'lucide-react'
 
 const DEFAULT_IMAGE =
@@ -117,32 +117,33 @@ function PreviousWeeksCarousel({
   const scrollRef = useRef<HTMLDivElement>(null)
   const rafRef = useRef<number | null>(null)
   const isHovering = useRef(false)
-
-  const scroll = useCallback(() => {
-    if (!scrollRef.current || isHovering.current) {
-      rafRef.current = requestAnimationFrame(scroll)
-      return
-    }
-
-    const el = scrollRef.current
-    const maxScroll = el.scrollWidth - el.clientWidth
-    const step = 0.5
-
-    if (el.scrollLeft >= maxScroll - 1) {
-      el.scrollTo({ left: 0, behavior: 'instant' })
-    } else {
-      el.scrollLeft += step
-    }
-
-    rafRef.current = requestAnimationFrame(scroll)
-  }, [])
+  const scrollFnRef = useRef<() => void>(() => {})
 
   useEffect(() => {
-    rafRef.current = requestAnimationFrame(scroll)
+    scrollFnRef.current = () => {
+      if (!scrollRef.current || isHovering.current) {
+        rafRef.current = requestAnimationFrame(scrollFnRef.current)
+        return
+      }
+
+      const el = scrollRef.current
+      const maxScroll = el.scrollWidth - el.clientWidth
+      const step = 0.5
+
+      if (el.scrollLeft >= maxScroll - 1) {
+        el.scrollTo({ left: 0, behavior: 'instant' })
+      } else {
+        el.scrollLeft += step
+      }
+
+      rafRef.current = requestAnimationFrame(scrollFnRef.current)
+    }
+
+    rafRef.current = requestAnimationFrame(scrollFnRef.current)
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current)
     }
-  }, [scroll])
+  }, [])
 
   const scrollBy = (dir: 'left' | 'right') => {
     if (!scrollRef.current) return

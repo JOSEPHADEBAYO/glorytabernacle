@@ -92,7 +92,6 @@ export function TestimonialsSection({
   testimonials = DEFAULT_TESTIMONIALS,
 }: TestimonialsSectionProps) {
   const [isFormOpen, setIsFormOpen] = useState(false)
-  const [formSuccess, setFormSuccess] = useState(false)
 
   return (
     <section
@@ -156,11 +155,8 @@ export function TestimonialsSection({
       {/* Form Modal */}
       {isFormOpen && (
         <TestimonyFormModal
-          onClose={() => {
-            setIsFormOpen(false)
-            setFormSuccess(false)
-          }}
-          onSuccess={() => setFormSuccess(true)}
+          onClose={() => setIsFormOpen(false)}
+          onSuccess={() => {}}
         />
       )}
     </section>
