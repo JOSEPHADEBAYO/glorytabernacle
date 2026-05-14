@@ -213,7 +213,7 @@ export default async function InformationPage() {
         </section>
       </main>
       <Footer
-        logo={{ src: '/logo-with-no-bg.png', alt: 'RCCG Glory Tabernacle' }}
+        logo={{ src: '/logo.png', alt: 'RCCG Glory Tabernacle' }}
         tagline="Furnish  .  Transform  .  Influence"
         columns={[
           {
@@ -227,9 +227,11 @@ export default async function InformationPage() {
           },
         ]}
         socialLinks={[
-          { platform: 'instagram', href: '#' },
-          { platform: 'youtube', href: '#' },
-          { platform: 'facebook', href: '#' },
+          { platform: 'instagram', href: 'https://www.instagram.com/glorytabernaclebarnstaple?igsh=MWkxaTF0Yjd1czk3Mg%3D%3D&utm_source=qr' },
+          { platform: 'youtube', href: 'https://www.youtube.com/@glorytabernaclehq' },
+          { platform: 'facebook', href: 'https://www.facebook.com/share/1CDurcWmxG/?mibextid=wwXIfr' },
+          { platform: 'x', href: 'https://x.com/rccggthq' },
+          { platform: 'tiktok', href: 'https://www.tiktok.com/@rccgglorytabernaclebarns?_r=1&_t=ZN-965RffiNMP8X' },
         ]}
         contactInfo={{
           address: 'North Devon College, Old Sticklepath Hill Barnstaple EX31 2BQ England',

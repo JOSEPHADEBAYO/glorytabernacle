@@ -104,7 +104,11 @@ function NotifyModal({ eventId }: { eventId?: string }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
 
-  const canSubmit = Boolean(eventId) && !isSubmitting
+  // Submission is allowed even without an upcoming event — in that case
+  // we still capture the visitor's general program interest so admins can
+  // reach them later. When an eventId exists, we additionally subscribe
+  // them to that event's 30-min-before reminder.
+  const canSubmit = !isSubmitting
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -125,25 +129,38 @@ function NotifyModal({ eventId }: { eventId?: string }) {
     }
     if (!valid) return
 
-    if (!eventId) {
-      setSubmitError(
-        "We can't subscribe you right now — there's no upcoming event scheduled."
-      )
-      return
-    }
-
     setIsSubmitting(true)
+
+    const payload = { name: name.trim(), email: email.trim() }
+
     try {
-      const res = await fetch(`/api/events/${eventId}/notify`, {
+      // Always capture as a general program-interest signup. This is the
+      // primary outcome — if this succeeds we count the form as submitted.
+      const interestPromise = fetch('/api/program-interest', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.trim(), email: email.trim() }),
+        body: JSON.stringify(payload),
       })
 
-      if (res.ok) {
+      // If an upcoming event exists, also subscribe for its 30-min reminder.
+      // Failure here is non-fatal — the admin still has the program-interest row.
+      const eventPromise = eventId
+        ? fetch(`/api/events/${eventId}/notify`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          }).catch((err) => {
+            console.warn('Event notify subscribe failed (non-fatal):', err)
+            return null
+          })
+        : Promise.resolve(null)
+
+      const [interestRes] = await Promise.all([interestPromise, eventPromise])
+
+      if (interestRes.ok) {
         setSubmitted(true)
       } else {
-        const data = await res.json().catch(() => ({}))
+        const data = await interestRes.json().catch(() => ({}))
         setSubmitError(
           data.error ?? 'Something went wrong. Please try again in a moment.'
         )

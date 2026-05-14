@@ -37,13 +37,12 @@ export default async function ParentsLayout({
             <div className="flex items-center gap-3">
               <div className="hidden sm:flex items-center gap-2">
                 {userImage ? (
-                  <Image
+                  <img
                     src={userImage}
                     alt=""
                     width={32}
                     height={32}
                     className="rounded-full"
-                    unoptimized
                   />
                 ) : (
                   <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-sm font-semibold text-blue-700">

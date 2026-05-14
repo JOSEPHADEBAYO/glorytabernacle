@@ -23,7 +23,7 @@ export function OurStorySection() {
             <div className="ml-4 overflow-hidden rounded-lg bg-[#000666] shadow-[0_32px_70px_rgba(0,6,102,0.18)]">
               <div className="relative flex min-h-[38rem] items-center justify-center bg-[radial-gradient(circle_at_50%_35%,rgba(255,255,255,0.08),transparent_36%),linear-gradient(180deg,#07184a_0%,#000666_100%)] p-10 md:min-h-[54rem]">
                 <Image
-                  src="/logo-white-bg.png"
+                  src="/logo.png"
                   alt="RCCG Glory Tabernacle"
                   width={620}
                   height={620}

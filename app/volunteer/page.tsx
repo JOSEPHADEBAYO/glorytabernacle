@@ -48,7 +48,7 @@ export default function VolunteerPage() {
 
           {/* CTA */}
           <Link
-            href="#step-into-service"
+            href="/volunteer-interest"
             className="inline-flex items-center justify-center px-7 py-3 rounded-lg font-bold text-white text-sm transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
             style={{ backgroundColor: 'var(--church-green)' }}
           >
@@ -165,15 +165,13 @@ export default function VolunteerPage() {
 
               {/* Right: CTA */}
               <div className="flex-none">
-                <a
-                  href="https://docs.google.com/forms"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  href="/volunteer-interest"
                   className="inline-flex items-center justify-center px-8 py-4 rounded-lg font-bold text-white text-sm transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
                   style={{ backgroundColor: 'var(--church-green)' }}
                 >
-                  Open Google Form
-                </a>
+                  Volunteer Now
+                </Link>
               </div>
 
             </div>
@@ -183,7 +181,7 @@ export default function VolunteerPage() {
 
       {/* ── Footer ── */}
       <Footer
-        logo={{ src: '/logo-with-no-bg.png', alt: 'RCCG Glory Tabernacle' }}
+        logo={{ src: '/logo.png', alt: 'RCCG Glory Tabernacle' }}
         tagline="Furnish  ·  Transform  ·  Influence"
         columns={[
           {
@@ -206,11 +204,11 @@ export default function VolunteerPage() {
           },
         ]}
         socialLinks={[
-          { platform: 'instagram', href: '#' },
-          { platform: 'youtube', href: '#' },
-          { platform: 'facebook', href: '#' },
-          { platform: 'x', href: '#' },
-          { platform: 'tiktok', href: '#' },
+          { platform: 'instagram', href: 'https://www.instagram.com/glorytabernaclebarnstaple?igsh=MWkxaTF0Yjd1czk3Mg%3D%3D&utm_source=qr' },
+          { platform: 'youtube', href: 'https://www.youtube.com/@glorytabernaclehq' },
+          { platform: 'facebook', href: 'https://www.facebook.com/share/1CDurcWmxG/?mibextid=wwXIfr' },
+          { platform: 'x', href: 'https://x.com/rccggthq' },
+          { platform: 'tiktok', href: 'https://www.tiktok.com/@rccgglorytabernaclebarns?_r=1&_t=ZN-965RffiNMP8X' },
         ]}
         contactInfo={{
           address: 'North Devon College, Old Sticklepath Hill Barnstaple EX31 2BQ England',

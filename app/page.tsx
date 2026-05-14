@@ -23,6 +23,7 @@ import { MembershipSection } from '@/components/church/membership-section'
 import { BooksSection } from '@/components/church/books-section'
 import { GlobalConnectionSection } from '@/components/church/global-connection-section'
 import { SupportSection } from '@/components/church/support-section'
+import { YouthScripturesSection } from '@/components/church/youth-scriptures-section'
 import { Footer } from '@/components/church/footer'
 import { prisma } from '@/lib/prisma'
 import type { ChurchEvent } from '@/components/church/event-card'
@@ -378,7 +379,76 @@ function toAnnouncementEvent(
   }
 }
 
-const SERMONS: Sermon[] = [
+/**
+ * Server-fetch the most recent 3 published sermons for the homepage.
+ * Maps DB rows to the SermonCard shape used by SermonsSection. Failures
+ * fall back to an empty array so the homepage can't crash.
+ *
+ * The newest sermon is marked `featured: true` so its card visually
+ * stands out — same as the previous hardcoded behaviour.
+ */
+async function loadHomepageSermons(): Promise<Sermon[]> {
+  try {
+    const rows = await prisma.sermon.findMany({
+      where: { published: true },
+      orderBy: { date: 'desc' },
+      take: 3,
+      select: {
+        id: true,
+        title: true,
+        speaker: true,
+        date: true,
+        series: true,
+        thumbnail: true,
+        videoUrl: true,
+        duration: true,
+      },
+    })
+
+    return rows.map((s, i) => ({
+      id: s.id,
+      title: s.title,
+      speaker: s.speaker,
+      date: s.date.toISOString().slice(0, 10),
+      series: s.series ?? undefined,
+      thumbnailSrc: s.thumbnail,
+      videoHref: s.videoUrl,
+      duration: s.duration,
+      featured: i === 0,
+    }))
+  } catch (err) {
+    console.error('Error loading homepage sermons:', err)
+    return []
+  }
+}
+
+/**
+ * Server-fetch published youth daily scriptures for the weekly card
+ * plus a horizontal carousel of previous weeks.
+ * Returns an empty array on DB error so the homepage can't crash.
+ */
+async function loadYouthScriptures(): Promise<Array<{ reference: string; text: string; videoUrl: string | null; date: string }>> {
+  try {
+    const rows = await prisma.dailyScripture.findMany({
+      where: { published: true },
+      orderBy: { date: 'desc' },
+      take: 13,
+    })
+    return rows.map((s) => ({
+      reference: s.reference,
+      text: s.text,
+      videoUrl: s.videoUrl,
+      date: s.date.toISOString(),
+    }))
+  } catch (err) {
+    console.error('Error loading youth scriptures:', err)
+    return []
+  }
+}
+
+// Fallback / placeholder data kept for reference; only used if the DB
+// fetch returns zero published sermons.
+const SERMONS_FALLBACK: Sermon[] = [
   {
     id: 'serm-1',
     title: 'Finding Hope in Desert Seasons',
@@ -419,6 +489,8 @@ export default async function Home() {
     ministryCards,
     testimonials,
     homepageBooks,
+    homepageSermons,
+    youthScriptures,
   ] = await Promise.all([
     loadHeroSlides(),
     loadGalleryItems(),
@@ -427,9 +499,15 @@ export default async function Home() {
     loadMinistryCards(),
     loadHomepageTestimonials(),
     loadHomepageBooks(),
+    loadHomepageSermons(),
+    loadYouthScriptures(),
   ])
 
   const announcementEvent = toAnnouncementEvent(nextEvent)
+  // If admins haven't added any sermons yet, fall back to the bundled
+  // placeholders so the section never looks empty during onboarding.
+  const sermonsToRender =
+    homepageSermons.length > 0 ? homepageSermons : SERMONS_FALLBACK
 
   return (
     <>
@@ -453,8 +531,8 @@ export default async function Home() {
       )}
       <AboutSection
         eyebrow="Our Foundation"
-        heading="A Tabernacle is not merely a building."
-        body="It is a life surrendered to God. It is God's dwelling place among His people. When God commanded a Tabernacle to be built, He was asking for a place, and a life to host His presence"
+        heading="A Tabernacle for His Glory"
+        body="A Tabernacle is not merely a building, it is a life surrendered to God. It is God's dwelling place among His people. When God commanded a Tabernacle to be built, He was asking for a place, and a life to host His presence. In His presence, we see His Glory, and when His Glory rest, nothing remains the same. His Presence undoes what religion cannot touch because the glory of God is the only lasting change agent."
         pillars={[
           {
             title: 'Furnish',
@@ -488,7 +566,7 @@ export default async function Home() {
       )}
       <SermonsSection
         heading="Recent Sermons"
-        sermons={SERMONS}
+        sermons={sermonsToRender}
         viewAllHref="/sermons"
       />
       <ServiceDaysSection />
@@ -497,10 +575,13 @@ export default async function Home() {
         <TestimonialsSection testimonials={testimonials} />
       )}
       <MembershipSection />
+      {youthScriptures.length > 0 && (
+        <YouthScripturesSection scriptures={youthScriptures} />
+      )}
       {homepageBooks.featured && (
         <BooksSection
-          featured={homepageBooks.featured}
-          secondary={homepageBooks.secondary}
+        featured={homepageBooks.featured}
+        secondary={homepageBooks.secondary}
         />
       )}
       <GlobalConnectionSection />
@@ -510,7 +591,7 @@ export default async function Home() {
         primaryCta={{ label: 'Give Online', href: '/giving' }}
       />
       <Footer
-        logo={{ src: '/logo-with-no-bg.png', alt: 'RCCG Glory Tabernacle' }}
+        logo={{ src: '/logo.png', alt: 'RCCG Glory Tabernacle' }}
         tagline="Furnish  ·  Transform  ·  Influence"
         columns={[
           {
@@ -533,11 +614,11 @@ export default async function Home() {
           },
         ]}
         socialLinks={[
-          { platform: 'instagram', href: '#' },
-          { platform: 'youtube', href: '#' },
-          { platform: 'facebook', href: '#' },
-          { platform: 'x', href: '#' },
-          { platform: 'tiktok', href: '#' },
+          { platform: 'instagram', href: 'https://www.instagram.com/glorytabernaclebarnstaple?igsh=MWkxaTF0Yjd1czk3Mg%3D%3D&utm_source=qr' },
+          { platform: 'youtube', href: 'https://www.youtube.com/@glorytabernaclehq' },
+          { platform: 'facebook', href: 'https://www.facebook.com/share/1CDurcWmxG/?mibextid=wwXIfr' },
+          { platform: 'x', href: 'https://x.com/rccggthq' },
+          { platform: 'tiktok', href: 'https://www.tiktok.com/@rccgglorytabernaclebarns?_r=1&_t=ZN-965RffiNMP8X' },
         ]}
         contactInfo={{
           address: 'North Devon College, Old Sticklepath Hill Barnstaple EX31 2BQ England',

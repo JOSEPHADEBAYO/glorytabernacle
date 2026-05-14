@@ -63,8 +63,13 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     /**
      * AWAITED. Runs after the adapter creates/finds the User row, BEFORE
-     * the JWT is issued. We elevate OAuth-only users to PARENT here so
-     * the role baked into the JWT is correct from the very first request.
+     * the JWT is issued.
+     *
+     * Rules:
+     * - Admin users (have passwordHash) → role never touched
+     * - New OAuth users (no role yet, defaults to VIEWER) → set to PARENT
+     * - Existing YOUTH users → role preserved as YOUTH
+     * - Existing PARENT users → role preserved as PARENT
      */
     async signIn({ user }) {
       if (!user.id) return true
@@ -75,14 +80,18 @@ export const authOptions: NextAuthOptions = {
       })
       if (!dbUser) return true
 
-      // OAuth-only user (no password) → ensure PARENT role.
       const isAdmin = Boolean(dbUser.passwordHash)
-      if (!isAdmin && dbUser.role !== 'PARENT') {
+      if (isAdmin) return true
+
+      // Only assign PARENT to brand-new OAuth users (VIEWER is the default).
+      // Existing YOUTH or PARENT roles are left untouched.
+      if (dbUser.role === 'VIEWER') {
         await prisma.user.update({
           where: { id: user.id },
           data: { role: 'PARENT' },
         })
       }
+
       return true
     },
 
@@ -118,11 +127,16 @@ export const authOptions: NextAuthOptions = {
     },
 
     /**
-     * Keep all internal post-auth redirects on this app. If anywhere
-     * outside our base URL is requested, fall back to /parents.
+     * Keep all internal post-auth redirects on this app.
+     * Respects the callbackUrl so /youth/callback works correctly.
      */
     async redirect({ url, baseUrl }) {
-      return url.startsWith(baseUrl) ? url : `${baseUrl}/parents`
+      // Allow any URL within our app
+      if (url.startsWith(baseUrl)) return url
+      // Allow relative URLs
+      if (url.startsWith('/')) return `${baseUrl}${url}`
+      // Fallback
+      return `${baseUrl}/parents`
     },
   },
 }

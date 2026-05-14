@@ -147,8 +147,8 @@ export default async function EventsPage() {
                 {[
                   { label: 'Weekly Services', detail: '2 Services held every Sunday.', accent: 'green' },
                   { label: '2nd Service', detail: 'Dedicated Business Service.', accent: 'red' },
-                  { label: 'First Sunday', detail: 'Celebration Service.', accent: 'green' },
-                  { label: 'Last Sunday', detail: 'Anointing and Healing Service.', accent: 'red' },
+                  { label: 'First Sunday', detail: 'CELEBRATION SERVICE', accent: 'green' },
+                  { label: 'Last Sunday', detail: 'Anointing & Healing Service.', accent: 'red' },
                 ].map((item) => (
                   <div
                     key={item.label}
@@ -193,8 +193,13 @@ export default async function EventsPage() {
                   },
                   {
                     icon: <Users className="size-5 flex-none text-gray-400" aria-hidden="true" />,
-                    label: 'S2S & Prayer Walk',
-                    detail: 'Scripts2Streets & Prayer Walk. Every Saturday.',
+                    label: 'S2S',
+                    detail: 'Script2Street (Evangelism) Every Saturday',
+                  },
+                  {
+                    icon: <Users className="size-5 flex-none text-gray-400" aria-hidden="true" />,
+                    label: 'Prayer Walk',
+                    detail: 'Prayer Walk. Every Saturday.',
                   },
                   {
                     icon: <Dumbbell className="size-5 flex-none text-gray-400" aria-hidden="true" />,
@@ -723,7 +728,7 @@ export default async function EventsPage() {
 
       {/* ── Footer ── */}
       <Footer
-        logo={{ src: '/logo-with-no-bg.png', alt: 'RCCG Glory Tabernacle' }}
+        logo={{ src: '/logo.png', alt: 'RCCG Glory Tabernacle' }}
         tagline="Furnish  ·  Transform  ·  Influence"
         columns={[
           {
@@ -746,11 +751,11 @@ export default async function EventsPage() {
           },
         ]}
         socialLinks={[
-          { platform: 'instagram', href: '#' },
-          { platform: 'youtube', href: '#' },
-          { platform: 'facebook', href: '#' },
-          { platform: 'x', href: '#' },
-          { platform: 'tiktok', href: '#' },
+          { platform: 'instagram', href: 'https://www.instagram.com/glorytabernaclebarnstaple?igsh=MWkxaTF0Yjd1czk3Mg%3D%3D&utm_source=qr' },
+          { platform: 'youtube', href: 'https://www.youtube.com/@glorytabernaclehq' },
+          { platform: 'facebook', href: 'https://www.facebook.com/share/1CDurcWmxG/?mibextid=wwXIfr' },
+          { platform: 'x', href: 'https://x.com/rccggthq' },
+          { platform: 'tiktok', href: 'https://www.tiktok.com/@rccgglorytabernaclebarns?_r=1&_t=ZN-965RffiNMP8X' },
         ]}
         contactInfo={{
           address:

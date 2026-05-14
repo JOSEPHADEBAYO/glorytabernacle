@@ -462,7 +462,7 @@ function TestimonialFormModal({
               value={formData.quote}
               onChange={(e) => setFormData({ ...formData, quote: e.target.value })}
               placeholder="Their words about Glory Tabernacle…"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none text-gray-900"
             />
           </div>
 
@@ -479,7 +479,7 @@ function TestimonialFormModal({
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="e.g. Sarah Johnson"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900"
               />
             </div>
             <div>
@@ -500,7 +500,7 @@ function TestimonialFormModal({
                     memberSince: parseInt(e.target.value, 10) || currentYear,
                   })
                 }
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900"
               />
             </div>
           </div>
@@ -517,7 +517,7 @@ function TestimonialFormModal({
               onChange={(e) =>
                 setFormData({ ...formData, order: parseInt(e.target.value, 10) || 0 })
               }
-              className="w-32 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+              className="w-32 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900"
             />
             <p className="mt-1 text-xs text-gray-500">
               Lower numbers appear first. Use 10, 20, 30 so you can insert between later.

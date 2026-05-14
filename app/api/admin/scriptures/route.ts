@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { getSessionToken, getSessionUser } from '@/lib/auth/session'
+import { validateSession, getSessionToken, getSessionUser } from '@/lib/auth/session'
 import { createDailyScriptureSchema, scriptureQuerySchema } from '@/lib/validation/youth'
 
 /**
@@ -9,12 +9,8 @@ import { createDailyScriptureSchema, scriptureQuerySchema } from '@/lib/validati
  */
 export async function GET(request: NextRequest) {
   try {
-    const token = await getSessionToken()
-    if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-    const user = await getSessionUser(token)
-    if (!user) {
+    const isValid = await validateSession()
+    if (!isValid) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -24,9 +20,10 @@ export async function GET(request: NextRequest) {
       limit: searchParams.get('limit') ?? '50',
     })
 
-    const publishedFilter = query.success && query.data.published !== undefined
-      ? query.data.published === 'true'
-      : undefined
+    const publishedFilter =
+      query.success && query.data.published !== undefined
+        ? query.data.published === 'true'
+        : undefined
 
     const scriptures = await prisma.dailyScripture.findMany({
       where: publishedFilter !== undefined ? { published: publishedFilter } : {},

@@ -30,7 +30,7 @@ const NAV_LINKS: NavLink[] = [
       { label: 'Books', href: '/books' },
       { label: 'Tracts', href: '/tracts' },
       { label: 'Gallery', href: '/gallery' },
-      { label: 'Information Hub', href: '/information' },
+      //{ label: 'Information Hub', href: '/information' },
     ],
   },
   { label: 'Volunteer', href: '/volunteer' },
@@ -113,14 +113,12 @@ export function TopNavBar() {
       <nav className="mx-auto flex h-16 max-w-[var(--container-max)] items-center px-[var(--section-padding-x)]">
         {/* Logo */}
         <div className="flex-none">
-          <Link href="/" aria-label="RCCG Glory Tabernacle home">
+          <Link href="/" aria-label="RCCG Glory Tabernacle home" className="block h-12 w-[100px] relative">
               <Image
-                src="/logo-with-no-bg.png"
+                src="/logo.png"
                 alt="RCCG Glory Tabernacle"
-                width={140}
-                height={140}
-                className="rounded-md object-cover"
-                onError={undefined}
+                fill
+                className="rounded-md object-contain"
               />
           </Link>
         </div>

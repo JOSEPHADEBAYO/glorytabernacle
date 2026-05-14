@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { getSessionToken } from '@/lib/auth/session'
+import { validateSession } from '@/lib/auth/session'
 import { updateDailyScriptureSchema } from '@/lib/validation/youth'
 
 /**
@@ -12,8 +12,8 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const token = await getSessionToken()
-    if (!token) {
+    const isValid = await validateSession()
+    if (!isValid) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -57,8 +57,8 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const token = await getSessionToken()
-    if (!token) {
+    const isValid = await validateSession()
+    if (!isValid) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 

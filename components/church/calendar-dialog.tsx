@@ -16,6 +16,28 @@ const MONTHS = [
   'July', 'August', 'September', 'October', 'November', 'December',
 ]
 
+/**
+ * Daily Mount Up prayer meeting — synthetic entry rendered on every
+ * calendar date alongside the regular events. Edit here to change time
+ * or Google Meet link.
+ */
+const MOUNT_UP: Omit<ChurchEvent, 'id' | 'date'> = {
+  title: 'Mount Up',
+  description:
+    'Daily prayer in tongues, open to all members. Join us on Google Meet to wait on the Lord together.',
+  time: '00:00 – 00:30',
+  location: 'Online · Google Meet',
+  registrationHref: 'https://meet.google.com/',
+}
+
+function mountUpFor(iso: string): ChurchEvent {
+  return {
+    id: `mountup-${iso}`,
+    date: iso,
+    ...MOUNT_UP,
+  }
+}
+
 export function CalendarDialog({ events, open, onClose }: CalendarDialogProps) {
   const today = new Date()
 
@@ -66,7 +88,11 @@ export function CalendarDialog({ events, open, onClose }: CalendarDialogProps) {
     return `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
   }
 
-  const selectedEvents = selectedDate ? (eventMap[selectedDate] ?? []) : []
+  // Mount Up is daily, so it appears on every selected date alongside any
+  // admin-managed events for that day.
+  const selectedEvents = selectedDate
+    ? [mountUpFor(selectedDate), ...(eventMap[selectedDate] ?? [])]
+    : []
 
   return (
     <>
@@ -138,7 +164,9 @@ export function CalendarDialog({ events, open, onClose }: CalendarDialogProps) {
               {cells.map((day, i) => {
                 if (!day) return <div key={`empty-${i}`} />
                 const iso = toISO(day)
-                const hasEvents = !!eventMap[iso]?.length
+                // Every day has Mount Up, so always render the dot.
+                const hasEvents = true
+                const hasOtherEvents = !!eventMap[iso]?.length
                 const isToday =
                   day === today.getDate() &&
                   viewMonth === today.getMonth() &&
@@ -168,7 +196,7 @@ export function CalendarDialog({ events, open, onClose }: CalendarDialogProps) {
                           ? { backgroundColor: 'var(--church-green)' }
                           : {}
                     }
-                    aria-label={`${day} ${MONTHS[viewMonth]}${hasEvents ? `, ${eventMap[iso].length} event(s)` : ''}`}
+                    aria-label={`${day} ${MONTHS[viewMonth]}, Mount Up daily prayer${hasOtherEvents ? `, ${eventMap[iso].length} additional event(s)` : ''}`}
                     aria-pressed={isSelected}
                   >
                     {day}

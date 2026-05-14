@@ -309,7 +309,7 @@ export default async function GroupsPage() {
       </main>
 
       <Footer
-        logo={{ src: '/logo-with-no-bg.png', alt: 'RCCG Glory Tabernacle' }}
+        logo={{ src: '/logo.png', alt: 'RCCG Glory Tabernacle' }}
         tagline="Furnish · Transform · Influence"
         columns={[
           {

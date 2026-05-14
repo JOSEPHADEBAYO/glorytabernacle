@@ -1,6 +1,13 @@
 /**
- * Shared TypeScript types for the Sermons Management System.
+ * Shared TypeScript types for the Sermons system.
+ *
+ * Mirrors the Sermon Prisma model. The homepage SermonsSection card
+ * shape happens to match this almost exactly — see app/page.tsx for the
+ * tiny adapter.
  */
+
+export const SERMON_ADMIN_ROLES = ['SUPER_ADMIN', 'CONTENT_EDITOR'] as const
+export type SermonAdminRole = typeof SERMON_ADMIN_ROLES[number]
 
 export interface Sermon {
   id: string

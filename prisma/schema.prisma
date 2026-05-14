@@ -382,6 +382,36 @@ model MembershipApplication {
   @@index([membershipClass])
 }
 
+model VolunteerInterest {
+  id                    String   @id @default(cuid())
+  name                  String
+  email                 String
+  phoneNumber           String
+  address               String   @db.Text
+  areaStrengths         Json
+  pastExperience        String   @db.Text
+  contributionStatement String   @db.Text
+  bornAgain             Boolean
+  filledWithHolyGhost   Boolean
+  createdAt             DateTime @default(now())
+
+  @@index([email])
+  @@index([createdAt])
+}
+
+// Program Interest — general "stay in the loop" signups captured by the
+// "Get Notified" modal on the homepage live-stream section. Distinct from
+// EventNotification (which is tied to a specific event for cron reminders).
+// Admins use this list to send broadcast emails about upcoming programmes.
+model ProgramInterest {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
 // Adult Attendance — public walk-up form at /attendance, used to track
 // who's at each service. The `service` field is a free-text string but is
 // validated against a fixed list (see lib/types/attendance.ts) so reports

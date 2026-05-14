@@ -14,21 +14,21 @@ const PASTORS = [
     name: 'Pastor E.A Adebayo',
     title: 'General Overseer, RCCG',
     bio: 'Pastor Adebayo has led RCCG worldwide with vision and passion for over 45 years, championing revival across the globe.',
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=80',
+    image: "https://res.cloudinary.com/deckwmsth/image/upload/v1778768358/ea_adeboye_1_sazksy.png",
   },
   {
     id: 'p2',
-    name: 'Pastor (Mrs.) Bukola Adebayo',
-    title: 'Associate Pastor',
-    bio: 'Pastor Bukola leads the women\'s ministry and discipleship programs, nurturing spiritual growth across all generations.',
-    image: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&auto=format&fit=crop&q=80',
+    name: 'Pastor (Mrs.) F.A. Adeboye',
+    title: 'Mother-In-Israel, RCCG',
+    bio: 'Pastor Foluke leads the women\'s ministry, nurturing spiritual growth across all generations.',
+    image: 'https://res.cloudinary.com/deckwmsth/image/upload/v1778768358/image_1_w1rxvh.png',
   },
   {
     id: 'p3',
-    name: 'Pastor Segun Segun',
-    title: 'Youth & Young Adults Pastor',
-    bio: 'Pastor Segun is passionate about raising the next generation of leaders who will impact their world for Christ.',
-    image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&auto=format&fit=crop&q=80',
+    name: 'Pastor Seye Adebayo',
+    title: 'Pastor-in-Charge, RCCG Glory Tabernacle, Barnstaple',
+    bio: 'Pastor Seye is passionate about raising the next generation of leaders who will impact their world for Christ.',
+    image: 'https://res.cloudinary.com/deckwmsth/image/upload/v1778771805/Removed_background_puapoi.png',
   },
 ]
 
@@ -67,8 +67,10 @@ export default function AboutPage() {
             The Glory<br />Tabernacle<br />Story.
           </h1>
           <p className="mt-4 text-base md:text-lg text-white/70 max-w-2xl leading-relaxed">
-          A resilient foundation built upon the weight of history and the ethereal light of
-eternal hope. Discover where we came from and where God is leading us.
+          We are a people called to build according to God&apos;s specification —
+furnishing lives unto good works with His Word, transforming hearts by His Spirit,
+and influencing every sphere of society with His Kingdom.
+
           </p>
         </div>
       </section>
@@ -172,7 +174,7 @@ eternal hope. Discover where we came from and where God is leading us.
 
       {/* ── Footer ── */}
       <Footer
-        logo={{ src: '/logo-with-no-bg.png', alt: 'RCCG Glory Tabernacle' }}
+        logo={{ src: '/logo.png', alt: 'RCCG Glory Tabernacle' }}
         tagline="Furnish  ·  Transform  ·  Influence"
         columns={[
           {
@@ -195,11 +197,11 @@ eternal hope. Discover where we came from and where God is leading us.
           },
         ]}
         socialLinks={[
-          { platform: 'instagram', href: '#' },
-          { platform: 'youtube', href: '#' },
-          { platform: 'facebook', href: '#' },
-          { platform: 'x', href: '#' },
-          { platform: 'tiktok', href: '#' },
+          { platform: 'instagram', href: 'https://www.instagram.com/glorytabernaclebarnstaple?igsh=MWkxaTF0Yjd1czk3Mg%3D%3D&utm_source=qr' },
+          { platform: 'youtube', href: 'https://www.youtube.com/@glorytabernaclehq' },
+          { platform: 'facebook', href: 'https://www.facebook.com/share/1CDurcWmxG/?mibextid=wwXIfr' },
+          { platform: 'x', href: 'https://x.com/rccggthq' },
+          { platform: 'tiktok', href: 'https://www.tiktok.com/@rccgglorytabernaclebarns?_r=1&_t=ZN-965RffiNMP8X' },
         ]}
         contactInfo={{
           address: 'North Devon College, Old Sticklepath Hill Barnstaple EX31 2BQ England',
