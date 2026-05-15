@@ -4,6 +4,15 @@ import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useToast } from '@/components/ui/toast-provider'
 import { MEMBERSHIP_CLASS_LABELS } from '@/lib/types/membership-application'
+import {
+  ConfirmDeleteModal,
+  useConfirmDelete,
+} from '@/components/ui/confirm-delete-modal'
+import {
+  EmailComposerModal,
+  formatSendResultToast,
+  type EmailRecipient,
+} from '@/components/dashboard/email-composer-modal'
 
 export interface DashboardMembershipApplication {
   id: string
@@ -74,7 +83,8 @@ export function NewMembersManager({
   const [search, setSearch] = useState('')
   const [classFilter, setClassFilter] = useState('')
   const [expandedId, setExpandedId] = useState<string | null>(null)
-  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const { isOpen: deleteIsOpen, pendingItem: deletePendingId, openDelete, closeDelete } = useConfirmDelete<string>()
+  const [emailRecipient, setEmailRecipient] = useState<EmailRecipient | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [hasUserInteracted, setHasUserInteracted] = useState(false)
@@ -140,11 +150,6 @@ export function NewMembersManager({
   }, [hasUserInteracted, pageSize, queryKey])
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Delete this membership application? This cannot be undone.')) {
-      return
-    }
-
-    setDeletingId(id)
     try {
       const res = await fetch(`/api/membership-applications/${id}`, {
         method: 'DELETE',
@@ -169,8 +174,6 @@ export function NewMembersManager({
         description: err instanceof Error ? err.message : 'Please try again.',
         variant: 'error',
       })
-    } finally {
-      setDeletingId(null)
     }
   }
 
@@ -256,14 +259,30 @@ export function NewMembersManager({
                       current === application.id ? null : application.id
                     )
                   }
-                  onDelete={() => handleDelete(application.id)}
-                  isDeleting={deletingId === application.id}
+                  onDelete={() => openDelete(application.id)}
+                  onSendEmail={() =>
+                    setEmailRecipient({
+                      id: application.id,
+                      name: `${application.firstName} ${application.lastName}`.trim(),
+                      email: application.email,
+                    })
+                  }
+                  isDeleting={deletePendingId === application.id}
                 />
               ))
             )}
           </tbody>
         </table>
       </div>
+
+      <ConfirmDeleteModal
+        open={deleteIsOpen}
+        onConfirm={async () => {
+          if (deletePendingId) await handleDelete(deletePendingId)
+          closeDelete()
+        }}
+        onCancel={closeDelete}
+      />
 
       {totalPages > 1 && (
         <div className="flex items-center justify-between gap-2">
@@ -294,6 +313,26 @@ export function NewMembersManager({
           </button>
         </div>
       )}
+
+      {/* Per-row Send Email composer — shared across all admin tables. */}
+      {emailRecipient && (
+        <EmailComposerModal
+          target={{ kind: 'single', recipient: emailRecipient }}
+          sendEndpoint="/api/admin/email/send"
+          buildPayload={({ subject, body, ctaLabel, ctaHref }) => ({
+            to: [{ name: emailRecipient.name, email: emailRecipient.email }],
+            subject,
+            body,
+            ...(ctaLabel ? { ctaLabel, ctaHref } : {}),
+          })}
+          onClose={() => setEmailRecipient(null)}
+          onSent={(result) => {
+            setEmailRecipient(null)
+            const t = formatSendResultToast(result)
+            toast({ ...t, duration: 5000 })
+          }}
+        />
+      )}
     </div>
   )
 }
@@ -303,12 +342,14 @@ function ApplicationRows({
   expanded,
   onToggle,
   onDelete,
+  onSendEmail,
   isDeleting,
 }: {
   application: DashboardMembershipApplication
   expanded: boolean
   onToggle: () => void
   onDelete: () => void
+  onSendEmail: () => void
   isDeleting: boolean
 }) {
   return (
@@ -334,6 +375,29 @@ function ApplicationRows({
         <Td>{application.rccgMember ? 'Yes' : 'No'}</Td>
         <Td>{formatDate(application.createdAt)}</Td>
         <td className="whitespace-nowrap px-4 py-3 text-right">
+          <button
+            type="button"
+            onClick={onSendEmail}
+            className="mr-3 inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800"
+            aria-label={`Send email to ${application.firstName} ${application.lastName}`}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-3.5 w-3.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"
+              />
+            </svg>
+            Email
+          </button>
           <button
             type="button"
             onClick={onToggle}

@@ -3,6 +3,10 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useToast } from '@/components/ui/toast-provider'
+import {
+  ConfirmDeleteModal,
+  useConfirmDelete,
+} from '@/components/ui/confirm-delete-modal'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -46,8 +50,8 @@ export function TestimonialsManager({
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [editing, setEditing] = useState<DashboardTestimonial | null>(null)
 
+  const { isOpen: deleteIsOpen, pendingItem: deletePendingId, openDelete, closeDelete } = useConfirmDelete<string>()
   const [togglingId, setTogglingId] = useState<string | null>(null)
-  const [deletingId, setDeletingId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const refetch = async () => {
@@ -66,8 +70,6 @@ export function TestimonialsManager({
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Delete this testimonial? This cannot be undone.')) return
-    setDeletingId(id)
     try {
       const res = await fetch(`/api/testimonials/${id}`, { method: 'DELETE' })
       if (res.ok) {
@@ -92,8 +94,6 @@ export function TestimonialsManager({
         variant: 'error',
         duration: 5000,
       })
-    } finally {
-      setDeletingId(null)
     }
   }
 
@@ -295,24 +295,33 @@ export function TestimonialsManager({
                 <button
                   type="button"
                   onClick={() => setEditing(t)}
-                  disabled={togglingId === t.id || deletingId === t.id}
+                  disabled={togglingId === t.id || deletePendingId === t.id}
                   className="flex-1 px-3 py-2 text-sm font-medium text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors disabled:opacity-50"
                 >
                   Edit
                 </button>
                 <button
                   type="button"
-                  onClick={() => handleDelete(t.id)}
-                  disabled={togglingId === t.id || deletingId === t.id}
+                  onClick={() => openDelete(t.id)}
+                  disabled={togglingId === t.id || deletePendingId === t.id}
                   className="flex-1 px-3 py-2 text-sm font-medium text-red-600 border border-red-600 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
                 >
-                  {deletingId === t.id ? 'Deleting…' : 'Delete'}
+                  {deletePendingId === t.id ? 'Deleting…' : 'Delete'}
                 </button>
               </div>
             </div>
           ))}
         </div>
       )}
+
+      <ConfirmDeleteModal
+        open={deleteIsOpen}
+        onConfirm={async () => {
+          if (deletePendingId) await handleDelete(deletePendingId)
+          closeDelete()
+        }}
+        onCancel={closeDelete}
+      />
 
       {isAddOpen && (
         <TestimonialFormModal

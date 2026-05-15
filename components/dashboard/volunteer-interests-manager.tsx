@@ -5,6 +5,15 @@ import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useToast } from '@/components/ui/toast-provider'
 import type { VolunteerAreaStrength } from '@/lib/types/volunteer-interest'
+import {
+  ConfirmDeleteModal,
+  useConfirmDelete,
+} from '@/components/ui/confirm-delete-modal'
+import {
+  EmailComposerModal,
+  formatSendResultToast,
+  type EmailRecipient,
+} from '@/components/dashboard/email-composer-modal'
 
 export interface DashboardVolunteerInterest {
   id: string
@@ -73,7 +82,8 @@ export function VolunteerInterestsManager({
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
   const [expandedId, setExpandedId] = useState<string | null>(null)
-  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const { isOpen: deleteIsOpen, pendingItem: deletePendingId, openDelete, closeDelete } = useConfirmDelete<string>()
+  const [emailRecipient, setEmailRecipient] = useState<EmailRecipient | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [hasUserInteracted, setHasUserInteracted] = useState(false)
@@ -133,9 +143,6 @@ export function VolunteerInterestsManager({
   }, [hasUserInteracted, pageSize, queryKey])
 
   async function handleDelete(id: string) {
-    if (!confirm('Delete this volunteer interest? This cannot be undone.')) return
-
-    setDeletingId(id)
     try {
       const response = await fetch(`/api/volunteer-interests/${id}`, {
         method: 'DELETE',
@@ -160,8 +167,6 @@ export function VolunteerInterestsManager({
         description: err instanceof Error ? err.message : 'Please try again.',
         variant: 'error',
       })
-    } finally {
-      setDeletingId(null)
     }
   }
 
@@ -248,6 +253,35 @@ export function VolunteerInterestsManager({
                           <button
                             type="button"
                             onClick={() =>
+                              setEmailRecipient({
+                                id: interest.id,
+                                name: interest.name,
+                                email: interest.email,
+                              })
+                            }
+                            className="inline-flex items-center gap-1 rounded-lg border border-blue-600 px-3 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-50"
+                            aria-label={`Send email to ${interest.name}`}
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-3.5 w-3.5"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth={2}
+                              stroke="currentColor"
+                              aria-hidden="true"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"
+                              />
+                            </svg>
+                            Email
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
                               setExpandedId((current) =>
                                 current === interest.id ? null : interest.id
                               )
@@ -258,11 +292,11 @@ export function VolunteerInterestsManager({
                           </button>
                           <button
                             type="button"
-                            onClick={() => handleDelete(interest.id)}
-                            disabled={deletingId === interest.id}
+                            onClick={() => openDelete(interest.id)}
+                            disabled={deletePendingId === interest.id}
                             className="rounded-lg border border-red-600 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-50 disabled:opacity-50"
                           >
-                            {deletingId === interest.id ? 'Deleting...' : 'Delete'}
+                            {deletePendingId === interest.id ? 'Deleting...' : 'Delete'}
                           </button>
                         </div>
                       </Td>
@@ -290,6 +324,15 @@ export function VolunteerInterestsManager({
           </tbody>
         </table>
       </div>
+
+      <ConfirmDeleteModal
+        open={deleteIsOpen}
+        onConfirm={async () => {
+          if (deletePendingId) await handleDelete(deletePendingId)
+          closeDelete()
+        }}
+        onCancel={closeDelete}
+      />
 
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
@@ -319,6 +362,26 @@ export function VolunteerInterestsManager({
             Next
           </button>
         </div>
+      )}
+
+      {/* Per-row Send Email composer — shared across all admin tables. */}
+      {emailRecipient && (
+        <EmailComposerModal
+          target={{ kind: 'single', recipient: emailRecipient }}
+          sendEndpoint="/api/admin/email/send"
+          buildPayload={({ subject, body, ctaLabel, ctaHref }) => ({
+            to: [{ name: emailRecipient.name, email: emailRecipient.email }],
+            subject,
+            body,
+            ...(ctaLabel ? { ctaLabel, ctaHref } : {}),
+          })}
+          onClose={() => setEmailRecipient(null)}
+          onSent={(result) => {
+            setEmailRecipient(null)
+            const t = formatSendResultToast(result)
+            toast({ ...t, duration: 5000 })
+          }}
+        />
       )}
     </div>
   )

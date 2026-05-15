@@ -4,11 +4,20 @@ import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useToast } from '@/components/ui/toast-provider'
 import {
+  ConfirmDeleteModal,
+  useConfirmDelete,
+} from '@/components/ui/confirm-delete-modal'
+import {
   GENDER_LABELS,
   MARITAL_STATUS_LABELS,
   type Gender,
   type MaritalStatus,
 } from '@/lib/types/group-member'
+import {
+  EmailComposerModal,
+  formatSendResultToast,
+  type EmailRecipient,
+} from '@/components/dashboard/email-composer-modal'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -94,7 +103,8 @@ export function MembersManager({
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [expandedId, setExpandedId] = useState<string | null>(null)
-  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const { isOpen: deleteIsOpen, pendingItem: deletePendingId, openDelete, closeDelete } = useConfirmDelete<string>()
+  const [emailRecipient, setEmailRecipient] = useState<EmailRecipient | null>(null)
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
 
@@ -168,8 +178,6 @@ export function MembersManager({
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Delete this member submission? This cannot be undone.')) return
-    setDeletingId(id)
     try {
       const res = await fetch(`/api/group-members/${id}`, {
         method: 'DELETE',
@@ -203,8 +211,6 @@ export function MembersManager({
         variant: 'error',
         duration: 5000,
       })
-    } finally {
-      setDeletingId(null)
     }
   }
 
@@ -291,14 +297,30 @@ export function MembersManager({
                   member={m}
                   expanded={expandedId === m.id}
                   onToggle={() => setExpandedId((id) => (id === m.id ? null : m.id))}
-                  onDelete={() => handleDelete(m.id)}
-                  isDeleting={deletingId === m.id}
+                  onDelete={() => openDelete(m.id)}
+                  onSendEmail={() =>
+                    setEmailRecipient({
+                      id: m.id,
+                      name: `${m.firstName} ${m.lastName}`.trim(),
+                      email: m.email,
+                    })
+                  }
+                  isDeleting={deletePendingId === m.id}
                 />
               ))
             )}
           </tbody>
         </table>
       </div>
+
+      <ConfirmDeleteModal
+        open={deleteIsOpen}
+        onConfirm={async () => {
+          if (deletePendingId) await handleDelete(deletePendingId)
+          closeDelete()
+        }}
+        onCancel={closeDelete}
+      />
 
       {/* Pagination */}
       {totalPages > 1 && (
@@ -330,6 +352,26 @@ export function MembersManager({
           </button>
         </div>
       )}
+
+      {/* Per-row Send Email composer — shared modal across all admin tables. */}
+      {emailRecipient && (
+        <EmailComposerModal
+          target={{ kind: 'single', recipient: emailRecipient }}
+          sendEndpoint="/api/admin/email/send"
+          buildPayload={({ subject, body, ctaLabel, ctaHref }) => ({
+            to: [{ name: emailRecipient.name, email: emailRecipient.email }],
+            subject,
+            body,
+            ...(ctaLabel ? { ctaLabel, ctaHref } : {}),
+          })}
+          onClose={() => setEmailRecipient(null)}
+          onSent={(result) => {
+            setEmailRecipient(null)
+            const t = formatSendResultToast(result)
+            toast({ ...t, duration: 5000 })
+          }}
+        />
+      )}
     </div>
   )
 }
@@ -343,12 +385,14 @@ function RowGroup({
   expanded,
   onToggle,
   onDelete,
+  onSendEmail,
   isDeleting,
 }: {
   member: DashboardMember
   expanded: boolean
   onToggle: () => void
   onDelete: () => void
+  onSendEmail: () => void
   isDeleting: boolean
 }) {
   return (
@@ -375,6 +419,16 @@ function RowGroup({
         <Td>{formatBirthday(member.birthDay, member.birthMonth)}</Td>
         <Td>{formatJoinedDate(member.createdAt)}</Td>
         <td className="px-4 py-3 whitespace-nowrap text-right">
+          <button
+            type="button"
+            onClick={onSendEmail}
+            className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800 mr-3"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+            </svg>
+            Email
+          </button>
           <button
             type="button"
             onClick={onToggle}

@@ -534,7 +534,7 @@ export default async function Home() {
       <AboutSection
         eyebrow="Our Foundation"
         heading="A Tabernacle for His Glory"
-        body="A Tabernacle is not merely a building, it is a life surrendered to God. It is God's dwelling place among His people. When God commanded a Tabernacle to be built, He was asking for a place, and a life to host His presence. In His presence, we see His Glory, and when His Glory rest, nothing remains the same. His Presence undoes what religion cannot touch because the glory of God is the only lasting change agent."
+        body="The Tabernacle: A Tabernacle is not merely a building"
         pillars={[
           {
             title: 'Furnish',

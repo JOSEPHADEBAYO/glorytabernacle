@@ -6,6 +6,10 @@ import Image from 'next/image'
 import { useToast } from '@/components/ui/toast-provider'
 import { FileUploadField } from '@/components/dashboard/file-upload-field'
 import { TRACT_CATEGORIES } from '@/lib/types/tract'
+import {
+  ConfirmDeleteModal,
+  useConfirmDelete,
+} from '@/components/ui/confirm-delete-modal'
 
 interface Tract {
   id: string
@@ -60,7 +64,7 @@ export function TractsManager({ initialTracts }: TractsManagerProps) {
   }
 
   const [togglingTractId, setTogglingTractId] = useState<string | null>(null)
-  const [deletingTractId, setDeletingTractId] = useState<string | null>(null)
+  const { isOpen: deleteIsOpen, pendingItem: deletePendingId, openDelete, closeDelete } = useConfirmDelete<string>()
   const [error, setError] = useState<string | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string>('All Categories')
   const [searchQuery, setSearchQuery] = useState<string>('')
@@ -70,9 +74,6 @@ export function TractsManager({ initialTracts }: TractsManagerProps) {
   const [gridDisplayCount, setGridDisplayCount] = useState(12)
 
   const handleDeleteTract = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this tract? This action cannot be undone.')) return
-
-    setDeletingTractId(id)
     try {
       const response = await fetch(`/api/tracts/${id}`, {
         method: 'DELETE',
@@ -109,8 +110,6 @@ export function TractsManager({ initialTracts }: TractsManagerProps) {
         variant: 'error',
         duration: 5000,
       })
-    } finally {
-      setDeletingTractId(null)
     }
   }
 
@@ -424,7 +423,7 @@ export function TractsManager({ initialTracts }: TractsManagerProps) {
                 onDelete={handleDeleteTract}
                 onTogglePublish={handleTogglePublish}
                 togglingTractId={togglingTractId}
-                deletingTractId={deletingTractId}
+                deletingTractId={deletePendingId}
               />
               
               {/* Load More Button for Grid */}
@@ -462,7 +461,7 @@ export function TractsManager({ initialTracts }: TractsManagerProps) {
                   onDelete={handleDeleteTract}
                   onTogglePublish={handleTogglePublish}
                   togglingTractId={togglingTractId}
-                  deletingTractId={deletingTractId}
+                  deletingTractId={deletePendingId}
                 />
               </div>
               
@@ -480,6 +479,15 @@ export function TractsManager({ initialTracts }: TractsManagerProps) {
           )}
         </>
       )}
+
+      <ConfirmDeleteModal
+        open={deleteIsOpen}
+        onConfirm={async () => {
+          if (deletePendingId) await handleDeleteTract(deletePendingId)
+          closeDelete()
+        }}
+        onCancel={closeDelete}
+      />
 
       {isAddModalOpen && (
         <AddTractModal
@@ -1200,7 +1208,7 @@ function TractGrid({
   onDelete,
   onTogglePublish,
   togglingTractId,
-  deletingTractId,
+  deletingTractId: deletePendingId,
 }: {
   tracts: Tract[]
   onEdit: (tract: Tract) => void
@@ -1326,17 +1334,17 @@ function TractGrid({
               </button>
               <button
                 onClick={() => onEdit(tract)}
-                disabled={togglingTractId === tract.id || deletingTractId === tract.id}
+                disabled={togglingTractId === tract.id || deletePendingId === tract.id}
                 className="flex-1 px-3 py-2 text-sm font-medium text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Edit
               </button>
               <button
                 onClick={() => onDelete(tract.id)}
-                disabled={togglingTractId === tract.id || deletingTractId === tract.id}
+                disabled={togglingTractId === tract.id || deletePendingId === tract.id}
                 className="flex-1 px-3 py-2 text-sm font-medium text-red-600 border border-red-600 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                {deletingTractId === tract.id ? (
+                {deletePendingId === tract.id ? (
                   <>
                     <svg
                       className="animate-spin h-4 w-4"
@@ -1378,7 +1386,7 @@ function TractsTable({
   onDelete,
   onTogglePublish,
   togglingTractId,
-  deletingTractId,
+  deletingTractId: deletePendingId,
 }: {
   tracts: Tract[]
   onEdit: (tract: Tract) => void
@@ -1556,7 +1564,7 @@ function TractsTable({
                     </button>
                     <button
                       onClick={() => onEdit(tract)}
-                      disabled={togglingTractId === tract.id || deletingTractId === tract.id}
+                      disabled={togglingTractId === tract.id || deletePendingId === tract.id}
                       className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all hover:scale-110 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                       title="Edit tract"
                     >
@@ -1577,11 +1585,11 @@ function TractsTable({
                     </button>
                     <button
                       onClick={() => onDelete(tract.id)}
-                      disabled={togglingTractId === tract.id || deletingTractId === tract.id}
+                      disabled={togglingTractId === tract.id || deletePendingId === tract.id}
                       className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all hover:scale-110 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                       title="Delete tract"
                     >
-                      {deletingTractId === tract.id ? (
+                      {deletePendingId === tract.id ? (
                         <svg
                           className="animate-spin h-5 w-5"
                           xmlns="http://www.w3.org/2000/svg"

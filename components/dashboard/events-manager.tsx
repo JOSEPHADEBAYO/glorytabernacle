@@ -4,6 +4,10 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { useToast } from '@/components/ui/toast-provider'
+import {
+  ConfirmDeleteModal,
+  useConfirmDelete,
+} from '@/components/ui/confirm-delete-modal'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -83,7 +87,7 @@ export function EventsManager({ initialEvents }: EventsManagerProps) {
   const [editingEvent, setEditingEvent] = useState<DashboardEvent | null>(null)
 
   const [togglingId, setTogglingId] = useState<string | null>(null)
-  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const { isOpen: deleteIsOpen, pendingItem: deletePendingId, openDelete, closeDelete } = useConfirmDelete<string>()
   const [error, setError] = useState<string | null>(null)
 
   const refetch = async () => {
@@ -104,9 +108,6 @@ export function EventsManager({ initialEvents }: EventsManagerProps) {
 
   // ---------- Delete -----------------------------------------------------
   const handleDelete = async (id: string) => {
-    if (!confirm('Delete this event? This cannot be undone.')) return
-
-    setDeletingId(id)
     try {
       const res = await fetch(`/api/events/${id}`, { method: 'DELETE' })
 
@@ -137,8 +138,6 @@ export function EventsManager({ initialEvents }: EventsManagerProps) {
         variant: 'error',
         duration: 5000,
       })
-    } finally {
-      setDeletingId(null)
     }
   }
 
@@ -450,18 +449,18 @@ export function EventsManager({ initialEvents }: EventsManagerProps) {
                     <button
                       type="button"
                       onClick={() => setEditingEvent(event)}
-                      disabled={togglingId === event.id || deletingId === event.id}
+                      disabled={togglingId === event.id || deletePendingId === event.id}
                       className="flex-1 px-3 py-2 text-sm font-medium text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors disabled:opacity-50"
                     >
                       Edit
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleDelete(event.id)}
-                      disabled={togglingId === event.id || deletingId === event.id}
+                      onClick={() => openDelete(event.id)}
+                      disabled={togglingId === event.id || deletePendingId === event.id}
                       className="flex-1 px-3 py-2 text-sm font-medium text-red-600 border border-red-600 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
                     >
-                      {deletingId === event.id ? 'Deleting…' : 'Delete'}
+                      {deletePendingId === event.id ? 'Deleting…' : 'Delete'}
                     </button>
                   </div>
                 </div>
@@ -470,6 +469,15 @@ export function EventsManager({ initialEvents }: EventsManagerProps) {
           })}
         </div>
       )}
+
+      <ConfirmDeleteModal
+        open={deleteIsOpen}
+        onConfirm={async () => {
+          if (deletePendingId) await handleDelete(deletePendingId)
+          closeDelete()
+        }}
+        onCancel={closeDelete}
+      />
 
       {/* Add modal */}
       {isAddOpen && (

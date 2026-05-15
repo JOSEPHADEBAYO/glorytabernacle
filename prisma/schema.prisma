@@ -21,6 +21,9 @@ model User {
   email         String    @unique
   passwordHash  String?
   name          String
+  phoneNumber   String?
+  position      String?
+  mustChangePassword Boolean @default(true)
   image         String?
   emailVerified DateTime?
   role          UserRole  @default(VIEWER)

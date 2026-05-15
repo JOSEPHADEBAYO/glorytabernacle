@@ -164,9 +164,7 @@ export function CalendarDialog({ events, open, onClose }: CalendarDialogProps) {
               {cells.map((day, i) => {
                 if (!day) return <div key={`empty-${i}`} />
                 const iso = toISO(day)
-                // Every day has Mount Up, so always render the dot.
-                const hasEvents = true
-                const hasOtherEvents = !!eventMap[iso]?.length
+                const eventCount = 1 + (eventMap[iso]?.length ?? 0) // 1 = Mount Up (daily) + any additional events
                 const isToday =
                   day === today.getDate() &&
                   viewMonth === today.getMonth() &&
@@ -184,9 +182,7 @@ export function CalendarDialog({ events, open, onClose }: CalendarDialogProps) {
                         ? 'text-white'
                         : isToday
                           ? 'text-white'
-                          : hasEvents
-                            ? 'text-gray-800 hover:bg-gray-100'
-                            : 'text-gray-400 hover:bg-gray-50'
+                          : 'text-gray-800 hover:bg-gray-100'
                       }
                     `}
                     style={
@@ -196,16 +192,20 @@ export function CalendarDialog({ events, open, onClose }: CalendarDialogProps) {
                           ? { backgroundColor: 'var(--church-green)' }
                           : {}
                     }
-                    aria-label={`${day} ${MONTHS[viewMonth]}, Mount Up daily prayer${hasOtherEvents ? `, ${eventMap[iso].length} additional event(s)` : ''}`}
+                    aria-label={`${day} ${MONTHS[viewMonth]}${eventCount > 0 ? `, ${eventCount} event(s)` : ''}`}
                     aria-pressed={isSelected}
                   >
                     {day}
-                    {hasEvents && (
+                    {eventCount > 0 && (
                       <span
-                        className={`absolute bottom-1 w-1.5 h-1.5 rounded-full ${isSelected || isToday ? 'bg-white/70' : ''}`}
-                        style={!isSelected && !isToday ? { backgroundColor: 'var(--church-green)' } : {}}
-                        aria-hidden="true"
-                      />
+                        className="absolute -top-0.5 -right-0.5 flex items-center justify-center min-w-[18px] h-[18px] rounded-full px-1 text-[10px] font-bold leading-none"
+                        style={{
+                          backgroundColor: isSelected || isToday ? 'rgba(255,255,255,0.9)' : 'var(--church-green)',
+                          color: isSelected || isToday ? 'var(--church-green)' : 'white',
+                        }}
+                      >
+                        {eventCount}
+                      </span>
                     )}
                   </button>
                 )

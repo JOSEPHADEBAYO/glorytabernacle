@@ -60,10 +60,119 @@ export function AboutSection({
             {heading}
           </h2>
 
-          {/* Body */}
-          <p className="text-base md:text-lg text-gray-600 leading-relaxed">
-            {body}
-          </p>
+          {/* The Tabernacle */}
+          <div
+            className="rounded-2xl p-6 space-y-4"
+            style={{
+              backgroundColor: 'rgba(27, 34, 119, 0.04)',
+              border: '1px solid rgba(27, 34, 119, 0.1)',
+            }}
+          >
+            <div className="flex items-center gap-3">
+              <div
+                className="h-8 w-1 rounded-full"
+                style={{ backgroundColor: 'var(--church-green)' }}
+                aria-hidden="true"
+              />
+              <div>
+                <p
+                  className="text-sm font-extrabold uppercase tracking-wider"
+                  style={{ color: 'rgba(27, 34, 119, 1)' }}
+                >
+                  {body}
+                </p>
+                <p className="text-xs font-medium" style={{ color: 'var(--church-green)' }}>
+                  Exodus 25:8
+                </p>
+              </div>
+            </div>
+            <ol className="space-y-3 pl-1">
+              <li className="flex items-start gap-3 text-sm text-gray-700 leading-relaxed">
+                <span
+                  className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+                  style={{ backgroundColor: 'var(--church-green)' }}
+                >
+                  1
+                </span>
+                It is a life surrendered to God.
+              </li>
+              <li className="flex items-start gap-3 text-sm text-gray-700 leading-relaxed">
+                <span
+                  className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+                  style={{ backgroundColor: 'var(--church-green)' }}
+                >
+                  2
+                </span>
+                It is God&apos;s dwelling place among His people.
+              </li>
+              <li className="flex items-start gap-3 text-sm text-gray-700 leading-relaxed">
+                <span
+                  className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+                  style={{ backgroundColor: 'var(--church-green)' }}
+                >
+                  3
+                </span>
+                When God commanded a Tabernacle to be built, He was asking for a place — a life to host His presence.
+              </li>
+            </ol>
+          </div>
+
+          {/* The Glory */}
+          <div
+            className="rounded-2xl p-6 space-y-4"
+            style={{
+              backgroundColor: 'rgba(27, 34, 119, 0.04)',
+              border: '1px solid rgba(27, 34, 119, 0.1)',
+            }}
+          >
+            <div className="flex items-center gap-3">
+              <div
+                className="h-8 w-1 rounded-full"
+                style={{ backgroundColor: 'var(--church-green)' }}
+                aria-hidden="true"
+              />
+              <div>
+                <p
+                  className="text-sm font-extrabold uppercase tracking-wider"
+                  style={{ color: 'rgba(27, 34, 119, 1)' }}
+                >
+                  Glory is the undeniable, tangible splendour and majesty of God.
+                </p>
+                <p className="text-xs font-medium" style={{ color: 'var(--church-green)' }}>
+                  Exodus 40:38
+                </p>
+              </div>
+            </div>
+            <ol className="space-y-3 pl-1">
+              <li className="flex items-start gap-3 text-sm text-gray-700 leading-relaxed">
+                <span
+                  className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+                  style={{ backgroundColor: 'var(--church-green)' }}
+                >
+                  1
+                </span>
+                <strong>Atmospheres Shift:</strong> When His glory rests, nothing remains the same.
+              </li>
+              <li className="flex items-start gap-3 text-sm text-gray-700 leading-relaxed">
+                <span
+                  className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+                  style={{ backgroundColor: 'var(--church-green)' }}
+                >
+                  2
+                </span>
+                <strong>Hearts Are Convicted:</strong> His presence undoes what religion cannot touch.
+              </li>
+              <li className="flex items-start gap-3 text-sm text-gray-700 leading-relaxed">
+                <span
+                  className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+                  style={{ backgroundColor: 'var(--church-green)' }}
+                >
+                  3
+                </span>
+                <strong>Lives Are Transformed:</strong> The glory of God is the only lasting change agent.
+              </li>
+            </ol>
+          </div>
 
           {/* Pillars — two columns */}
           {pillars && pillars.length > 0 && (

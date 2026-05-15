@@ -19,9 +19,9 @@ const SERVICE_COLUMNS: ServiceColumn[] = [
     icon: 'calendar',
     items: [
       { label: '1st Service' },
-      { label: '2nd Service', detail: 'Business Service' },
-      { label: '1st Sunday', detail: 'Celebration' },
-      { label: 'Last Sunday', detail: 'Anointing & Healing' },
+      { label: '2nd Service', detail: 'Business Service (5:00pm)' },
+      { label: '1st Sunday', detail: 'Celebration Service (10:00am)' },
+      { label: 'Last Sunday', detail: 'Anointing & Healing (10:00am)' },
     ],
   },
   {

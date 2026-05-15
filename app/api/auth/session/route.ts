@@ -1,12 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-
-// Super Admin credentials (for validation)
-const SUPER_ADMIN = {
-  email: 'adeolusegun1000@gmail.com',
-  name: 'David Segun',
-  role: 'SUPER_ADMIN',
-}
+import { prisma } from '@/lib/prisma'
 
 export async function GET(request: NextRequest) {
   try {
@@ -20,22 +14,28 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Validate session token format
-    if (!sessionToken.startsWith('session_')) {
+    const session = await prisma.session.findUnique({
+      where: { token: sessionToken },
+      include: { user: true },
+    })
+
+    if (!session || session.expiresAt < new Date()) {
+      if (session) {
+        await prisma.session.delete({ where: { id: session.id } })
+      }
+      cookieStore.delete('session_token')
       return NextResponse.json(
-        { error: 'Invalid session token' },
+        { error: 'Session expired' },
         { status: 401 }
       )
     }
 
-    // In production, this would check database for session validity
-    // For now, we return the user info if token exists
     return NextResponse.json({
       valid: true,
       user: {
-        email: SUPER_ADMIN.email,
-        name: SUPER_ADMIN.name,
-        role: SUPER_ADMIN.role,
+        email: session.user.email,
+        name: session.user.name,
+        role: session.user.role,
       },
     })
   } catch (error) {

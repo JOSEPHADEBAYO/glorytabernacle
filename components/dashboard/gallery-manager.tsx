@@ -4,6 +4,10 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { useToast } from '@/components/ui/toast-provider'
+import {
+  ConfirmDeleteModal,
+  useConfirmDelete,
+} from '@/components/ui/confirm-delete-modal'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -71,7 +75,7 @@ export function GalleryManager({ initialPhotos }: GalleryManagerProps) {
   const [editingPhoto, setEditingPhoto] = useState<GalleryPhoto | null>(null)
 
   const [togglingId, setTogglingId] = useState<string | null>(null)
-  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const { isOpen: deleteIsOpen, pendingItem: deletePendingId, openDelete, closeDelete } = useConfirmDelete<string>()
   const [error, setError] = useState<string | null>(null)
 
   // Refetch from server to keep client state in sync after writes.
@@ -93,9 +97,6 @@ export function GalleryManager({ initialPhotos }: GalleryManagerProps) {
 
   // ---------- Delete -----------------------------------------------------
   const handleDelete = async (id: string) => {
-    if (!confirm('Delete this photo? This cannot be undone.')) return
-
-    setDeletingId(id)
     try {
       const res = await fetch(`/api/gallery/${id}`, { method: 'DELETE' })
 
@@ -126,8 +127,6 @@ export function GalleryManager({ initialPhotos }: GalleryManagerProps) {
         variant: 'error',
         duration: 5000,
       })
-    } finally {
-      setDeletingId(null)
     }
   }
 
@@ -408,18 +407,18 @@ export function GalleryManager({ initialPhotos }: GalleryManagerProps) {
                   <button
                     type="button"
                     onClick={() => setEditingPhoto(photo)}
-                    disabled={togglingId === photo.id || deletingId === photo.id}
-                    className="flex-1 px-3 py-2 text-sm font-medium text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors disabled:opacity-50"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleDelete(photo.id)}
-                    disabled={togglingId === photo.id || deletingId === photo.id}
-                    className="flex-1 px-3 py-2 text-sm font-medium text-red-600 border border-red-600 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
-                  >
-                    {deletingId === photo.id ? 'Deleting…' : 'Delete'}
+                      disabled={togglingId === photo.id || deletePendingId === photo.id}
+                      className="flex-1 px-3 py-2 text-sm font-medium text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors disabled:opacity-50"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => openDelete(photo.id)}
+                      disabled={togglingId === photo.id || deletePendingId === photo.id}
+                      className="flex-1 px-3 py-2 text-sm font-medium text-red-600 border border-red-600 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50"
+                    >
+                      {deletePendingId === photo.id ? 'Deleting…' : 'Delete'}
                   </button>
                 </div>
               </div>
@@ -427,6 +426,15 @@ export function GalleryManager({ initialPhotos }: GalleryManagerProps) {
           ))}
         </div>
       )}
+
+      <ConfirmDeleteModal
+        open={deleteIsOpen}
+        onConfirm={async () => {
+          if (deletePendingId) await handleDelete(deletePendingId)
+          closeDelete()
+        }}
+        onCancel={closeDelete}
+      />
 
       {/* Add modal */}
       {isAddOpen && (

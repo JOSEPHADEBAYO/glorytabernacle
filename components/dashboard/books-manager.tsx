@@ -4,6 +4,10 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { useToast } from '@/components/ui/toast-provider'
+import {
+  ConfirmDeleteModal,
+  useConfirmDelete,
+} from '@/components/ui/confirm-delete-modal'
 
 interface Book {
   id: string
@@ -50,7 +54,7 @@ export function BooksManager({ initialBooks }: BooksManagerProps) {
   const [error, setError] = useState<string | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string>('All Categories')
   const [searchQuery, setSearchQuery] = useState<string>('')
-  const [deletingBookId, setDeletingBookId] = useState<string | null>(null)
+  const { isOpen: deleteIsOpen, pendingItem: deletePendingId, openDelete, closeDelete } = useConfirmDelete<string>()
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid')
   
   // Pagination states
@@ -88,9 +92,6 @@ export function BooksManager({ initialBooks }: BooksManagerProps) {
   }
 
   const handleDeleteBook = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this book?')) return
-
-    setDeletingBookId(id)
     try {
       const response = await fetch(`/api/books/${id}`, {
         method: 'DELETE',
@@ -129,8 +130,6 @@ export function BooksManager({ initialBooks }: BooksManagerProps) {
         variant: 'error',
         duration: 5000,
       })
-    } finally {
-      setDeletingBookId(null)
     }
   }
 
@@ -534,17 +533,17 @@ export function BooksManager({ initialBooks }: BooksManagerProps) {
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleEditBook(book)}
-                      disabled={togglingBookId === book.id || deletingBookId === book.id}
+                      disabled={togglingBookId === book.id || deletePendingId === book.id}
                       className="flex-1 px-3 py-2 text-sm font-medium text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Edit
                     </button>
                     <button
-                      onClick={() => handleDeleteBook(book.id)}
-                      disabled={togglingBookId === book.id || deletingBookId === book.id}
+                      onClick={() => openDelete(book.id)}
+                      disabled={togglingBookId === book.id || deletePendingId === book.id}
                       className="flex-1 px-3 py-2 text-sm font-medium text-red-600 border border-red-600 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
-                      {deletingBookId === book.id ? (
+                      {deletePendingId === book.id ? (
                         <>
                           <svg
                             className="animate-spin h-4 w-4"
@@ -613,7 +612,7 @@ export function BooksManager({ initialBooks }: BooksManagerProps) {
                 onDelete={handleDeleteBook}
                 onTogglePublish={handleTogglePublish}
                 togglingBookId={togglingBookId}
-                deletingBookId={deletingBookId}
+                deletingBookId={deletePendingId}
                 isLoading={isLoading}
               />
             </div>
@@ -632,6 +631,15 @@ export function BooksManager({ initialBooks }: BooksManagerProps) {
           )}
         </>
       )}
+
+      <ConfirmDeleteModal
+        open={deleteIsOpen}
+        onConfirm={async () => {
+          if (deletePendingId) await handleDeleteBook(deletePendingId)
+          closeDelete()
+        }}
+        onCancel={closeDelete}
+      />
 
       {isAddModalOpen && (
         <AddBookModal
@@ -1795,7 +1803,7 @@ function BooksTable({
   onDelete,
   onTogglePublish,
   togglingBookId,
-  deletingBookId,
+  deletingBookId: deletePendingId,
   isLoading,
 }: {
   books: Book[]
@@ -1937,7 +1945,7 @@ function BooksTable({
                   <div className="flex items-center justify-end gap-2">
                     <button
                       onClick={() => onEdit(book)}
-                      disabled={togglingBookId === book.id || deletingBookId === book.id}
+                      disabled={togglingBookId === book.id || deletePendingId === book.id}
                       className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all hover:scale-110 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                       title="Edit book"
                     >
@@ -1958,11 +1966,11 @@ function BooksTable({
                     </button>
                     <button
                       onClick={() => onDelete(book.id)}
-                      disabled={togglingBookId === book.id || deletingBookId === book.id}
+                      disabled={togglingBookId === book.id || deletePendingId === book.id}
                       className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all hover:scale-110 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                       title="Delete book"
                     >
-                      {deletingBookId === book.id ? (
+                      {deletePendingId === book.id ? (
                         <svg
                           className="animate-spin h-5 w-5"
                           xmlns="http://www.w3.org/2000/svg"

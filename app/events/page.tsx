@@ -146,9 +146,9 @@ export default async function EventsPage() {
               <div className="flex flex-col gap-3">
                 {[
                   { label: 'Weekly Services', detail: '2 Services held every Sunday.', accent: 'green' },
-                  { label: '2nd Service', detail: 'Dedicated Business Service.', accent: 'red' },
-                  { label: 'First Sunday', detail: 'CELEBRATION SERVICE', accent: 'green' },
-                  { label: 'Last Sunday', detail: 'Anointing & Healing Service.', accent: 'red' },
+                  { label: '2nd Service', detail: 'Dedicated Business Service. (5:00pm)', accent: 'red' },
+                  { label: 'First Sunday', detail: 'CELEBRATION SERVICE (10:00am)', accent: 'green' },
+                  { label: 'Last Sunday', detail: 'Anointing & Healing Service. (10:00am)', accent: 'red' },
                 ].map((item) => (
                   <div
                     key={item.label}

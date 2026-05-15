@@ -7,6 +7,10 @@ import { Edit, ExternalLink, Grid3X3, List, Plus, Search, Trash2 } from 'lucide-
 import { FileUploadField } from '@/components/dashboard/file-upload-field'
 import { useToast } from '@/components/ui/toast-provider'
 import { youtubeUrlSchema } from '@/lib/validation/sermon'
+import {
+  ConfirmDeleteModal,
+  useConfirmDelete,
+} from '@/components/ui/confirm-delete-modal'
 
 export interface DashboardSermon {
   id: string
@@ -80,8 +84,9 @@ export function SermonsManager({ initialSermons }: SermonsManagerProps) {
   const [gridDisplayCount, setGridDisplayCount] = useState(12)
   const [currentPage, setCurrentPage] = useState(1)
   const [modal, setModal] = useState<{ mode: SermonFormMode; sermon?: DashboardSermon } | null>(null)
+  const { isOpen: deleteIsOpen, pendingItem: deletePendingId, openDelete, closeDelete } = useConfirmDelete<string>()
+  const [deleteItemName, setDeleteItemName] = useState<string | null>(null)
   const [togglingId, setTogglingId] = useState<string | null>(null)
-  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   const seriesOptions = useMemo(
     () => Array.from(new Set(sermons.map((s) => s.series).filter(Boolean))) as string[],
@@ -162,16 +167,14 @@ export function SermonsManager({ initialSermons }: SermonsManagerProps) {
     }
   }
 
-  async function handleDelete(sermon: DashboardSermon) {
-    if (!confirm(`Delete "${sermon.title}"? This cannot be undone.`)) return
-    setDeletingId(sermon.id)
+  async function handleDelete(id: string) {
     try {
-      const res = await fetch(`/api/sermons/${sermon.id}`, { method: 'DELETE' })
+      const res = await fetch(`/api/sermons/${id}`, { method: 'DELETE' })
       if (!res.ok) {
         const data = await res.json()
         throw new Error(errorMessageFrom(data, 'Could not delete sermon'))
       }
-      setSermons((items) => items.filter((item) => item.id !== sermon.id))
+      setSermons((items) => items.filter((item) => item.id !== id))
       toast({
         title: 'Sermon deleted',
         description: 'The sermon has been removed.',
@@ -186,8 +189,6 @@ export function SermonsManager({ initialSermons }: SermonsManagerProps) {
         variant: 'error',
         duration: 5000,
       })
-    } finally {
-      setDeletingId(null)
     }
   }
 
@@ -287,9 +288,12 @@ export function SermonsManager({ initialSermons }: SermonsManagerProps) {
                 key={sermon.id}
                 sermon={sermon}
                 isToggling={togglingId === sermon.id}
-                isDeleting={deletingId === sermon.id}
+                isDeleting={deletePendingId === sermon.id}
                 onEdit={() => setModal({ mode: 'edit', sermon })}
-                onDelete={() => handleDelete(sermon)}
+                onDelete={() => {
+                  setDeleteItemName(sermon.title)
+                  openDelete(sermon.id)
+                }}
                 onToggle={() => handleTogglePublish(sermon)}
               />
             ))}
@@ -312,13 +316,30 @@ export function SermonsManager({ initialSermons }: SermonsManagerProps) {
           currentPage={currentPage}
           totalPages={totalPages}
           togglingId={togglingId}
-          deletingId={deletingId}
+          deletingId={deletePendingId}
           onPageChange={setCurrentPage}
           onEdit={(sermon) => setModal({ mode: 'edit', sermon })}
-          onDelete={handleDelete}
+          onDelete={(sermon) => {
+            setDeleteItemName(sermon.title)
+            openDelete(sermon.id)
+          }}
           onToggle={handleTogglePublish}
         />
       )}
+
+      <ConfirmDeleteModal
+        open={deleteIsOpen}
+        itemName={deleteItemName ?? undefined}
+        onConfirm={async () => {
+          if (deletePendingId) await handleDelete(deletePendingId)
+          closeDelete()
+          setDeleteItemName(null)
+        }}
+        onCancel={() => {
+          closeDelete()
+          setDeleteItemName(null)
+        }}
+      />
 
       {modal && (
         <SermonFormModal

@@ -5,6 +5,10 @@ import { useRouter } from 'next/navigation'
 import { ExternalLink, Pencil, Plus, Trash2 } from 'lucide-react'
 import { useToast } from '@/components/ui/toast-provider'
 import {
+  ConfirmDeleteModal,
+  useConfirmDelete,
+} from '@/components/ui/confirm-delete-modal'
+import {
   INFORMATION_CATEGORIES,
   INFORMATION_CATEGORY_LABELS,
   type InformationCategory,
@@ -152,11 +156,12 @@ export function InformationManager({ initialItems }: InformationManagerProps) {
     }
   }
 
-  async function deleteItem(item: DashboardInformationItem) {
-    if (!confirm('Delete this information item? This cannot be undone.')) return
-    setBusyId(item.id)
+  const { isOpen: deleteIsOpen, pendingItem: deletePendingId, openDelete, closeDelete } = useConfirmDelete<string>()
+
+  async function deleteItem(id: string) {
+    setBusyId(id)
     try {
-      const response = await fetch(`/api/information/${item.id}`, {
+      const response = await fetch(`/api/information/${id}`, {
         method: 'DELETE',
       })
 
@@ -165,7 +170,7 @@ export function InformationManager({ initialItems }: InformationManagerProps) {
         throw new Error(data.error ?? 'Failed to delete item')
       }
 
-      setItems((current) => current.filter((entry) => entry.id !== item.id))
+      setItems((current) => current.filter((entry) => entry.id !== id))
       toast({ title: 'Information deleted', variant: 'success', duration: 3000 })
       router.refresh()
     } catch (error) {
@@ -338,7 +343,7 @@ export function InformationManager({ initialItems }: InformationManagerProps) {
                   </button>
                   <button
                     type="button"
-                    onClick={() => deleteItem(item)}
+                    onClick={() => openDelete(item.id)}
                     disabled={busyId === item.id}
                     className="inline-flex items-center gap-1 rounded-lg border border-red-600 px-3 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:opacity-60"
                   >
@@ -351,6 +356,15 @@ export function InformationManager({ initialItems }: InformationManagerProps) {
           ))}
         </div>
       )}
+
+      <ConfirmDeleteModal
+        open={deleteIsOpen}
+        onConfirm={async () => {
+          if (deletePendingId) await deleteItem(deletePendingId)
+          closeDelete()
+        }}
+        onCancel={closeDelete}
+      />
 
       {modal && (
         <InformationModal

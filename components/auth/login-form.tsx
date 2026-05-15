@@ -31,6 +31,12 @@ export function LoginForm() {
         return
       }
 
+      if (data.mustChangePassword) {
+        router.push('/dashboard/settings')
+        router.refresh()
+        return
+      }
+
       // Redirect to dashboard on success
       router.push('/dashboard')
       router.refresh()

@@ -266,10 +266,10 @@ export function Sidebar() {
       <div className="border-t border-gray-200 p-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-semibold">
-            DS
+            DO
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900 truncate">David Segun</p>
+            <p className="text-sm font-medium text-gray-900 truncate">David Oluwasegun</p>
             <p className="text-xs text-gray-500 truncate">Super Admin</p>
           </div>
         </div>

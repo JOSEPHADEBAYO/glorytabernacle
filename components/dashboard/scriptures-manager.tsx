@@ -3,6 +3,10 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, Pencil, Trash2, Eye, EyeOff, BookOpen, ExternalLink } from 'lucide-react'
+import {
+  ConfirmDeleteModal,
+  useConfirmDelete,
+} from '@/components/ui/confirm-delete-modal'
 
 interface Scripture {
   id: string
@@ -43,7 +47,7 @@ export function ScripturesManager({ initialScriptures }: Props) {
   const [editingScripture, setEditingScripture] = useState<Scripture | null>(null)
   const [form, setForm] = useState(EMPTY_FORM)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const { isOpen: deleteIsOpen, pendingItem: deletePendingId, openDelete, closeDelete } = useConfirmDelete<string>()
   const [togglingId, setTogglingId] = useState<string | null>(null)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -134,8 +138,6 @@ export function ScripturesManager({ initialScriptures }: Props) {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Delete this scripture? This cannot be undone.')) return
-    setDeletingId(id)
     try {
       const res = await fetch(`/api/admin/scriptures/${id}`, { method: 'DELETE' })
       if (!res.ok) throw new Error('Failed to delete')
@@ -143,8 +145,6 @@ export function ScripturesManager({ initialScriptures }: Props) {
       await refetch()
     } catch {
       showToast('Failed to delete scripture.', 'error')
-    } finally {
-      setDeletingId(null)
     }
   }
 
@@ -257,8 +257,8 @@ export function ScripturesManager({ initialScriptures }: Props) {
                 <button
                   type="button"
                   title="Delete"
-                  disabled={deletingId === s.id}
-                  onClick={() => handleDelete(s.id)}
+                  disabled={deletePendingId === s.id}
+                  onClick={() => openDelete(s.id)}
                   className="rounded-lg p-2 text-gray-400 hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -268,6 +268,15 @@ export function ScripturesManager({ initialScriptures }: Props) {
           ))}
         </div>
       )}
+
+      <ConfirmDeleteModal
+        open={deleteIsOpen}
+        onConfirm={async () => {
+          if (deletePendingId) await handleDelete(deletePendingId)
+          closeDelete()
+        }}
+        onCancel={closeDelete}
+      />
 
       {/* Modal */}
       {isModalOpen && (

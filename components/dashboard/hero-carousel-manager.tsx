@@ -6,6 +6,10 @@ import Image from 'next/image'
 import { ImagePlus, Loader2, Pencil, Trash2, Upload } from 'lucide-react'
 import { useToast } from '@/components/ui/toast-provider'
 import type { HeroCarouselImage } from '@/lib/types/hero-carousel'
+import {
+  ConfirmDeleteModal,
+  useConfirmDelete,
+} from '@/components/ui/confirm-delete-modal'
 
 interface HeroCarouselManagerProps {
   initialImages: HeroCarouselImage[]
@@ -75,7 +79,7 @@ export function HeroCarouselManager({
   const [editingId, setEditingId] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
-  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const { isOpen: deleteIsOpen, pendingItem: deletePendingId, openDelete, closeDelete } = useConfirmDelete<string>()
   const [error, setError] = useState<string | null>(null)
 
   const refetch = async () => {
@@ -205,9 +209,6 @@ export function HeroCarouselManager({
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Delete this hero carousel image?')) return
-
-    setDeletingId(id)
     try {
       const res = await fetch(`/api/hero-carousel/${id}`, { method: 'DELETE' })
       const data = await res.json().catch(() => ({}))
@@ -227,8 +228,6 @@ export function HeroCarouselManager({
       const message =
         err instanceof Error ? err.message : 'An error occurred while deleting'
       toast({ title: 'Delete failed', description: message, variant: 'error' })
-    } finally {
-      setDeletingId(null)
     }
   }
 
@@ -526,12 +525,12 @@ export function HeroCarouselManager({
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleDelete(image.id)}
-                        disabled={deletingId === image.id}
+                        onClick={() => openDelete(image.id)}
+                        disabled={deletePendingId === image.id}
                         className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-red-200 text-red-600 hover:bg-red-50 disabled:opacity-50"
                         aria-label={`Delete ${image.title}`}
                       >
-                        {deletingId === image.id ? (
+                        {deletePendingId === image.id ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
                           <Trash2 className="h-4 w-4" />
@@ -545,6 +544,15 @@ export function HeroCarouselManager({
           </div>
         )}
       </div>
+
+      <ConfirmDeleteModal
+        open={deleteIsOpen}
+        onConfirm={async () => {
+          if (deletePendingId) await handleDelete(deletePendingId)
+          closeDelete()
+        }}
+        onCancel={closeDelete}
+      />
     </div>
   )
 }
