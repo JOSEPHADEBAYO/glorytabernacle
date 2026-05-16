@@ -1,13 +1,18 @@
 /**
  * Shared TypeScript types for the Children Ministry system.
+ *
+ * As of the 15 May 2026 cut-over, children check-in is staff-managed —
+ * CHILDREN_LEADER (plus SUPER_ADMIN as a fallback) registers, edits, and
+ * signs each child in / out from /dashboard/children. The legacy
+ * parent-self-service OAuth flow has been retired.
  */
 
 import type { Gender } from '@/lib/types/group-member'
 
 export type { Gender }
 
-/** Roles allowed to view/manage admin-side children data. */
-export const CHILDREN_ADMIN_ROLES = ['SUPER_ADMIN', 'CONTENT_EDITOR'] as const
+/** Roles allowed to view / manage admin-side children data. */
+export const CHILDREN_ADMIN_ROLES = ['SUPER_ADMIN', 'CHILDREN_LEADER'] as const
 export type ChildrenAdminRole = typeof CHILDREN_ADMIN_ROLES[number]
 
 /**
@@ -24,6 +29,9 @@ export interface ChildRecord {
   medicalNotes: string | null
   specialNeeds: string | null
   photoUrl: string | null
+  primaryGuardianName: string
+  primaryGuardianPhone: string
+  primaryGuardianEmail: string | null
   emergencyContactName: string
   emergencyContactPhone: string
   emergencyContactRelation: string
@@ -31,7 +39,7 @@ export interface ChildRecord {
   updatedAt: Date
 }
 
-/** Input shape for POST /api/parents/me/children. */
+/** Input shape for POST /api/admin/children. */
 export interface CreateChildInput {
   firstName: string
   lastName: string
@@ -41,12 +49,15 @@ export interface CreateChildInput {
   medicalNotes?: string
   specialNeeds?: string
   photoUrl?: string
+  primaryGuardianName: string
+  primaryGuardianPhone: string
+  primaryGuardianEmail?: string
   emergencyContactName: string
   emergencyContactPhone: string
   emergencyContactRelation: string
 }
 
-/** Input shape for PUT /api/parents/me/children/[id]. */
+/** Input shape for PUT /api/admin/children/[id]. */
 export interface UpdateChildInput {
   firstName?: string
   lastName?: string
@@ -56,6 +67,9 @@ export interface UpdateChildInput {
   medicalNotes?: string
   specialNeeds?: string
   photoUrl?: string
+  primaryGuardianName?: string
+  primaryGuardianPhone?: string
+  primaryGuardianEmail?: string
   emergencyContactName?: string
   emergencyContactPhone?: string
   emergencyContactRelation?: string

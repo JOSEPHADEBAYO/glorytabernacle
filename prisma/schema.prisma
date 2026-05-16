@@ -11,11 +11,16 @@ datasource db {
 
 // User Management
 //
-// Two distinct user types share this table, distinguished by `role`:
-//   - Admin users (SUPER_ADMIN / CONTENT_EDITOR / VIEWER) authenticate via the
-//     existing cookie-based admin login and have a `passwordHash`.
-//   - Parent users (PARENT) authenticate via Google OAuth (Auth.js) and have
-//     no `passwordHash`. They get a profile `image` from Google.
+// All user types share this table, distinguished by `role`:
+//   - Admin / staff users (SUPER_ADMIN / CONTENT_EDITOR / CHILDREN_LEADER /
+//     VIEWER) authenticate via the cookie-based email-and-password login.
+//   - YOUTH users authenticate via Google OAuth (Auth.js) for the youth
+//     portal — they have no `passwordHash` and get a profile `image` from
+//     Google.
+//   - PARENT is a deprecated legacy role. Children check-in is now handled
+//     by CHILDREN_LEADER from /dashboard/children; the parent self-service
+//     OAuth flow has been removed. Existing PARENT rows are retained for
+//     check-in-history integrity but cannot log in.
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
@@ -36,14 +41,12 @@ model User {
   auditLogs      AuditLog[]
 
   // Auth.js (NextAuth v5) relations — populated for OAuth-authenticated
-  // parents. Empty for admin-cookie users.
+  // YOUTH users. Empty for admin-cookie users.
   accounts     Account[]
   authSessions AuthSession[]
 
-  // Many-to-many: a parent can have multiple children; a child can belong
-  // to multiple parents (typically two: married couple).
-  children       Child[]       @relation("ParentToChild")
-  // Check-in audit trail: records the parent who signed a child in/out.
+  // Check-in audit trail: records the staff member (CHILDREN_LEADER or
+  // SUPER_ADMIN) who signed a child in / out.
   checkInsCreated  ChildCheckIn[] @relation("CheckInSignedInBy")
   checkInsClosed   ChildCheckIn[] @relation("CheckInSignedOutBy")
 
@@ -57,8 +60,9 @@ model User {
 enum UserRole {
   SUPER_ADMIN
   CONTENT_EDITOR
+  CHILDREN_LEADER
   VIEWER
-  PARENT
+  PARENT  // Deprecated — see User docblock.
   YOUTH
 }
 
@@ -111,6 +115,9 @@ model VerificationToken {
 // Children Ministry — registration + check-in / check-out
 // =========================================================================
 
+// Child records are owned by the children's ministry, not by parent
+// accounts. The Children Leader registers each child and captures the
+// primary guardian's contact details plus a separate emergency contact.
 model Child {
   id                       String    @id @default(cuid())
   firstName                String
@@ -123,11 +130,20 @@ model Child {
   specialNeeds             String?   @db.Text
   // Optional Cloudinary URL for the child's photo.
   photoUrl                 String?
+
+  // Primary guardian — the day-to-day contact who drops the child off /
+  // picks them up. The Children Leader uses these details for routine
+  // contact.
+  primaryGuardianName      String
+  primaryGuardianPhone     String
+  primaryGuardianEmail     String?
+
+  // Emergency contact — a second person (different from the primary
+  // guardian) to call if the primary cannot be reached.
   emergencyContactName     String
   emergencyContactPhone    String
   emergencyContactRelation String
 
-  parents   User[]         @relation("ParentToChild")
   checkIns  ChildCheckIn[]
 
   createdAt DateTime @default(now())

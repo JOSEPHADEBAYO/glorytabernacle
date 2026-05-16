@@ -53,7 +53,17 @@ export async function POST(request: NextRequest) {
 
     const passwordHash = await bcrypt.hash(oneTimePassword, 12)
 
-    const role: UserRole = position === 'Head of Youth Department' ? 'YOUTH' : 'CONTENT_EDITOR'
+    // Position → role mapping. We intentionally only elevate to YOUTH /
+    // CHILDREN_LEADER for the dedicated department heads; everyone else
+    // defaults to CONTENT_EDITOR. SUPER_ADMIN cannot be created here.
+    let role: UserRole
+    if (position === 'Head of Youth Department') {
+      role = 'YOUTH'
+    } else if (position === 'Head of Children Department') {
+      role = 'CHILDREN_LEADER'
+    } else {
+      role = 'CONTENT_EDITOR'
+    }
 
     const user = await prisma.user.create({
       data: {

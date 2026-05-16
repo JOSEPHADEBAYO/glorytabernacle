@@ -1,5 +1,8 @@
 /**
  * Zod validation schemas for the Children Ministry system.
+ *
+ * Staff-managed model (CHILDREN_LEADER + SUPER_ADMIN). Each child captures
+ * a primary guardian (day-to-day contact) and a separate emergency contact.
  */
 
 import { z } from 'zod'
@@ -41,8 +44,16 @@ const dobSchema = z.coerce
 const optionalText = (max: number) =>
   z.string().trim().max(max).optional().or(z.literal(''))
 
+const optionalEmail = z
+  .string()
+  .trim()
+  .email('Must be a valid email address')
+  .max(254, 'Email too long')
+  .optional()
+  .or(z.literal(''))
+
 /**
- * Schema for POST /api/parents/me/children.
+ * Schema for POST /api/admin/children — the Children Leader registers a child.
  */
 export const createChildSchema = z.object({
   firstName: z
@@ -61,6 +72,13 @@ export const createChildSchema = z.object({
   medicalNotes: optionalText(2000),
   specialNeeds: optionalText(2000),
   photoUrl: z.string().url('Photo URL must be a valid URL').optional().or(z.literal('')),
+  primaryGuardianName: z
+    .string()
+    .trim()
+    .min(1, 'Primary guardian name is required')
+    .max(100, 'Primary guardian name too long'),
+  primaryGuardianPhone: ukPhoneSchema,
+  primaryGuardianEmail: optionalEmail,
   emergencyContactName: z
     .string()
     .trim()
@@ -75,8 +93,7 @@ export const createChildSchema = z.object({
 })
 
 /**
- * Schema for PUT /api/parents/me/children/[id]. Mirrors create, all fields
- * optional, at least one required.
+ * Schema for PUT /api/admin/children/[id]. All fields optional, at least one required.
  */
 export const updateChildSchema = z
   .object({
@@ -88,6 +105,9 @@ export const updateChildSchema = z
     medicalNotes: optionalText(2000),
     specialNeeds: optionalText(2000),
     photoUrl: z.string().url().optional().or(z.literal('')),
+    primaryGuardianName: z.string().trim().min(1).max(100).optional(),
+    primaryGuardianPhone: ukPhoneSchema.optional(),
+    primaryGuardianEmail: optionalEmail,
     emergencyContactName: z.string().trim().min(1).max(100).optional(),
     emergencyContactPhone: ukPhoneSchema.optional(),
     emergencyContactRelation: z.string().trim().min(1).max(60).optional(),
@@ -97,27 +117,19 @@ export const updateChildSchema = z
   })
 
 /**
- * Schema for POST /api/parents/me/check-in: ticked-children array.
+ * Schema for POST /api/admin/children/[id]/check-in — single-child action.
  */
-export const checkInSchema = z.object({
-  childIds: z
-    .array(z.string().min(1))
-    .min(1, 'Pick at least one child to check in')
-    .max(20, 'Too many children at once'),
+export const checkInSingleSchema = z.object({}).strict()
+
+/**
+ * Schema for POST /api/admin/children/[id]/check-out — single check-in close.
+ */
+export const checkOutSingleSchema = z.object({
+  checkInId: z.string().min(1, 'checkInId is required').optional(),
 })
 
 /**
- * Schema for POST /api/parents/me/check-out: array of open check-in ids.
- */
-export const checkOutSchema = z.object({
-  checkInIds: z
-    .array(z.string().min(1))
-    .min(1, 'Pick at least one child to check out')
-    .max(20, 'Too many children at once'),
-})
-
-/**
- * Query params for the admin-side endpoints.
+ * Query params for the admin-side list endpoints.
  */
 export const adminChildrenQuerySchema = z.object({
   page: z.coerce.number().int().min(1).optional(),

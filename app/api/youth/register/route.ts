@@ -7,7 +7,9 @@ import { auth } from '@/lib/auth/parent-auth'
  *
  * Called after Google sign-in from the youth portal.
  * Sets the authenticated user's role to YOUTH if they are currently PARENT or VIEWER.
- * This allows a user who first signed in via /parents to switch to the youth portal.
+ * This handles the case where the OAuth user was created with a different
+ * role (e.g. legacy PARENT or default VIEWER) and is now signing in via
+ * the youth portal.
  */
 export async function POST() {
   try {

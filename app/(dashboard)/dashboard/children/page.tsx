@@ -2,11 +2,30 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { ChildrenAdminPanel } from '@/components/dashboard/children-admin-panel'
+import {
+  CHILDREN_ADMIN_ROLES,
+  type ChildrenAdminRole,
+} from '@/lib/types/child'
+
 export default async function ChildrenDashboardPage() {
   const cookieStore = await cookies()
   const sessionToken = cookieStore.get('session_token')?.value
   if (!sessionToken) {
     redirect('/login')
+  }
+
+  // Role gate: only CHILDREN_LEADER and SUPER_ADMIN may access this page.
+  // Other dashboard users (CONTENT_EDITOR, VIEWER) are bounced back to /dashboard.
+  const session = await prisma.session.findUnique({
+    where: { token: sessionToken },
+    include: { user: { select: { role: true } } },
+  })
+  if (!session || session.expiresAt < new Date()) {
+    redirect('/login')
+  }
+  const role = session.user.role as ChildrenAdminRole | string
+  if (!CHILDREN_ADMIN_ROLES.includes(role as ChildrenAdminRole)) {
+    redirect('/dashboard')
   }
 
   // Pre-fetch the first batch of data so the page renders immediately.

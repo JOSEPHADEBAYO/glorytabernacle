@@ -81,16 +81,28 @@ export default function UsersPage() {
   }, [router])
 
   const fetchGroups = useCallback(async () => {
+    // Two department-head positions are hardcoded because they map to
+    // dedicated roles (YOUTH, CHILDREN_LEADER) on the server. Every other
+    // position is derived from the published Groups list.
+    const fixedPositions = [
+      'Head of Youth Department',
+      'Head of Children Department',
+    ]
     try {
       const res = await fetch('/api/groups')
       if (res.ok) {
         const data = await res.json()
         const titles = (data.groups ?? []).map((g: GroupOption) => `${POSITION_PREFIX}${g.title}`)
-        setGroupOptions(['Head of Youth Department', ...titles])
+        // De-duplicate in case a published Group happens to share one of the
+        // fixed titles.
+        const merged = [...fixedPositions, ...titles.filter((t: string) => !fixedPositions.includes(t))]
+        setGroupOptions(merged)
+        return
       }
     } catch {
-      setGroupOptions(['Head of Youth Department'])
+      // fall through
     }
+    setGroupOptions(fixedPositions)
   }, [])
 
   useEffect(() => {

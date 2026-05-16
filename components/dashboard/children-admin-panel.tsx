@@ -1,7 +1,18 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Image from 'next/image'
+import { useToast } from '@/components/ui/toast-provider'
+import {
+  ConfirmDeleteModal,
+  useConfirmDelete,
+} from '@/components/ui/confirm-delete-modal'
+import {
+  ChildForm,
+  EMPTY_CHILD_FORM,
+  childToFormValues,
+  type ChildFormValues,
+} from '@/components/dashboard/child-form'
 
 // ---------------------------------------------------------------------------
 // Types — match the API response shapes
@@ -32,10 +43,13 @@ interface AdminChild {
   allergies: string | null
   medicalNotes: string | null
   specialNeeds: string | null
+  photoUrl: string | null
+  primaryGuardianName: string
+  primaryGuardianPhone: string
+  primaryGuardianEmail: string | null
   emergencyContactName: string
   emergencyContactPhone: string
   emergencyContactRelation: string
-  parents: Array<{ id: string; name: string; email: string }>
   checkIns: Array<{ id: string; signedInAt: string; signedOutAt: string | null }>
 }
 
@@ -105,9 +119,7 @@ export function ChildrenAdminPanel({
         </nav>
       </div>
 
-      {tab === 'live' && (
-        <LiveAttendance initial={initialActiveCheckIns} />
-      )}
+      {tab === 'live' && <LiveAttendance initial={initialActiveCheckIns} />}
       {tab === 'children' && <AllChildren />}
       {tab === 'analytics' && <AnalyticsTab />}
     </div>
@@ -119,9 +131,11 @@ export function ChildrenAdminPanel({
 // ---------------------------------------------------------------------------
 
 function LiveAttendance({ initial }: { initial: AdminCheckIn[] }) {
+  const { toast } = useToast()
   const [checkIns, setCheckIns] = useState<AdminCheckIn[]>(initial)
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date())
   const [error, setError] = useState<string | null>(null)
+  const [busyId, setBusyId] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -155,6 +169,34 @@ function LiveAttendance({ initial }: { initial: AdminCheckIn[] }) {
     }
   }, [])
 
+  async function handleCheckOut(checkIn: AdminCheckIn) {
+    setBusyId(checkIn.id)
+    try {
+      const res = await fetch(
+        `/api/admin/children/${checkIn.child.id}/check-out`,
+        { method: 'POST' }
+      )
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error ?? 'Failed to check out')
+      }
+      setCheckIns((current) => current.filter((c) => c.id !== checkIn.id))
+      toast({
+        title: 'Signed out',
+        description: `${checkIn.child.firstName} ${checkIn.child.lastName} has been checked out.`,
+        variant: 'success',
+      })
+    } catch (err) {
+      toast({
+        title: 'Check-out failed',
+        description: err instanceof Error ? err.message : 'Please try again.',
+        variant: 'error',
+      })
+    } finally {
+      setBusyId(null)
+    }
+  }
+
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
@@ -170,7 +212,8 @@ function LiveAttendance({ initial }: { initial: AdminCheckIn[] }) {
 
       {checkIns.length === 0 ? (
         <div className="rounded-2xl border border-gray-100 bg-white p-10 text-center text-sm text-gray-500">
-          The live board will populate once parents start signing children in.
+          The live board will populate once children are signed in from the
+          All children tab.
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -232,6 +275,14 @@ function LiveAttendance({ initial }: { initial: AdminCheckIn[] }) {
                   )}
                 </div>
               )}
+              <button
+                type="button"
+                onClick={() => handleCheckOut(c)}
+                disabled={busyId === c.id}
+                className="mt-4 w-full rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
+              >
+                {busyId === c.id ? 'Signing out…' : 'Sign out'}
+              </button>
             </article>
           ))}
         </div>
@@ -241,10 +292,11 @@ function LiveAttendance({ initial }: { initial: AdminCheckIn[] }) {
 }
 
 // ---------------------------------------------------------------------------
-// Tab 2: All children — paginated table
+// Tab 2: All children — paginated table with register / edit / check-in/out
 // ---------------------------------------------------------------------------
 
 function AllChildren() {
+  const { toast } = useToast()
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [page, setPage] = useState(1)
@@ -257,6 +309,19 @@ function AllChildren() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [busyId, setBusyId] = useState<string | null>(null)
+
+  // Modal state for register + edit
+  const [isRegisterOpen, setIsRegisterOpen] = useState(false)
+  const [editing, setEditing] = useState<AdminChild | null>(null)
+
+  // Delete confirmation
+  const {
+    isOpen: deleteIsOpen,
+    pendingItem: deletePendingId,
+    openDelete,
+    closeDelete,
+  } = useConfirmDelete<string>()
 
   useEffect(() => {
     const id = setTimeout(() => {
@@ -266,57 +331,119 @@ function AllChildren() {
     return () => clearTimeout(id)
   }, [search])
 
-  useEffect(() => {
-    let cancelled = false
-    const fetchData = async () => {
-      setIsLoading(true)
-      setError(null)
-      try {
-        const params = new URLSearchParams()
-        params.set('page', String(page))
-        params.set('pageSize', String(pageSize))
-        if (debouncedSearch) params.set('search', debouncedSearch)
-        const res = await fetch(`/api/admin/children?${params}`, {
-          cache: 'no-store',
+  const fetchData = useCallback(async () => {
+    setIsLoading(true)
+    setError(null)
+    try {
+      const params = new URLSearchParams()
+      params.set('page', String(page))
+      params.set('pageSize', String(pageSize))
+      if (debouncedSearch) params.set('search', debouncedSearch)
+      const res = await fetch(`/api/admin/children?${params}`, {
+        cache: 'no-store',
+      })
+      if (res.ok) {
+        const json = await res.json()
+        setData({
+          children: json.children,
+          total: json.total,
+          totalPages: json.totalPages,
         })
-        if (cancelled) return
-        if (res.ok) {
-          const json = await res.json()
-          setData({
-            children: json.children,
-            total: json.total,
-            totalPages: json.totalPages,
-          })
-        } else {
-          setError('Could not load children')
-        }
-      } catch (err) {
-        if (!cancelled) {
-          console.error('All children fetch error:', err)
-          setError('Network error')
-        }
-      } finally {
-        if (!cancelled) setIsLoading(false)
+      } else {
+        setError('Could not load children')
       }
-    }
-    fetchData()
-    return () => {
-      cancelled = true
+    } catch (err) {
+      console.error('All children fetch error:', err)
+      setError('Network error')
+    } finally {
+      setIsLoading(false)
     }
   }, [debouncedSearch, page])
 
+  useEffect(() => {
+    let cancelled = false
+    fetchData().then(() => {
+      if (cancelled) return
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [fetchData])
+
+  async function handleCheckInOut(child: AdminChild, action: 'in' | 'out') {
+    setBusyId(child.id)
+    try {
+      const res = await fetch(
+        `/api/admin/children/${child.id}/check-${action}`,
+        { method: 'POST' }
+      )
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}))
+        throw new Error(json.error ?? `Failed to check ${action}`)
+      }
+      toast({
+        title: action === 'in' ? 'Signed in' : 'Signed out',
+        description: `${child.firstName} ${child.lastName} has been checked ${action}.`,
+        variant: 'success',
+      })
+      await fetchData()
+    } catch (err) {
+      toast({
+        title: `Check-${action} failed`,
+        description: err instanceof Error ? err.message : 'Please try again.',
+        variant: 'error',
+      })
+    } finally {
+      setBusyId(null)
+    }
+  }
+
+  async function handleDelete(id: string) {
+    try {
+      const res = await fetch(`/api/admin/children/${id}`, { method: 'DELETE' })
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}))
+        throw new Error(json.error ?? 'Failed to delete')
+      }
+      toast({
+        title: 'Child removed',
+        description: 'The child record has been deleted.',
+        variant: 'success',
+      })
+      await fetchData()
+    } catch (err) {
+      toast({
+        title: 'Delete failed',
+        description: err instanceof Error ? err.message : 'Please try again.',
+        variant: 'error',
+      })
+    }
+  }
+
   return (
     <div className="space-y-4">
-      <input
-        type="search"
-        placeholder="Search by name"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="w-full max-w-md px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-      />
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <input
+          type="search"
+          placeholder="Search by child name or guardian"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full sm:max-w-md px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900"
+        />
+        <button
+          type="button"
+          onClick={() => setIsRegisterOpen(true)}
+          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+        >
+          Register a child
+        </button>
+      </div>
 
       {error && (
-        <div role="alert" className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+        <div
+          role="alert"
+          className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700"
+        >
           {error}
         </div>
       )}
@@ -327,7 +454,7 @@ function AllChildren() {
             <tr>
               <Th>Name</Th>
               <Th>DOB</Th>
-              <Th>Parents</Th>
+              <Th>Primary guardian</Th>
               <Th>Status</Th>
               <th className="px-4 py-3" aria-label="Actions" />
             </tr>
@@ -349,9 +476,14 @@ function AllChildren() {
                     child={c}
                     isIn={isIn}
                     isExpanded={isExpanded}
+                    isBusy={busyId === c.id}
                     onToggle={() =>
                       setExpandedId((id) => (id === c.id ? null : c.id))
                     }
+                    onCheckIn={() => handleCheckInOut(c, 'in')}
+                    onCheckOut={() => handleCheckInOut(c, 'out')}
+                    onEdit={() => setEditing(c)}
+                    onDelete={() => openDelete(c.id)}
                   />
                 )
               })
@@ -383,20 +515,107 @@ function AllChildren() {
           </button>
         </div>
       )}
+
+      <ConfirmDeleteModal
+        open={deleteIsOpen}
+        onConfirm={async () => {
+          if (deletePendingId) await handleDelete(deletePendingId)
+          closeDelete()
+        }}
+        onCancel={closeDelete}
+      />
+
+      {isRegisterOpen && (
+        <ChildModalShell title="Register a child" onClose={() => setIsRegisterOpen(false)}>
+          <ChildForm
+            initialValues={EMPTY_CHILD_FORM}
+            uploadEndpoint="/api/upload"
+            submitLabel="Register"
+            onCancel={() => setIsRegisterOpen(false)}
+            onUploadError={(msg) =>
+              toast({ title: 'Photo upload failed', description: msg, variant: 'error' })
+            }
+            onSubmit={async (values) => {
+              const res = await fetch('/api/admin/children', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(values),
+              })
+              if (!res.ok) {
+                const json = await res.json().catch(() => ({}))
+                throw new Error(json.error ?? 'Failed to register child')
+              }
+              toast({
+                title: 'Child registered',
+                description: `${values.firstName} ${values.lastName} is now on the roster.`,
+                variant: 'success',
+              })
+              setIsRegisterOpen(false)
+              await fetchData()
+            }}
+          />
+        </ChildModalShell>
+      )}
+
+      {editing && (
+        <ChildModalShell title="Edit child" onClose={() => setEditing(null)}>
+          <ChildForm
+            initialValues={childToFormValues(editing)}
+            uploadEndpoint="/api/upload"
+            submitLabel="Save changes"
+            onCancel={() => setEditing(null)}
+            onUploadError={(msg) =>
+              toast({ title: 'Photo upload failed', description: msg, variant: 'error' })
+            }
+            onSubmit={async (values: ChildFormValues) => {
+              const res = await fetch(`/api/admin/children/${editing.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(values),
+              })
+              if (!res.ok) {
+                const json = await res.json().catch(() => ({}))
+                throw new Error(json.error ?? 'Failed to update child')
+              }
+              toast({
+                title: 'Child updated',
+                description: `${values.firstName} ${values.lastName} has been updated.`,
+                variant: 'success',
+              })
+              setEditing(null)
+              await fetchData()
+            }}
+          />
+        </ChildModalShell>
+      )}
     </div>
   )
 }
+
+// ---------------------------------------------------------------------------
+// Row + modal shell
+// ---------------------------------------------------------------------------
 
 function ChildRow({
   child,
   isIn,
   isExpanded,
+  isBusy,
   onToggle,
+  onCheckIn,
+  onCheckOut,
+  onEdit,
+  onDelete,
 }: {
   child: AdminChild
   isIn: boolean
   isExpanded: boolean
+  isBusy: boolean
   onToggle: () => void
+  onCheckIn: () => void
+  onCheckOut: () => void
+  onEdit: () => void
+  onDelete: () => void
 }) {
   return (
     <>
@@ -414,18 +633,24 @@ function ChildRow({
           })}
         </Td>
         <Td>
-          <div className="space-y-0.5">
-            {child.parents.map((p) => (
-              <div key={p.id} className="flex flex-col">
-                <span className="text-xs font-medium text-gray-900">{p.name}</span>
-                <a
-                  href={`mailto:${p.email}`}
-                  className="text-xs text-blue-600 hover:underline"
-                >
-                  {p.email}
-                </a>
-              </div>
-            ))}
+          <div className="flex flex-col">
+            <span className="text-xs font-medium text-gray-900">
+              {child.primaryGuardianName}
+            </span>
+            <a
+              className="text-xs text-blue-600 hover:underline"
+              href={`tel:${child.primaryGuardianPhone}`}
+            >
+              {child.primaryGuardianPhone}
+            </a>
+            {child.primaryGuardianEmail && (
+              <a
+                className="text-xs text-blue-600 hover:underline"
+                href={`mailto:${child.primaryGuardianEmail}`}
+              >
+                {child.primaryGuardianEmail}
+              </a>
+            )}
           </div>
         </Td>
         <Td>
@@ -441,13 +666,49 @@ function ChildRow({
           )}
         </Td>
         <td className="px-4 py-3 whitespace-nowrap text-right">
-          <button
-            type="button"
-            onClick={onToggle}
-            className="text-sm font-medium text-blue-600 hover:text-blue-800"
-          >
-            {isExpanded ? 'Hide' : 'Details'}
-          </button>
+          <div className="flex justify-end gap-2">
+            {isIn ? (
+              <button
+                type="button"
+                onClick={onCheckOut}
+                disabled={isBusy}
+                className="rounded-lg border border-blue-600 px-3 py-1 text-xs font-semibold text-blue-700 hover:bg-blue-50 disabled:opacity-50"
+              >
+                {isBusy ? 'Working…' : 'Sign out'}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={onCheckIn}
+                disabled={isBusy}
+                className="rounded-lg px-3 py-1 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-50"
+                style={{ backgroundColor: 'rgb(27, 109, 36)' }}
+              >
+                {isBusy ? 'Working…' : 'Sign in'}
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={onToggle}
+              className="text-xs font-medium text-blue-600 hover:text-blue-800"
+            >
+              {isExpanded ? 'Hide' : 'Details'}
+            </button>
+            <button
+              type="button"
+              onClick={onEdit}
+              className="text-xs font-medium text-blue-600 hover:text-blue-800"
+            >
+              Edit
+            </button>
+            <button
+              type="button"
+              onClick={onDelete}
+              className="text-xs font-medium text-red-600 hover:text-red-800"
+            >
+              Delete
+            </button>
+          </div>
         </td>
       </tr>
       {isExpanded && (
@@ -487,6 +748,40 @@ function ChildRow({
         </tr>
       )}
     </>
+  )
+}
+
+function ChildModalShell({
+  title,
+  onClose,
+  children,
+}: {
+  title: string
+  onClose: () => void
+  children: React.ReactNode
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-label={title}
+    >
+      <div className="w-full max-w-2xl rounded-2xl bg-white shadow-2xl max-h-[90vh] overflow-y-auto">
+        <header className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
+          <h2 className="text-base font-bold text-gray-900">{title}</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 text-xl leading-none"
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </header>
+        {children}
+      </div>
+    </div>
   )
 }
 

@@ -1,16 +1,16 @@
 /**
- * NextAuth v4 configuration for parent users.
+ * NextAuth v4 configuration — formerly shared by parents + youth, now used
+ * by the YOUTH portal only. The parent self-service flow was retired on
+ * 15 May 2026; children check-in is now staff-managed from /dashboard/children.
  *
- * - Google is the only sign-in provider — parents authenticate with their
- *   personal Google accounts. No passwords stored for parents.
+ * - Google is the only sign-in provider.
  * - JWT session strategy. The adapter still creates User + Account rows
- *   (so we have a persistent parent identity to link children to), but
- *   sessions live in a signed cookie rather than a database table. This
- *   sidesteps the model-name collision with the existing legacy `Session`
- *   model used by the stubbed admin login.
- * - On every sign-in we promote OAuth-only users (no password) to PARENT
- *   in the awaited `callbacks.signIn`, ensuring the role is correct
- *   *before* the JWT is issued.
+ *   (so we have a persistent youth identity), but sessions live in a signed
+ *   cookie rather than a database table.
+ * - On every sign-in, brand-new OAuth users (no role yet, defaults to
+ *   VIEWER) are promoted to YOUTH. Existing YOUTH or PARENT (legacy) roles
+ *   are left untouched. Admin / staff users (have passwordHash) are never
+ *   touched.
  *
  * Required env vars:
  *   - GOOGLE_CLIENT_ID
@@ -25,13 +25,19 @@ import GoogleProvider from 'next-auth/providers/google'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import { prisma } from '@/lib/prisma'
 
-type ParentRole = 'SUPER_ADMIN' | 'CONTENT_EDITOR' | 'VIEWER' | 'PARENT' | 'YOUTH'
+type AppRole =
+  | 'SUPER_ADMIN'
+  | 'CONTENT_EDITOR'
+  | 'CHILDREN_LEADER'
+  | 'VIEWER'
+  | 'PARENT' // legacy — no longer assigned
+  | 'YOUTH'
 
 declare module 'next-auth' {
   interface Session {
     user: {
       id: string
-      role: ParentRole
+      role: AppRole
     } & DefaultSession['user']
   }
 }
@@ -39,7 +45,7 @@ declare module 'next-auth' {
 declare module 'next-auth/jwt' {
   interface JWT {
     id?: string
-    role?: ParentRole
+    role?: AppRole
   }
 }
 
@@ -58,7 +64,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   pages: {
-    signIn: '/parents/login',
+    signIn: '/youth/login',
   },
   callbacks: {
     /**
@@ -66,10 +72,11 @@ export const authOptions: NextAuthOptions = {
      * the JWT is issued.
      *
      * Rules:
-     * - Admin users (have passwordHash) → role never touched
-     * - New OAuth users (no role yet, defaults to VIEWER) → set to PARENT
-     * - Existing YOUTH users → role preserved as YOUTH
-     * - Existing PARENT users → role preserved as PARENT
+     * - Admin / staff users (have passwordHash) → role never touched
+     * - New OAuth users (defaults to VIEWER) → set to YOUTH
+     * - Existing YOUTH users → role preserved
+     * - Existing PARENT users (legacy) → role preserved for audit, but
+     *   they can no longer access /parents because those routes are gone.
      */
     async signIn({ user }) {
       if (!user.id) return true
@@ -80,15 +87,15 @@ export const authOptions: NextAuthOptions = {
       })
       if (!dbUser) return true
 
-      const isAdmin = Boolean(dbUser.passwordHash)
-      if (isAdmin) return true
+      const isStaff = Boolean(dbUser.passwordHash)
+      if (isStaff) return true
 
-      // Only assign PARENT to brand-new OAuth users (VIEWER is the default).
-      // Existing YOUTH or PARENT roles are left untouched.
+      // Brand-new OAuth users default to VIEWER from the adapter; promote
+      // them to YOUTH for the youth portal.
       if (dbUser.role === 'VIEWER') {
         await prisma.user.update({
           where: { id: user.id },
-          data: { role: 'PARENT' },
+          data: { role: 'YOUTH' },
         })
       }
 
@@ -109,7 +116,7 @@ export const authOptions: NextAuthOptions = {
           select: { role: true },
         })
         token.id = user.id
-        token.role = (dbUser?.role as ParentRole | undefined) ?? 'PARENT'
+        token.role = (dbUser?.role as AppRole | undefined) ?? 'YOUTH'
       }
       return token
     },
@@ -121,7 +128,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session.user) {
         session.user.id = (token.id as string) ?? ''
-        session.user.role = (token.role as ParentRole | undefined) ?? 'PARENT'
+        session.user.role = (token.role as AppRole | undefined) ?? 'YOUTH'
       }
       return session
     },
@@ -131,12 +138,9 @@ export const authOptions: NextAuthOptions = {
      * Respects the callbackUrl so /youth/callback works correctly.
      */
     async redirect({ url, baseUrl }) {
-      // Allow any URL within our app
       if (url.startsWith(baseUrl)) return url
-      // Allow relative URLs
       if (url.startsWith('/')) return `${baseUrl}${url}`
-      // Fallback
-      return `${baseUrl}/parents`
+      return `${baseUrl}/youth`
     },
   },
 }
