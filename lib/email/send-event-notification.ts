@@ -6,7 +6,7 @@
  * Required environment variables:
  *   - RESEND_API_KEY              — your Resend API key
  *   - NOTIFICATION_FROM_EMAIL     — From address (must be on a verified domain
- *                                   in Resend, e.g. "RCCG Glory Tabernacle
+ *                                   in Resend, e.g. "RCCG Glory Tabernacle, Barnstaple
  *                                   <notifications@gloryt.org>")
  */
 
@@ -46,7 +46,7 @@ function getFromAddress(): string {
     // Reasonable default for development. Resend requires the sender to be on
     // a verified domain in production; the user is expected to set this env
     // var before going live.
-    return 'RCCG Glory Tabernacle <onboarding@resend.dev>'
+    return 'RCCG Glory Tabernacle, Barnstaple <onboarding@resend.dev>'
   }
   return from
 }
@@ -122,7 +122,7 @@ function buildHtml({ recipientName, event }: SendEventNotificationArgs): string 
                     : ''
                 }
 
-                <p style="margin:0;font-size:12px;line-height:1.6;color:#999;">You're receiving this because you signed up for reminders on RCCG Glory Tabernacle's website.</p>
+                <p style="margin:0;font-size:12px;line-height:1.6;color:#999;">You're receiving this because you signed up for reminders on RCCG Glory Tabernacle, Barnstaple's website.</p>
               </td>
             </tr>
           </table>
@@ -149,7 +149,7 @@ function buildText({ recipientName, event }: SendEventNotificationArgs): string 
     lines.push(`Register / Join: ${event.registrationHref}`)
   }
   lines.push('')
-  lines.push("You're receiving this because you signed up for reminders on RCCG Glory Tabernacle's website.")
+  lines.push("You're receiving this because you signed up for reminders on RCCG Glory Tabernacle, Barnstaple's website.")
   return lines.join('\n')
 }
 

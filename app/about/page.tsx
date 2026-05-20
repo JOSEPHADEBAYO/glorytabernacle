@@ -26,7 +26,7 @@ const PASTORS = [
   {
     id: 'p3',
     name: 'Pastor Seye Adebayo',
-    title: 'Pastor-in-Charge, RCCG Glory Tabernacle, Barnstaple',
+    title: 'Pastor-in-Charge, RCCG Glory Tabernacle, Barnstaple, Barnstaple',
     bio: 'Pastor Seye is passionate about raising the next generation of leaders who will impact their world for Christ.',
     image: 'https://res.cloudinary.com/deckwmsth/image/upload/v1778771805/Removed_background_puapoi.png',
   },
@@ -148,7 +148,7 @@ and influencing every sphere of society with His Kingdom.
                 Ready to find your place in the story?
               </h2>
               <p className="text-sm text-white/70 leading-relaxed">
-                We would love to walk alongside you. Join us at RCCG Glory Tabernacle and discover where you belong.
+                We would love to walk alongside you. Join us at RCCG Glory Tabernacle, Barnstaple and discover where you belong.
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 flex-none">
@@ -174,7 +174,7 @@ and influencing every sphere of society with His Kingdom.
 
       {/* ── Footer ── */}
       <Footer
-        logo={{ src: '/logo.png', alt: 'RCCG Glory Tabernacle' }}
+        logo={{ src: '/logo.png', alt: 'RCCG Glory Tabernacle, Barnstaple' }}
         tagline="Furnish  ·  Transform  ·  Influence"
         columns={[
           {
@@ -209,7 +209,7 @@ and influencing every sphere of society with His Kingdom.
           email: 'admin@glorytabernacle.co.uk',
           directionsHref: 'https://www.google.com/maps/place/51.072269,-4.069444',
         }}
-        copyrightText={`© ${new Date().getFullYear()} RCCG Glory Tabernacle. All rights reserved.`}
+        copyrightText={`© ${new Date().getFullYear()} RCCG Glory Tabernacle, Barnstaple. All rights reserved.`}
       />
     </>
   )

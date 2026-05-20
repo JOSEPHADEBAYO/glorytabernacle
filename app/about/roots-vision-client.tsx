@@ -88,7 +88,7 @@ export function RootsVisionClient() {
           >
             <Image
               src="/fellowship.png"
-              alt="RCCG Glory Tabernacle building"
+              alt="RCCG Glory Tabernacle, Barnstaple building"
               width={600}
               height={300}
               className="object-cover w-full h-full"

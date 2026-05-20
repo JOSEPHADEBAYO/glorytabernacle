@@ -43,7 +43,7 @@ export default function VolunteerPage() {
 
           {/* Subtext */}
           <p className="text-sm md:text-base text-white/65 leading-relaxed max-w-md mb-8">
-            Join a legacy of service. At RCCG Glory Tabernacle, we believe that every hand extended is a reflection of the light that we carry.
+            Join a legacy of service. At RCCG Glory Tabernacle, Barnstaple, we believe that every hand extended is a reflection of the light that we carry.
           </p>
 
           {/* CTA */}
@@ -72,7 +72,7 @@ export default function VolunteerPage() {
             </div>
 
             <p className="text-sm md:text-base text-gray-500 leading-relaxed">
-              At RCCG Glory Tabernacle, volunteering is more than serving—it is becoming part of God’s purpose. We believe God does not only use people to serve His purposes, He also makes them transgenerational blessings. If God can use you, He can bless you. Through serving, people are FURNISHED for good works, TRANSFORMED in character and purpose, and empowered to INFLUENCE their world for Jesus Christ. Whatever your gift or experience is, there is a place for you to grow, belong, and make kingdom impact
+              At RCCG Glory Tabernacle, Barnstaple, volunteering is more than serving—it is becoming part of God’s purpose. We believe God does not only use people to serve His purposes, He also makes them transgenerational blessings. If God can use you, He can bless you. Through serving, people are FURNISHED for good works, TRANSFORMED in character and purpose, and empowered to INFLUENCE their world for Jesus Christ. Whatever your gift or experience is, there is a place for you to grow, belong, and make kingdom impact
             </p>
 
             {/* Benefit bullets */}
@@ -181,7 +181,7 @@ export default function VolunteerPage() {
 
       {/* ── Footer ── */}
       <Footer
-        logo={{ src: '/logo.png', alt: 'RCCG Glory Tabernacle' }}
+        logo={{ src: '/logo.png', alt: 'RCCG Glory Tabernacle, Barnstaple' }}
         tagline="Furnish  ·  Transform  ·  Influence"
         columns={[
           {
@@ -216,7 +216,7 @@ export default function VolunteerPage() {
           email: 'info@rccgglory.org',
           directionsHref: 'https://maps.google.com',
         }}
-        copyrightText={`© ${new Date().getFullYear()} RCCG Glory Tabernacle. All rights reserved.`}
+        copyrightText={`© ${new Date().getFullYear()} RCCG Glory Tabernacle, Barnstaple. All rights reserved.`}
       />
     </>
   )

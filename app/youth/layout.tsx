@@ -20,7 +20,7 @@ export default async function YouthLayout({
           <Link href="/youth" className="flex items-center gap-3">
             <Image
               src="/logo-with-no-bg.png"
-              alt="RCCG Glory Tabernacle"
+              alt="RCCG Glory Tabernacle, Barnstaple"
               width={120}
               height={36}
               className="object-contain"

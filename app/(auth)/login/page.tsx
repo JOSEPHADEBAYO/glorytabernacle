@@ -28,7 +28,7 @@ export default function LoginPage() {
       <div className="absolute left-8 md:left-12 top-8 md:top-12 z-10">
         <Image
           src="/logo-white-bg.png"
-          alt="RCCG Glory Tabernacle"
+          alt="RCCG Glory Tabernacle, Barnstaple"
           width={120}
           height={60}
           className="rounded-lg shadow-lg"

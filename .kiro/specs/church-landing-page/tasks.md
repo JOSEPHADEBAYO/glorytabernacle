@@ -1,8 +1,8 @@
-# Implementation Plan: RCCG Glory Tabernacle Church Landing Page
+# Implementation Plan: RCCG Glory Tabernacle, Barnstaple Church Landing Page
 
 ## Overview
 
-Implement the RCCG Glory Tabernacle website using Next.js 16 App Router, TypeScript, Tailwind CSS v4, and the existing shadcn/radix-ui foundation. The build proceeds section-by-section, starting with the design system and shared primitives, then each landing page section, then stub pages and error boundaries, and finally property-based tests.
+Implement the RCCG Glory Tabernacle, Barnstaple website using Next.js 16 App Router, TypeScript, Tailwind CSS v4, and the existing shadcn/radix-ui foundation. The build proceeds section-by-section, starting with the design system and shared primitives, then each landing page section, then stub pages and error boundaries, and finally property-based tests.
 
 All components are TypeScript. All data is hardcoded static arrays. Placeholder images use `https://placehold.co/`. External images require a `remotePatterns` entry in `next.config.ts`. The `priority` prop on `next/image` is deprecated in Next.js 16 — use `preload={true}` instead. The `error.tsx` boundary uses `unstable_retry` (not `reset`).
 

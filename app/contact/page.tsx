@@ -187,7 +187,7 @@ function DepartmentContacts() {
           <Building2 className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" />
           <div>
             <p className="text-sm font-semibold" style={{ color: 'rgba(0,6,102,1)' }}>
-              RCCG Glory Tabernacle
+              RCCG Glory Tabernacle, Barnstaple
             </p>
             <p className="mt-0.5 text-xs leading-relaxed text-gray-500">
               North Devon College<br />
@@ -210,7 +210,7 @@ function MapSection() {
   return (
     <div className="relative w-full overflow-hidden" style={{ height: '400px' }}>
       <iframe
-        title="RCCG Glory Tabernacle location"
+        title="RCCG Glory Tabernacle, Barnstaple location"
         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2524.123456789!2d-4.0601!3d51.0801!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x486c4b1234567890%3A0xabcdef1234567890!2sNorth%20Devon%20College%2C%20Old%20Sticklepath%20Hill%2C%20Barnstaple%20EX31%202BQ!5e0!3m2!1sen!2suk!4v1234567890"
         width="100%"
         height="100%"
@@ -395,7 +395,7 @@ export default function ContactPage() {
       <SocialSection />
 
       <Footer
-        logo={{ src: '/logo.png', alt: 'RCCG Glory Tabernacle' }}
+        logo={{ src: '/logo.png', alt: 'RCCG Glory Tabernacle, Barnstaple' }}
         tagline="Furnish · Transform · Influence"
         columns={[
           {
@@ -423,7 +423,7 @@ export default function ContactPage() {
           email: 'admin@glorytabernacle.co.uk',
           directionsHref: 'https://maps.google.com/?q=North+Devon+College+Old+Sticklepath+Hill+Barnstaple+EX31+2BQ+England',
         }}
-        copyrightText={`© ${new Date().getFullYear()} RCCG Glory Tabernacle. All rights reserved.`}
+        copyrightText={`© ${new Date().getFullYear()} RCCG Glory Tabernacle, Barnstaple. All rights reserved.`}
       />
     </>
   )

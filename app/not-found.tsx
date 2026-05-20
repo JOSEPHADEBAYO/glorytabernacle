@@ -10,7 +10,7 @@ export default function NotFound() {
         className="text-sm font-semibold uppercase tracking-widest mb-4"
         style={{ color: 'var(--church-light-green)' }}
       >
-        RCCG Glory Tabernacle
+        RCCG Glory Tabernacle, Barnstaple
       </p>
       <h1
         className="text-8xl font-extrabold mb-4"

@@ -241,7 +241,7 @@ function MembershipFooter() {
         <div>
           <Image
             src="/logo-with-no-bg.png"
-            alt="RCCG Glory Tabernacle"
+            alt="RCCG Glory Tabernacle, Barnstaple"
             width={92}
             height={92}
             className="rounded-full"

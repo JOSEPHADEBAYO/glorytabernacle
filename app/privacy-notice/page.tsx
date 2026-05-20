@@ -3,9 +3,9 @@ import { TopNavBar } from '@/components/church/nav-bar'
 import { Footer } from '@/components/church/footer'
 
 export const metadata: Metadata = {
-  title: 'Privacy Notice — RCCG Glory Tabernacle Barnstaple',
+  title: 'Privacy Notice — RCCG Glory Tabernacle, Barnstaple Barnstaple',
   description:
-    'How RCCG Glory Tabernacle Barnstaple collects, uses, and protects your personal data, including children’s data, under UK GDPR.',
+    'How RCCG Glory Tabernacle, Barnstaple Barnstaple collects, uses, and protects your personal data, including children’s data, under UK GDPR.',
 }
 
 /**
@@ -43,7 +43,7 @@ export default function PrivacyNoticePage() {
           <div className="prose-church mt-8 space-y-6 text-sm leading-relaxed text-gray-700">
             <Section title="1. Who we are">
               <p>
-                RCCG Glory Tabernacle Barnstaple (&ldquo;we&rdquo;,
+                RCCG Glory Tabernacle, Barnstaple Barnstaple (&ldquo;we&rdquo;,
                 &ldquo;us&rdquo;, &ldquo;the church&rdquo;) is the data
                 controller for the personal information described in this
                 notice. We are based at North Devon College, Old Sticklepath

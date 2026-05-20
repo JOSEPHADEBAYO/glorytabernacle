@@ -22,7 +22,7 @@ export default function Error({
         className="text-sm font-semibold uppercase tracking-widest mb-4"
         style={{ color: 'var(--church-light-green)' }}
       >
-        RCCG Glory Tabernacle
+        RCCG Glory Tabernacle, Barnstaple
       </p>
       <h2
         className="text-3xl font-bold mb-4"

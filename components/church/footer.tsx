@@ -123,7 +123,7 @@ export function Footer({
         {/* Main grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_auto] gap-10 lg:gap-8">
           <div className="flex flex-col gap-4">
-            <Link href="/" aria-label="RCCG Glory Tabernacle home">    
+            <Link href="/" aria-label="RCCG Glory Tabernacle, Barnstaple home">    
                   <Image src={logo.src} alt={logo.alt} width={80} height={40} className="rounded-md object-contain" />
             </Link>
             {tagline && (

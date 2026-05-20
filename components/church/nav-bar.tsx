@@ -113,10 +113,10 @@ export function TopNavBar() {
       <nav className="mx-auto flex h-16 max-w-[var(--container-max)] items-center px-[var(--section-padding-x)]">
         {/* Logo */}
         <div className="flex-none">
-          <Link href="/" aria-label="RCCG Glory Tabernacle home" className="block h-12 w-[100px] relative">
+          <Link href="/" aria-label="RCCG Glory Tabernacle, Barnstaple home" className="block h-12 w-[100px] relative">
               <Image
                 src="/logo.png"
-                alt="RCCG Glory Tabernacle"
+                alt="RCCG Glory Tabernacle, Barnstaple"
                 fill
                 className="rounded-md object-contain"
               />

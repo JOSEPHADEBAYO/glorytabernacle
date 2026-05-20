@@ -54,7 +54,7 @@ function getResend(): Resend {
 function getFromAddress(): string {
   return (
     process.env.NOTIFICATION_FROM_EMAIL ??
-    'RCCG Glory Tabernacle <onboarding@resend.dev>'
+    'RCCG Glory Tabernacle, Barnstaple <onboarding@resend.dev>'
   )
 }
 

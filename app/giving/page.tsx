@@ -96,7 +96,7 @@ export default function GivingPage() {
               How to Give
             </h2>
             <p className="max-w-xl text-sm leading-relaxed text-gray-500">
-              You can now give your tithes, freewill offerings and other kingdom investments here at RCCG Glory Tabernacle to support the work of God. Choose the giving option that best suits your location and preference.
+              You can now give your tithes, freewill offerings and other kingdom investments here at RCCG Glory Tabernacle, Barnstaple to support the work of God. Choose the giving option that best suits your location and preference.
             </p>
           </div>
 
@@ -273,7 +273,7 @@ export default function GivingPage() {
       </section>
 
       <Footer
-        logo={{ src: '/logo.png', alt: 'RCCG Glory Tabernacle' }}
+        logo={{ src: '/logo.png', alt: 'RCCG Glory Tabernacle, Barnstaple' }}
         tagline="Recovering the past, restoring the present, and reviving the future."
         columns={[
           {
@@ -300,7 +300,7 @@ export default function GivingPage() {
           email: 'info@rccgglory.org',
           directionsHref: 'https://maps.google.com/?q=North+Devon+College+Barnstaple+EX31+2BQ',
         }}
-        copyrightText={`© ${new Date().getFullYear()} RCCG Glory Tabernacle. All rights reserved.`}
+        copyrightText={`© ${new Date().getFullYear()} RCCG Glory Tabernacle, Barnstaple. All rights reserved.`}
       />
     </>
   )

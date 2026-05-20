@@ -49,7 +49,7 @@ function getResend(): Resend {
 function getFromAddress(): string {
   return (
     process.env.NOTIFICATION_FROM_EMAIL ??
-    'RCCG Glory Tabernacle <onboarding@resend.dev>'
+    'RCCG Glory Tabernacle, Barnstaple <onboarding@resend.dev>'
   )
 }
 
@@ -186,7 +186,7 @@ function buildHtml({ name, subject, body, ctaLabel, ctaHref }: BuildHtmlArgs): s
 <meta name="x-apple-disable-message-reformatting" />
 <meta name="color-scheme" content="light" />
 <meta name="supported-color-schemes" content="light" />
-<title>RCCG Glory Tabernacle</title>
+<title>RCCG Glory Tabernacle, Barnstaple</title>
 <!--[if mso]>
 <style type="text/css">
   body, table, td, p, a { font-family: Arial, sans-serif !important; }
@@ -217,7 +217,7 @@ function buildHtml({ name, subject, body, ctaLabel, ctaHref }: BuildHtmlArgs): s
               -->
               <img
                 src="${logoUrl}"
-                alt="RCCG Glory Tabernacle"
+                alt="RCCG Glory Tabernacle, Barnstaple"
                 width="180"
                 height="48"
                 style="display:block;border:0;outline:none;text-decoration:none;height:auto;max-width:180px;margin:0 auto;color:#ffffff;font-size:18px;font-weight:700;line-height:48px;letter-spacing:0.01em;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;"
@@ -258,7 +258,7 @@ function buildHtml({ name, subject, body, ctaLabel, ctaHref }: BuildHtmlArgs): s
             <td style="padding:24px 36px 32px 36px;">
               <p style="margin:0;font-size:14px;line-height:1.6;color:${BRAND.textMuted};">
                 In Christ,<br />
-                <strong style="color:${BRAND.text};">RCCG Glory Tabernacle</strong>
+                <strong style="color:${BRAND.text};">RCCG Glory Tabernacle, Barnstaple</strong>
               </p>
             </td>
           </tr>
@@ -270,7 +270,7 @@ function buildHtml({ name, subject, body, ctaLabel, ctaHref }: BuildHtmlArgs): s
                 <tr>
                   <td align="center" style="padding-bottom:18px;">
                     <p style="margin:0 0 4px 0;font-size:14px;font-weight:700;color:#ffffff;letter-spacing:0.01em;">
-                      RCCG Glory Tabernacle
+                      RCCG Glory Tabernacle, Barnstaple
                     </p>
                     <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.55);">
                       Furnish · Transform · Influence
@@ -311,7 +311,7 @@ function buildHtml({ name, subject, body, ctaLabel, ctaHref }: BuildHtmlArgs): s
                       isn&apos;t for you, just reply and let us know — we&apos;ll remove you.
                     </p>
                     <p style="margin:8px 0 0 0;font-size:11px;color:rgba(255,255,255,0.45);">
-                      © ${new Date().getFullYear()} RCCG Glory Tabernacle. All rights reserved.
+                      © ${new Date().getFullYear()} RCCG Glory Tabernacle, Barnstaple. All rights reserved.
                     </p>
                   </td>
                 </tr>
@@ -345,7 +345,7 @@ function buildPlainText({
   if (ctaLabel && ctaHref) {
     lines.push('', `${ctaLabel}: ${ctaHref}`)
   }
-  lines.push('', '— RCCG Glory Tabernacle')
+  lines.push('', '— RCCG Glory Tabernacle, Barnstaple')
   return lines.join('\n')
 }
 

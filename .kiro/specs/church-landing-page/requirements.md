@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This document defines the functional and non-functional requirements for the RCCG Glory Tabernacle church website. The site is a multi-page Next.js 16 (App Router) application with a 7-section landing page as the primary deliverable. It is built on TypeScript, Tailwind CSS v4, and the existing shadcn/radix-ui foundation. Data is hardcoded for the initial release; a CMS integration is out of scope. Additional pages (sermons, giving, books) are stubbed with placeholder content.
+This document defines the functional and non-functional requirements for the RCCG Glory Tabernacle, Barnstaple church website. The site is a multi-page Next.js 16 (App Router) application with a 7-section landing page as the primary deliverable. It is built on TypeScript, Tailwind CSS v4, and the existing shadcn/radix-ui foundation. Data is hardcoded for the initial release; a CMS integration is out of scope. Additional pages (sermons, giving, books) are stubbed with placeholder content.
 
 ---
 
@@ -35,7 +35,7 @@ This document defines the functional and non-functional requirements for the RCC
 
 #### Acceptance Criteria
 
-1. THE TopNavBar SHALL render the RCCG Glory Tabernacle logo on the far left, navigation links centered, and a "GIVE" CTA button on the far right.
+1. THE TopNavBar SHALL render the RCCG Glory Tabernacle, Barnstaple logo on the far left, navigation links centered, and a "GIVE" CTA button on the far right.
 2. THE TopNavBar SHALL always display a `--church-navy` background regardless of scroll position.
 3. THE TopNavBar SHALL render the following links in order: Home, About, Media (with dropdown), Volunteer, Connect (with dropdown).
 4. WHEN a visitor hovers over or clicks "Media" on desktop, THE TopNavBar SHALL reveal a dropdown menu containing "Sermons" and "Books".
@@ -170,7 +170,7 @@ This document defines the functional and non-functional requirements for the RCC
 1. THE Footer SHALL render every `FooterColumn` with its heading and all of its `FooterLink` items.
 2. THE Footer SHALL render an icon link for every entry in the `socialLinks` array.
 3. THE Footer SHALL render the church's address, phone number, and email address from `contactInfo`.
-4. THE Footer SHALL render the RCCG Glory Tabernacle logo using `next/image`.
+4. THE Footer SHALL render the RCCG Glory Tabernacle, Barnstaple logo using `next/image`.
 5. THE Footer SHALL render the `copyrightText` string.
 6. THE Footer SHALL be a Server_Component with no client-side JavaScript.
 7. WHEN rendered on an `lg` breakpoint viewport or wider, THE Footer SHALL display a four-column grid layout.

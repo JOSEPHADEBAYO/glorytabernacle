@@ -35,7 +35,7 @@ import type { HeroSlide } from '@/components/church/hero'
 const FALLBACK_HERO_SLIDES: HeroSlide[] = [
   {
     backgroundImage: '/Carousel%202.png',
-    eyebrow: 'Welcome to RCCG Glory Tabernacle',
+    eyebrow: 'Welcome to RCCG Glory Tabernacle, Barnstaple',
     headline: 'A Place of',
     headlineAccent: 'Transformation',
     headlineLine2: 'Within and Without',
@@ -552,7 +552,7 @@ export default async function Home() {
         yearsOfMinistry={74}
         image={{
           src: '/fellowship.png',
-          alt: 'RCCG Glory Tabernacle fellowship',
+          alt: 'RCCG Glory Tabernacle, Barnstaple fellowship',
           width: 700,
           height: 600,
         }}
@@ -593,7 +593,7 @@ export default async function Home() {
         primaryCta={{ label: 'Give Online', href: '/giving' }}
       />
       <Footer
-        logo={{ src: '/logo.png', alt: 'RCCG Glory Tabernacle' }}
+        logo={{ src: '/logo.png', alt: 'RCCG Glory Tabernacle, Barnstaple' }}
         tagline="Furnish  ·  Transform  ·  Influence"
         columns={[
           {
@@ -628,7 +628,7 @@ export default async function Home() {
           email: 'info@rccgglory.org',
           directionsHref: 'https://maps.google.com',
         }}
-        copyrightText={`© ${new Date().getFullYear()} RCCG Glory Tabernacle. All rights reserved.`}
+        copyrightText={`© ${new Date().getFullYear()} RCCG Glory Tabernacle, Barnstaple. All rights reserved.`}
       />
     </>
   )

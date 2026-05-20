@@ -12,7 +12,7 @@ function getResend(): Resend {
 }
 
 function getFromAddress(): string {
-  return process.env.NOTIFICATION_FROM_EMAIL ?? 'RCCG Glory Tabernacle <onboarding@resend.dev>'
+  return process.env.NOTIFICATION_FROM_EMAIL ?? 'RCCG Glory Tabernacle, Barnstaple <onboarding@resend.dev>'
 }
 
 function getSiteUrl(): string {
@@ -77,7 +77,7 @@ function buildHtml(recipientName: string): string {
                 </p>
 
                 <p style="margin:0;font-size:12px;line-height:1.6;color:#999;">
-                  You're receiving this because you're part of the RCCG Glory Tabernacle family.
+                  You're receiving this because you're part of the RCCG Glory Tabernacle, Barnstaple family.
                 </p>
               </td>
             </tr>
@@ -104,7 +104,7 @@ function buildText(recipientName: string): string {
     '',
     'Time: 12:00am & 12:30am',
     '',
-    "You're receiving this because you're part of the RCCG Glory Tabernacle family.",
+    "You're receiving this because you're part of the RCCG Glory Tabernacle, Barnstaple family.",
   ].join('\n')
 }
 

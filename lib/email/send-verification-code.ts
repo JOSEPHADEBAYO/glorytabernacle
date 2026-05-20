@@ -12,7 +12,7 @@ function getResend(): Resend {
 }
 
 function getFromAddress(): string {
-  return process.env.NOTIFICATION_FROM_EMAIL ?? 'RCCG Glory Tabernacle <onboarding@resend.dev>'
+  return process.env.NOTIFICATION_FROM_EMAIL ?? 'RCCG Glory Tabernacle, Barnstaple <onboarding@resend.dev>'
 }
 
 function buildHtml(code: string): string {
@@ -46,7 +46,7 @@ function buildHtml(code: string): string {
                   This code expires in 10 minutes. If you did not request this, you can ignore this email.
                 </p>
                 <p style="margin:0;font-size:12px;line-height:1.6;color:#999;">
-                  RCCG Glory Tabernacle Barnstaple
+                  RCCG Glory Tabernacle, Barnstaple Barnstaple
                 </p>
               </td>
             </tr>
@@ -72,7 +72,7 @@ function buildText(code: string): string {
     '',
     'This code expires in 10 minutes. If you did not request this, you can ignore this email.',
     '',
-    'RCCG Glory Tabernacle Barnstaple',
+    'RCCG Glory Tabernacle, Barnstaple Barnstaple',
   ].join('\n')
 }
 

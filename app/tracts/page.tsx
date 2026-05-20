@@ -127,7 +127,7 @@ export default async function TractsPage() {
       </section>
 
       <Footer
-        logo={{ src: '/logo.png', alt: 'RCCG Glory Tabernacle' }}
+        logo={{ src: '/logo.png', alt: 'RCCG Glory Tabernacle, Barnstaple' }}
         tagline="Furnish  ·  Transform  ·  Influence"
         columns={[
           {
@@ -154,7 +154,7 @@ export default async function TractsPage() {
           email: 'info@rccgglory.org',
           directionsHref: 'https://maps.google.com',
         }}
-        copyrightText={`© ${new Date().getFullYear()} RCCG Glory Tabernacle. All rights reserved.`}
+        copyrightText={`© ${new Date().getFullYear()} RCCG Glory Tabernacle, Barnstaple. All rights reserved.`}
       />
     </>
   )

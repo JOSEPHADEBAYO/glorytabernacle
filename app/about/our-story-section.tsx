@@ -34,7 +34,7 @@ const STORY_SEGMENTS: StorySegment[] = [
   {
     kind: 'body',
     text:
-      "That question became a conviction, that conviction became a calling, and that calling became The RCCG Glory Tabernacle, planted in the heart of Barnstaple, North Devon, with a mandate to liberate God's people, thereby walking in absolute victory.",
+      "That question became a conviction, that conviction became a calling, and that calling became The RCCG Glory Tabernacle, Barnstaple, planted in the heart of Barnstaple, North Devon, with a mandate to liberate God's people, thereby walking in absolute victory.",
   },
   {
     kind: 'body',
@@ -60,7 +60,7 @@ const STORY_SEGMENTS: StorySegment[] = [
     text:
       'You may have come broken, but you will not leave broken. You may have come small, but you cannot remain small because nothing small is found in the Tabernacle.',
   },
-  { kind: 'bold', text: 'Welcome to RCCG GLORY TABERNACLE, Barnstaple' },
+  { kind: 'bold', text: 'Welcome to RCCG Glory Tabernacle, Barnstaple' },
 ]
 
 // ---------------------------------------------------------------------------
@@ -531,7 +531,7 @@ export function OurStorySection() {
               <div className="relative flex min-h-[38rem] items-center justify-center bg-[radial-gradient(circle_at_50%_35%,rgba(255,255,255,0.08),transparent_36%),linear-gradient(180deg,#07184a_0%,#000666_100%)] p-10 md:min-h-[54rem]">
                 <Image
                   src="/logo.png"
-                  alt="RCCG Glory Tabernacle"
+                  alt="RCCG Glory Tabernacle, Barnstaple"
                   width={620}
                   height={620}
                   className="h-auto w-full max-w-[34rem] object-contain opacity-95"
@@ -606,6 +606,7 @@ export function OurStorySection() {
                 </p>
               ))}
             </div>
+            <p className="mt-1 text-sm font-extrabold md:text-[0.95rem]" style={{ color: 'rgba(0, 6, 102, 1)' }}>Barnstaple, North Devon</p>
           </div>
         </div>
       </div>

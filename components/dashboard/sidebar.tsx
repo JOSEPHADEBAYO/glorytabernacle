@@ -242,7 +242,7 @@ export function Sidebar({
       <div className="h-16 flex items-center px-6 border-b border-gray-200">
         <Image
           src="/logo-with-no-bg.png"
-          alt="RCCG Glory Tabernacle"
+          alt="RCCG Glory Tabernacle, Barnstaple"
           width={140}
           height={40}
           className="object-contain"

@@ -309,7 +309,7 @@ export default async function GroupsPage() {
       </main>
 
       <Footer
-        logo={{ src: '/logo.png', alt: 'RCCG Glory Tabernacle' }}
+        logo={{ src: '/logo.png', alt: 'RCCG Glory Tabernacle, Barnstaple' }}
         tagline="Furnish · Transform · Influence"
         columns={[
           {
@@ -338,7 +338,7 @@ export default async function GroupsPage() {
           email: 'admin@glorytabernacle.co.uk',
           directionsHref: 'https://maps.google.com/?q=North+Devon+College+Old+Sticklepath+Hill+Barnstaple+EX31+2BQ+England',
         }}
-        copyrightText={`© ${new Date().getFullYear()} RCCG Glory Tabernacle. All rights reserved.`}
+        copyrightText={`© ${new Date().getFullYear()} RCCG Glory Tabernacle, Barnstaple. All rights reserved.`}
       />
     </>
   )

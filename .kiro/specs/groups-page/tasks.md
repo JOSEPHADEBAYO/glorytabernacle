@@ -89,7 +89,7 @@ The page is a Server Component with static group data defined inline. All images
 
 - [x] 5. Integrate Footer component
   - [x] 5.1 Add Footer with appropriate props
-    - Pass logo props: `{ src: '/logo-with-no-bg.png', alt: 'RCCG Glory Tabernacle' }`
+    - Pass logo props: `{ src: '/logo-with-no-bg.png', alt: 'RCCG Glory Tabernacle, Barnstaple' }`
     - Pass tagline: "Furnish · Transform · Influence"
     - Pass columns with Quick Links including "Church Groups" link to `/groups`
     - Pass social links array (Instagram, YouTube, Facebook)

@@ -644,7 +644,7 @@ function ConsentSection({
           }}
           required
           title="Processing my child's personal data"
-          description="I consent to RCCG Glory Tabernacle holding my child's personal information (name, date of birth, contact details, attendance) for the purposes of registration, pastoral care, and safeguarding."
+          description="I consent to RCCG Glory Tabernacle, Barnstaple holding my child's personal information (name, date of birth, contact details, attendance) for the purposes of registration, pastoral care, and safeguarding."
         />
         <ConsentCheckbox
           checked={values.consentMedicalInfoSharing}

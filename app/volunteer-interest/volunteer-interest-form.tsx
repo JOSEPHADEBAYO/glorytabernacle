@@ -164,7 +164,7 @@ export function VolunteerInterestForm({ groups }: VolunteerInterestFormProps) {
           Why you should volunteer
         </h1>
         <p className="mt-5 max-w-5xl text-sm leading-7 text-gray-600 md:text-base">
-          At RCCG Glory Tabernacle, volunteering is more than serving-it is becoming part of God&apos;s purpose. We believe God does not only use people to serve His purposes, He also makes them transgenerational blessings. If God can use you, He can bless you. Through serving, people are FURNISHED for good works, TRANSFORMED in character and purpose, and empowered to INFLUENCE their world for Jesus Christ. Whatever your gift or experience, there is a place for you to grow, belong, and make kingdom impact
+          At RCCG Glory Tabernacle, Barnstaple, volunteering is more than serving-it is becoming part of God&apos;s purpose. We believe God does not only use people to serve His purposes, He also makes them transgenerational blessings. If God can use you, He can bless you. Through serving, people are FURNISHED for good works, TRANSFORMED in character and purpose, and empowered to INFLUENCE their world for Jesus Christ. Whatever your gift or experience, there is a place for you to grow, belong, and make kingdom impact
         </p>
       </div>
 

@@ -81,7 +81,7 @@ export function buildReportBody(input: ChildReportInput): {
     `We're thankful for the opportunity to walk alongside ${input.childFirstName} each Sunday. If there's anything you'd like us to know — a prayer request, an update, or something we should be aware of — just reply to this email.`,
     '',
     'In Christ,',
-    "RCCG Glory Tabernacle Children's Ministry",
+    "RCCG Glory Tabernacle, Barnstaple Children's Ministry",
   ]
 
   const body = [...intro, ...entries, ...closing].join('\n\n')

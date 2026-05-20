@@ -61,7 +61,7 @@ export default async function VolunteerInterestPage() {
         </section>
       </main>
       <Footer
-        logo={{ src: '/logo.png', alt: 'RCCG Glory Tabernacle' }}
+        logo={{ src: '/logo.png', alt: 'RCCG Glory Tabernacle, Barnstaple' }}
         tagline="Furnish  .  Transform  .  Influence"
         columns={[
           {
@@ -87,7 +87,7 @@ export default async function VolunteerInterestPage() {
           email: 'admin@glorytabernacle.co.uk',
           directionsHref: 'https://maps.google.com',
         }}
-        copyrightText={`Copyright ${new Date().getFullYear()} RCCG Glory Tabernacle. All rights reserved.`}
+        copyrightText={`Copyright ${new Date().getFullYear()} RCCG Glory Tabernacle, Barnstaple. All rights reserved.`}
       />
     </>
   )

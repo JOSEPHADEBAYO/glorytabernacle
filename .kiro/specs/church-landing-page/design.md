@@ -2,7 +2,7 @@
 
 ## Overview
 
-A multi-page church website for **RCCG Glory Tabernacle**, built with Next.js 16 (App Router), TypeScript, and Tailwind CSS v4. The project is structured as a complete design system and UI component library, starting with a 7-section landing page and expanding to additional pages (giving, sermons, book sales, etc.) over time. The design system is built on top of the existing shadcn/radix-ui foundation already present in the project, extending it with church-specific design tokens and components.
+A multi-page church website for **RCCG Glory Tabernacle, Barnstaple**, built with Next.js 16 (App Router), TypeScript, and Tailwind CSS v4. The project is structured as a complete design system and UI component library, starting with a 7-section landing page and expanding to additional pages (giving, sermons, book sales, etc.) over time. The design system is built on top of the existing shadcn/radix-ui foundation already present in the project, extending it with church-specific design tokens and components.
 
 The architecture prioritizes Server Components by default, dropping to Client Components only where interactivity is required (mobile menu, dark mode toggle, toast notifications, modals). All routing uses the Next.js 16 App Router with the `app/` directory.
 

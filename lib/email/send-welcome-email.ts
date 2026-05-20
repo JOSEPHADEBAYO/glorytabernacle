@@ -12,7 +12,7 @@ function getResend(): Resend {
 }
 
 function getFromAddress(): string {
-  return process.env.NOTIFICATION_FROM_EMAIL ?? 'RCCG Glory Tabernacle <onboarding@resend.dev>'
+  return process.env.NOTIFICATION_FROM_EMAIL ?? 'RCCG Glory Tabernacle, Barnstaple <onboarding@resend.dev>'
 }
 
 function buildHtml(name: string, email: string, password: string, position: string): string {
@@ -32,7 +32,7 @@ function buildHtml(name: string, email: string, password: string, position: stri
                 <p style="margin:0 0 16px 0;font-size:12px;font-weight:bold;letter-spacing:0.15em;text-transform:uppercase;color:rgb(27,109,36);">Account Created</p>
                 <h1 style="margin:0 0 8px 0;font-size:22px;line-height:1.3;color:rgba(27,34,119,1);">Welcome, ${name}!</h1>
                 <p style="margin:0 0 20px 0;font-size:14px;line-height:1.6;color:#555;">
-                  You have been granted access to the RCCG Glory Tabernacle dashboard as <strong>${position}</strong>.
+                  You have been granted access to the RCCG Glory Tabernacle, Barnstaple, dashboard as <strong>${position}</strong>.
                 </p>
                 <p style="margin:0 0 16px 0;font-size:14px;line-height:1.6;color:#555;">Your login credentials:</p>
                 <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin:0 0 24px 0;">
@@ -56,7 +56,7 @@ function buildHtml(name: string, email: string, password: string, position: stri
                   </tr>
                 </table>
                 <p style="margin:0;margin-top:24px;font-size:12px;line-height:1.6;color:#999;">
-                  RCCG Glory Tabernacle Barnstaple
+                  RCCG Glory Tabernacle, Barnstaple Barnstaple
                 </p>
               </td>
             </tr>
@@ -74,7 +74,7 @@ function buildText(name: string, email: string, password: string, position: stri
     '',
     `Welcome, ${name}!`,
     '',
-    `You have been granted access to the RCCG Glory Tabernacle dashboard as ${position}.`,
+    `You have been granted access to the RCCG Glory Tabernacle, Barnstaple dashboard as ${position}.`,
     '',
     'Your login credentials:',
     '',
@@ -85,7 +85,7 @@ function buildText(name: string, email: string, password: string, position: stri
     '',
     `Log in here: ${process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'}/login`,
     '',
-    'RCCG Glory Tabernacle Barnstaple',
+    'RCCG Glory Tabernacle, Barnstaple Barnstaple',
   ].join('\n')
 }
 
@@ -100,7 +100,7 @@ export async function sendWelcomeEmail(
     const { data, error } = await resend.emails.send({
       from: getFromAddress(),
       to,
-      subject: `Welcome to RCCG Glory Tabernacle Dashboard — Your Login Credentials`,
+      subject: `Welcome to RCCG Glory Tabernacle, Barnstaple Dashboard — Your Login Credentials`,
       html: buildHtml(name, to, oneTimePassword, position),
       text: buildText(name, to, oneTimePassword, position),
     })

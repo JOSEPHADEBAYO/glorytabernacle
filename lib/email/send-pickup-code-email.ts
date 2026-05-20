@@ -46,7 +46,7 @@ export async function sendPickupCodeEmail(
 
   const subject = `Pickup code for ${childName} — Children's Ministry`
   const body = [
-    `${input.childFirstName} was signed in to RCCG Glory Tabernacle Children's Ministry on ${when}.`,
+    `${input.childFirstName} was signed in to RCCG Glory Tabernacle, Barnstaple Children's Ministry on ${when}.`,
     '',
     `Your pickup code is:`,
     '',
@@ -57,7 +57,7 @@ export async function sendPickupCodeEmail(
     `If you didn't drop ${input.childFirstName} off or you didn't expect this email, reply right away and we'll look into it.`,
     '',
     "In Christ,",
-    "RCCG Glory Tabernacle Children's Ministry",
+    "RCCG Glory Tabernacle, Barnstaple Children's Ministry",
   ].join('\n')
 
   const result = await sendBroadcastEmail({
