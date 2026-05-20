@@ -36,6 +36,7 @@ export async function GET() {
         role: true,
         isActive: true,
         mustChangePassword: true,
+        isDesignatedSafeguardingLead: true,
         createdAt: true,
       },
     })

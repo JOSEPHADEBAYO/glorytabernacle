@@ -35,8 +35,26 @@ export interface ChildRecord {
   emergencyContactName: string
   emergencyContactPhone: string
   emergencyContactRelation: string
+  consentDataProcessing: boolean
+  consentPhotography: boolean
+  consentMedicalInfoSharing: boolean
+  consentEmergencyTreatment: boolean
+  consentCapturedAt: Date | null
+  consentByName: string | null
   createdAt: Date
   updatedAt: Date
+}
+
+/**
+ * A named adult permitted to collect a specific child (in addition to the
+ * primary guardian, who is implicitly authorised via the Child record).
+ */
+export interface AuthorisedCollectorInput {
+  name: string
+  relationship: string
+  phone?: string
+  photoUrl?: string
+  notes?: string
 }
 
 /** Input shape for POST /api/admin/children. */
@@ -55,6 +73,12 @@ export interface CreateChildInput {
   emergencyContactName: string
   emergencyContactPhone: string
   emergencyContactRelation: string
+  authorisedCollectors?: AuthorisedCollectorInput[]
+  consentDataProcessing: boolean
+  consentPhotography: boolean
+  consentMedicalInfoSharing: boolean
+  consentEmergencyTreatment: boolean
+  consentByName?: string
 }
 
 /** Input shape for PUT /api/admin/children/[id]. */
@@ -73,6 +97,7 @@ export interface UpdateChildInput {
   emergencyContactName?: string
   emergencyContactPhone?: string
   emergencyContactRelation?: string
+  authorisedCollectors?: AuthorisedCollectorInput[]
 }
 
 /**

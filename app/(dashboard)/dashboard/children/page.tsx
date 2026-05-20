@@ -2,6 +2,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { ChildrenAdminPanel } from '@/components/dashboard/children-admin-panel'
+import { RaiseConcernButton } from '@/components/dashboard/raise-concern-button'
 import {
   CHILDREN_ADMIN_ROLES,
   type ChildrenAdminRole,
@@ -47,16 +48,52 @@ export default async function ChildrenDashboardPage() {
             photoUrl: true,
             allergies: true,
             specialNeeds: true,
+  
+            // REQUIRED BY AdminCheckIn
+            primaryGuardianName: true,
+            primaryGuardianPhone: true,
+            primaryGuardianEmail: true,
+  
+            // REQUIRED BY AdminCheckIn
+            authorisedCollectors: {
+              select: {
+                id: true,
+                name: true,
+                relationship: true,
+                phone: true,
+                photoUrl: true,
+                notes: true,
+              },
+            },
           },
         },
-        signedInBy: { select: { id: true, name: true, email: true } },
-        signedOutBy: { select: { id: true, name: true, email: true } },
+  
+        signedInBy: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+  
+        signedOutBy: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
       },
     }),
-    prisma.childCheckIn.count({ where: { signedInAt: { gte: startOfToday } } }),
+  
+    prisma.childCheckIn.count({
+      where: {
+        signedInAt: { gte: startOfToday },
+      },
+    }),
+  
     prisma.child.count(),
   ])
-
   // const serializedActiveCheckIns = activeCheckIns.map((checkIn) => ({
   //   ...checkIn,
   //   signedInAt: checkIn.signedInAt.toISOString(),
@@ -73,13 +110,16 @@ export default async function ChildrenDashboardPage() {
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold" style={{ color: 'rgba(27, 34, 119, 1)' }}>
-          Children
-        </h1>
-        <p className="mt-1 text-sm text-gray-600">
-          Live attendance, registered children, and Sunday/monthly trends.
-        </p>
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold" style={{ color: 'rgba(27, 34, 119, 1)' }}>
+            Children
+          </h1>
+          <p className="mt-1 text-sm text-gray-600">
+            Live attendance, registered children, and Sunday/monthly trends.
+          </p>
+        </div>
+        <RaiseConcernButton />
       </div>
       <ChildrenAdminPanel
         initialActiveCheckIns={serializedActiveCheckIns}

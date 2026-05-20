@@ -609,7 +609,10 @@ export function BooksManager({ initialBooks }: BooksManagerProps) {
               <BooksTable
                 books={paginatedBooks}
                 onEdit={handleEditBook}
-                onDelete={handleDeleteBook}
+                // Open the confirm-delete modal — the modal's onConfirm
+                // calls handleDeleteBook(deletePendingId). Passing the
+                // delete handler directly here bypassed the confirmation.
+                onDelete={openDelete}
                 onTogglePublish={handleTogglePublish}
                 togglingBookId={togglingBookId}
                 deletingBookId={deletePendingId}

@@ -31,13 +31,82 @@
 | --- | --- | --- |
 | `GET` | `/api/admin/children` | Paginated list (search by name or guardian). |
 | `POST` | `/api/admin/children` | Register a new child. |
-| `GET` | `/api/admin/children/[id]` | Single child + last 20 check-ins. |
+| `GET` | `/api/admin/children/[id]` | Single child + check-in history (up to 500). |
 | `PUT` | `/api/admin/children/[id]` | Partial update. |
 | `DELETE` | `/api/admin/children/[id]` | Permanently remove a child (cascades check-ins). |
 | `POST` | `/api/admin/children/[id]/check-in` | Sign a child in. Idempotent. |
-| `POST` | `/api/admin/children/[id]/check-out` | Close the open check-in. |
+| `POST` | `/api/admin/children/[id]/check-out` | Close the open check-in. Optional `{ performance }` body. |
+| `PATCH` | `/api/admin/check-ins/[id]/performance` | Edit a performance note after the fact. |
+| `POST` | `/api/admin/children/[id]/email-performance` | Email one child's performance report to the primary guardian. |
+| `POST` | `/api/admin/children/email-performances` | Bulk-email reports for every child in a date range. |
 
 All gated to `CHILDREN_LEADER` or `SUPER_ADMIN`.
+
+### Safeguarding concern log + DSL role (17 May 2026 follow-up migration)
+
+A confidential safeguarding concern log with a strict need-to-know access model:
+
+- **Raise** a concern: any CHILDREN_LEADER or SUPER_ADMIN. A prominent red "Raise safeguarding concern" button sits at the top of `/dashboard/children` and opens a modal (who it's about — a registered child or "someone else/general" — type, when, what happened, action taken, who notified, MASH-referral flag). The form reminds the user to call 999 first if a child is in immediate danger.
+- **View / manage** the log: SUPER_ADMIN, or any user flagged as a **Designated Safeguarding Lead (DSL)**. A new `/dashboard/safeguarding` page (gated server-side and in the API) lists concerns, filters by status (Open / Monitoring / Closed), and lets the DSL record resolution notes, toggle the MASH-referral flag, and change status. Closing stamps who closed it and when.
+- The **DSL flag** is a boolean on the user account, toggled by a SUPER_ADMIN from `/dashboard/users` (new "Safeguarding Lead" column). It's orthogonal to role — a CHILDREN_LEADER can also be the DSL. The Safeguarding sidebar item only appears for DSL + Super Admin.
+
+Concerns can optionally link to a registered child; the child's name is snapshotted so the record survives deletion and supports standalone concerns. Concern types: disclosure, physical, emotional, sexual, neglect, behavioural, online, allegation-against-an-adult, other.
+
+Schema: `User.isDesignatedSafeguardingLead`; new `SafeguardingConcern` model + `ConcernType` / `ConcernStatus` enums. Migration: `prisma/migrations/20260517090000_safeguarding_concerns/migration.sql`.
+
+Endpoints (all under `/api/admin/safeguarding-concerns`): `POST` raise (leader+admin), `GET` list + `GET [id]` + `PATCH [id]` (DSL+admin). Plus `PATCH /api/users/[id]/dsl` (super-admin only) to set the DSL flag.
+
+### GDPR consent capture (16 May 2026 follow-up migration)
+
+The registration form (admin modal + public `/parent/register`) now captures UK GDPR consent before a child can be saved. Four consent boxes — three mandatory (processing personal data, sharing medical/allergy info with leaders, emergency first aid / 999), one optional (photography & use of images) — plus a "consent given by" name field that auto-fills from the primary guardian. The Zod schema rejects a submission that doesn't carry the three mandatory consents.
+
+On save we store the four flags plus `consentCapturedAt` (timestamp) and `consentByName` (text snapshot of who agreed). Editing a child re-stamps `consentCapturedAt` if any consent field changes. The All Children details and Pending tab show the consent status as green/grey badges with the name + date.
+
+A public **`/privacy-notice`** page covers the UK GDPR Article 13/14 transparency requirements (who we are, what we collect, lawful basis, special-category consent, sharing, retention, data-subject rights, ICO complaints). It is linked from the consent section of the form. **The privacy notice is a template and should be reviewed by the church's data-protection lead or a solicitor before go-live.**
+
+Schema: `Child` gains `consentDataProcessing`, `consentPhotography`, `consentMedicalInfoSharing`, `consentEmergencyTreatment`, `consentCapturedAt`, `consentByName`. Migration: `prisma/migrations/20260516220000_child_consent/migration.sql`.
+
+### Authorised collectors (16 May 2026 follow-up migration)
+
+Each child can have up to five named **authorised collectors** in addition to the primary guardian (who is implicitly authorised). The collectors fieldset is part of the shared ChildForm — name, relationship, optional phone, optional photo (Cloudinary upload), and optional notes — so it's available on both the admin modal and the public `/parent/register` page.
+
+At sign-out, the SignOutModal now prompts the leader to pick who is collecting: the primary guardian, one of the named collectors, or an off-list "Someone else" override that requires a name, relationship, and a short reason. The chosen name + relationship is snapshotted onto the `ChildCheckIn` row (`collectedByName`, `collectedByRelationship`, `collectedFromList`, `collectionNotes`) so the audit trail survives later edits to the collectors list. Off-list pickups can be filtered server-side later by querying `collectedFromList=false` for DSL review.
+
+Schema:
+- new `AuthorisedCollector` model (FK to Child, cascade delete)
+- `ChildCheckIn` gains `collectedByName`, `collectedByRelationship`, `collectedFromList`, `collectionNotes`
+
+Migration: `prisma/migrations/20260516180000_authorised_collectors/migration.sql`.
+
+The check-out endpoint validates that the collector details are present and that off-list collectors carry a reason; it returns 400 if either rule is broken.
+
+### Pickup code + parent-submission approval (16 May 2026 follow-up migration)
+
+Two safeguarding additions that close the most important gaps before go-live:
+
+**Pickup code at sign-out.** Each check-in now generates a 6-digit numeric code that is stored on the `ChildCheckIn` row and emailed to the primary guardian. The sign-out modal requires that code before the Children Leader can close the check-in. A "Resend code" button is available on each live-attendance card and inside the sign-out modal in case the guardian can't find the email. New endpoints:
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `POST` | `/api/admin/children/[id]/resend-pickup-code` | Re-email the existing code on the open check-in. |
+
+The check-in response now includes `emailSent` and `emailError` so the UI can flag failures immediately. Check-out now requires `{ code }` in the body and returns `422` if the code is wrong, `422` if no code is stored on the check-in (legacy rows or pre-rollout), and `409` if there's no open check-in.
+
+**Approval gate for parent submissions.** The `Child` model has a new `approved` boolean (default `true` so every existing row stays visible). Submissions via `/parent/register` set `approved=false`. A new **Pending** tab in `/dashboard/children` lists pending submissions with full details and Approve / Reject actions. Children that are not yet approved cannot be signed in — the check-in endpoint returns `409` with a clear message.
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `POST` | `/api/admin/children/[id]/approve` | Flip `approved=true`. Idempotent. |
+
+The admin list endpoint accepts `?status=pending` (only pending) or `?status=all` (everything); the default is approved-only.
+
+Migration SQL: `prisma/migrations/20260516120000_pickup_code_and_approval/migration.sql`.
+
+### Performance tracking (15 May 2026 follow-up migration)
+
+`ChildCheckIn` gained two columns: `performance` (text, nullable) and `performanceUpdatedAt`. Hand-authored migration lives at `prisma/migrations/20260515220000_child_performance/migration.sql`.
+
+The dashboard `/dashboard/children` now has a fourth tab — **Performance** — listing every child with a timeline of their check-ins and the teacher's notes. Notes can be edited inline. Each card has a "Send report" button (emails the primary guardian via the standard enterprise template), and there's a top-of-page "Email all guardians" button with a date-range selector (defaults to the current calendar month).
 
 ## Commands to run
 

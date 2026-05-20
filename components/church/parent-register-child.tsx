@@ -49,12 +49,14 @@ export function ParentRegisterChild() {
           className="mt-5 text-2xl font-extrabold"
           style={{ color: 'rgba(27, 34, 119, 1)' }}
         >
-          {success.firstName} is registered
+          Thanks — we&apos;ve received {success.firstName}&apos;s details
         </h2>
         <p className="mt-3 text-sm text-gray-600 leading-relaxed max-w-md mx-auto">
-          Thank you. {success.firstName} {success.lastName} is now on our
-          Children&apos;s Ministry roster. When you arrive on Sunday, the
-          children&apos;s leader will sign them in.
+          For safeguarding, every parent-submitted registration is reviewed
+          by our Children&apos;s Leader before {success.firstName} {success.lastName} appears on
+          the roster. We&apos;ll have you set up before Sunday — if anything
+          needs checking, we&apos;ll be in touch on the contact details
+          you provided.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           <button

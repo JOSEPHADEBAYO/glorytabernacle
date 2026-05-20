@@ -32,6 +32,10 @@ model User {
   image         String?
   emailVerified DateTime?
   role          UserRole  @default(VIEWER)
+  // Designated Safeguarding Lead flag — orthogonal to `role`. A user can be
+  // a CHILDREN_LEADER who is also the DSL. Only DSLs (and SUPER_ADMINs) can
+  // read / manage the safeguarding concern log.
+  isDesignatedSafeguardingLead Boolean @default(false)
   isActive      Boolean   @default(true)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -39,6 +43,9 @@ model User {
   sessions       Session[]
   twoFactorCodes TwoFactorCode[]
   auditLogs      AuditLog[]
+  // Safeguarding concerns this user has raised.
+  concernsRaised SafeguardingConcern[] @relation("ConcernRaisedBy")
+  concernsClosed SafeguardingConcern[] @relation("ConcernClosedBy")
 
   // Auth.js (NextAuth v5) relations — populated for OAuth-authenticated
   // YOUTH users. Empty for admin-cookie users.
@@ -118,6 +125,12 @@ model VerificationToken {
 // Child records are owned by the children's ministry, not by parent
 // accounts. The Children Leader registers each child and captures the
 // primary guardian's contact details plus a separate emergency contact.
+//
+// `approved` gates whether the child shows up on the live roster. Records
+// created by the Children Leader from /dashboard/children are approved
+// automatically. Records created by parents from the public /parent/register
+// form are saved as `approved=false` and must be reviewed by a Children
+// Leader before they appear on the active roster.
 model Child {
   id                       String    @id @default(cuid())
   firstName                String
@@ -128,8 +141,13 @@ model Child {
   allergies                String?   @db.Text
   medicalNotes             String?   @db.Text
   specialNeeds             String?   @db.Text
-  // Optional Cloudinary URL for the child's photo.
+  // Child photo. New uploads are stored as Cloudinary `authenticated`
+  // assets — we keep the public_id and generate a signed delivery URL on
+  // read so the image can't be viewed by anyone who merely has a URL.
+  // `photoUrl` remains for legacy public uploads (pre-authentication) and
+  // any externally-hosted URL; `photoPublicId` takes precedence when set.
   photoUrl                 String?
+  photoPublicId            String?
 
   // Primary guardian — the day-to-day contact who drops the child off /
   // picks them up. The Children Leader uses these details for routine
@@ -144,23 +162,159 @@ model Child {
   emergencyContactPhone    String
   emergencyContactRelation String
 
-  checkIns  ChildCheckIn[]
+  // Approval gate — see docblock above.
+  approved                 Boolean   @default(true)
+
+  // UK GDPR Article 6 + Article 9 consent capture. Required at registration
+  // for the children's-ministry to lawfully process the child's data and
+  // (especially) the special-category fields (health / allergies). To
+  // withdraw consent later, flip these to false rather than deleting the
+  // record so the audit trail survives.
+  consentDataProcessing      Boolean   @default(false)
+  consentPhotography         Boolean   @default(false)
+  consentMedicalInfoSharing  Boolean   @default(false)
+  consentEmergencyTreatment  Boolean   @default(false)
+  // When the consent was captured + who gave it (text snapshot — usually
+  // the primary guardian's name, but recorded explicitly so historical
+  // changes to the guardian record don't corrupt the consent audit).
+  consentCapturedAt          DateTime?
+  consentByName              String?
+
+  checkIns             ChildCheckIn[]
+  authorisedCollectors AuthorisedCollector[]
+  safeguardingConcerns SafeguardingConcern[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([lastName, firstName])
+  @@index([approved])
+}
+
+// Adults authorised by the guardian to collect a specific child. The
+// primary guardian is implicitly authorised (their details live on Child
+// itself); this table holds *additional* named adults (grandparents, aunts
+// and uncles, family friends). At sign-out the Children Leader picks who
+// is collecting; the chosen name + relationship are snapshotted onto the
+// ChildCheckIn row so the audit trail survives later edits to this list.
+model AuthorisedCollector {
+  id           String   @id @default(cuid())
+  childId      String
+  name         String
+  relationship String
+  phone        String?
+  // Optional photo — leaders use this to visually verify the person at the
+  // door. Stored as a Cloudinary `authenticated` asset (signed on read);
+  // `photoUrl` is the legacy/public fallback.
+  photoUrl     String?
+  photoPublicId String?
+  notes        String?  @db.Text
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  child Child @relation(fields: [childId], references: [id], onDelete: Cascade)
+
+  @@index([childId])
+}
+
+// Safeguarding concern log. Highly sensitive — only the Designated
+// Safeguarding Lead(s) and SUPER_ADMIN may read / manage these. Any
+// CHILDREN_LEADER (or SUPER_ADMIN) may RAISE one.
+//
+// A concern may optionally be linked to a registered child; `childName`
+// snapshots the name at the time it was raised so the record reads
+// correctly even if the child is later deleted, and supports standalone
+// concerns (about a visiting adult, a leader, or a general observation)
+// where no `childId` is set.
+model SafeguardingConcern {
+  id           String          @id @default(cuid())
+  childId      String?
+  childName    String?
+  concernType  ConcernType
+  // What was witnessed / disclosed.
+  description  String          @db.Text
+  // What the person raising it did at the time.
+  actionTaken  String?         @db.Text
+  // Free text: who was informed (DSL, parents, etc.).
+  whoNotified  String?         @db.Text
+  // Whether this has been referred to the local authority (Devon MASH) /
+  // social care.
+  referredToMash Boolean       @default(false)
+  occurredAt   DateTime
+  status       ConcernStatus   @default(OPEN)
+
+  raisedById   String
+  raisedBy     User            @relation("ConcernRaisedBy", fields: [raisedById], references: [id], onDelete: Restrict)
+
+  // DSL resolution fields, set when the concern is closed.
+  resolution   String?         @db.Text
+  closedById   String?
+  closedBy     User?           @relation("ConcernClosedBy", fields: [closedById], references: [id], onDelete: SetNull)
+  closedAt     DateTime?
+
+  child        Child?          @relation(fields: [childId], references: [id], onDelete: SetNull)
+
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  @@index([status])
+  @@index([childId])
+  @@index([occurredAt])
+  @@index([referredToMash])
+}
+
+enum ConcernType {
+  DISCLOSURE
+  PHYSICAL
+  EMOTIONAL
+  SEXUAL
+  NEGLECT
+  BEHAVIOURAL
+  ONLINE
+  ALLEGATION_AGAINST_ADULT
+  OTHER
+}
+
+enum ConcernStatus {
+  OPEN
+  MONITORING
+  CLOSED
 }
 
 // One row per drop-off / pick-up cycle. `signedOutAt` and `signedOutById`
 // are null while the child is still in the children's-ministry care.
+//
+// `performance` captures the teacher's free-text note on how the child did
+// that session. It may be set at check-out time or filled in later (which
+// is why `performanceUpdatedAt` is tracked separately from the row's
+// natural update timestamp).
+//
+// `pickupCode` is a short numeric code generated at check-in and emailed
+// to the primary guardian. The guardian must present this code at pickup
+// before the Children Leader can close the check-in. The code lives only
+// for the duration of the open check-in (no separate expiry / hashing —
+// see CHILDREN_LEADER_CUTOVER.md for the rationale).
 model ChildCheckIn {
-  id            String    @id @default(cuid())
-  childId       String
-  signedInAt    DateTime  @default(now())
-  signedInById  String
-  signedOutAt   DateTime?
-  signedOutById String?
+  id                    String    @id @default(cuid())
+  childId               String
+  signedInAt            DateTime  @default(now())
+  signedInById          String
+  signedOutAt           DateTime?
+  signedOutById         String?
+  performance           String?   @db.Text
+  performanceUpdatedAt  DateTime?
+  pickupCode            String?
+
+  // Who collected the child (snapshot at pickup time so the audit trail
+  // survives if the AuthorisedCollector record is later edited / removed).
+  // `collectedFromList=true` means the collector was a named entry on the
+  // child's AuthorisedCollector list (or the primary guardian);
+  // `collectedFromList=false` is an off-list override, in which case
+  // `collectionNotes` should explain why.
+  collectedByName       String?
+  collectedByRelationship String?
+  collectedFromList     Boolean   @default(false)
+  collectionNotes       String?   @db.Text
 
   child       Child @relation(fields: [childId], references: [id], onDelete: Cascade)
   signedInBy  User  @relation("CheckInSignedInBy", fields: [signedInById], references: [id], onDelete: Restrict)
@@ -170,6 +324,7 @@ model ChildCheckIn {
   @@index([signedInAt])
   @@index([signedOutAt])
   @@index([signedInById])
+  @@index([collectedFromList])
 }
 
 model Session {

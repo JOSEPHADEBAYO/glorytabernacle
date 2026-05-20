@@ -193,8 +193,8 @@ function PreviousWeeksCarousel({
 }
 
 export function YouthScripturesSection({
-  heading = 'Youth Weekly Scripture',
-  subtext = 'A word for the youth — refreshed every week.',
+  heading = 'SCRIPTURE OF THE WEEK',
+  subtext = 'A word from the youth — refreshed every week.',
   scriptures,
   cardImageUrl = DEFAULT_IMAGE,
 }: YouthScripturesSectionProps) {
@@ -206,7 +206,7 @@ export function YouthScripturesSection({
 
   return (
     <section
-      aria-label="Youth Weekly Scripture"
+      aria-label="Youth Scripture Of The Week"
       className="relative w-full overflow-hidden py-12 px-[var(--section-padding-x)]"
       style={{ backgroundColor: 'rgba(0, 6, 102, 1)' }}
     >

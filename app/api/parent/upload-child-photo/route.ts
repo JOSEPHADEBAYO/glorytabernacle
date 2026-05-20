@@ -9,7 +9,16 @@ cloudinary.config({
 })
 
 const MAX_BYTES = 5 * 1024 * 1024 // 5 MB
-const ALLOWED = new Set(['image/jpeg', 'image/png'])
+// Accept the formats mobile cameras / galleries produce, including iPhone
+// HEIC. Cloudinary normalises these on upload.
+const ALLOWED = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/heic',
+  'image/heif',
+])
+const IMAGE_EXT = /\.(jpe?g|png|webp|heic|heif)$/i
 
 /**
  * POST /api/parent/upload-child-photo
@@ -29,9 +38,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
     }
 
-    if (!ALLOWED.has(file.type)) {
+    // Accept by MIME type, or by extension when the browser reports an
+    // empty type (common for iOS HEIC photos).
+    const typeOk =
+      ALLOWED.has(file.type) ||
+      (file.type === '' && IMAGE_EXT.test(file.name))
+    if (!typeOk) {
       return NextResponse.json(
-        { error: 'Only JPG and PNG photos are accepted.' },
+        { error: 'Please upload a photo (JPG, PNG, WEBP, or HEIC).' },
         { status: 400 }
       )
     }

@@ -420,7 +420,10 @@ export function TractsManager({ initialTracts }: TractsManagerProps) {
               <TractGrid
                 tracts={gridTracts}
                 onEdit={handleEditTract}
-                onDelete={handleDeleteTract}
+                // Open the confirm-delete modal — the modal's onConfirm
+                // is wired to call handleDeleteTract(deletePendingId).
+                // Passing the delete handler directly bypassed the modal.
+                onDelete={openDelete}
                 onTogglePublish={handleTogglePublish}
                 togglingTractId={togglingTractId}
                 deletingTractId={deletePendingId}
@@ -458,7 +461,10 @@ export function TractsManager({ initialTracts }: TractsManagerProps) {
                 <TractsTable
                   tracts={paginatedTracts}
                   onEdit={handleEditTract}
-                  onDelete={handleDeleteTract}
+                  // Open the confirm-delete modal (modal's onConfirm runs
+                  // handleDeleteTract). Passing the handler directly here
+                  // would skip the confirmation step.
+                  onDelete={openDelete}
                   onTogglePublish={handleTogglePublish}
                   togglingTractId={togglingTractId}
                   deletingTractId={deletePendingId}

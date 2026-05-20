@@ -53,6 +53,36 @@ const optionalEmail = z
   .or(z.literal(''))
 
 /**
+ * Authorised collector — one named adult permitted to collect the child
+ * (in addition to the primary guardian).
+ */
+const collectorSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1, 'Collector name is required')
+    .max(100, 'Collector name too long'),
+  relationship: z
+    .string()
+    .trim()
+    .min(1, 'Relationship is required (e.g. Father, Aunt)')
+    .max(60, 'Relationship too long'),
+  phone: z
+    .string()
+    .trim()
+    .max(30)
+    .optional()
+    .or(z.literal('')),
+  photoUrl: z.string().url('Photo URL must be a valid URL').optional().or(z.literal('')),
+  notes: optionalText(2000),
+})
+
+const collectorsArraySchema = z
+  .array(collectorSchema)
+  .max(5, 'You can list up to 5 authorised collectors per child.')
+  .optional()
+
+/**
  * Schema for POST /api/admin/children — the Children Leader registers a child.
  */
 export const createChildSchema = z.object({
@@ -90,6 +120,33 @@ export const createChildSchema = z.object({
     .trim()
     .min(1, 'Emergency contact relationship is required')
     .max(60, 'Relationship too long'),
+  authorisedCollectors: collectorsArraySchema,
+
+  // UK GDPR consent — three mandatory, one optional.
+  consentDataProcessing: z
+    .boolean()
+    .refine((v) => v === true, {
+      message:
+        "You must consent to processing your child's data for us to register them.",
+    }),
+  consentMedicalInfoSharing: z
+    .boolean()
+    .refine((v) => v === true, {
+      message:
+        'Medical info sharing consent is required so leaders can keep your child safe.',
+    }),
+  consentEmergencyTreatment: z
+    .boolean()
+    .refine((v) => v === true, {
+      message:
+        'Emergency treatment consent is required so we can act in a medical emergency.',
+    }),
+  consentPhotography: z.boolean().default(false),
+  consentByName: z
+    .string()
+    .trim()
+    .min(1, 'Please enter the name of the parent/guardian giving consent.')
+    .max(100, 'Name too long'),
 })
 
 /**
@@ -111,6 +168,12 @@ export const updateChildSchema = z
     emergencyContactName: z.string().trim().min(1).max(100).optional(),
     emergencyContactPhone: ukPhoneSchema.optional(),
     emergencyContactRelation: z.string().trim().min(1).max(60).optional(),
+    authorisedCollectors: collectorsArraySchema,
+    consentDataProcessing: z.boolean().optional(),
+    consentPhotography: z.boolean().optional(),
+    consentMedicalInfoSharing: z.boolean().optional(),
+    consentEmergencyTreatment: z.boolean().optional(),
+    consentByName: z.string().trim().min(1).max(100).optional(),
   })
   .refine((data) => Object.keys(data).length > 0, {
     message: 'At least one field must be provided for update',
@@ -123,9 +186,24 @@ export const checkInSingleSchema = z.object({}).strict()
 
 /**
  * Schema for POST /api/admin/children/[id]/check-out — single check-in close.
+ *
+ * `code` is the 6-digit pickup code emailed to the guardian at sign-in.
+ * `collectedByName` + `collectedByRelationship` snapshot who actually
+ * collected the child. `collectedFromList=true` means the collector
+ * matched a named entry (primary guardian or AuthorisedCollector);
+ * `false` is an off-list override, in which case `collectionNotes` should
+ * explain the reason.
  */
 export const checkOutSingleSchema = z.object({
-  checkInId: z.string().min(1, 'checkInId is required').optional(),
+  code: z
+    .string()
+    .trim()
+    .regex(/^\d{6}$/, 'A 6-digit pickup code is required'),
+  performance: z.string().trim().max(4000).optional(),
+  collectedByName: z.string().trim().min(1).max(100).optional(),
+  collectedByRelationship: z.string().trim().min(1).max(60).optional(),
+  collectedFromList: z.boolean().optional(),
+  collectionNotes: z.string().trim().max(2000).optional(),
 })
 
 /**

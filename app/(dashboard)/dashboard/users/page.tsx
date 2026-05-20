@@ -15,6 +15,7 @@ interface ManagedUser {
   role: string
   isActive: boolean
   mustChangePassword: boolean
+  isDesignatedSafeguardingLead: boolean
   createdAt: string
 }
 
@@ -164,6 +165,43 @@ export default function UsersPage() {
     }
   }
 
+  async function handleToggleDsl(u: ManagedUser) {
+    const next = !u.isDesignatedSafeguardingLead
+    // Optimistic update so the toggle feels instant.
+    setUsers((prev) =>
+      prev.map((x) =>
+        x.id === u.id ? { ...x, isDesignatedSafeguardingLead: next } : x
+      )
+    )
+    try {
+      const res = await fetch(`/api/users/${u.id}/dsl`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isDesignatedSafeguardingLead: next }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error ?? 'Failed to update')
+      }
+      showToast(
+        next
+          ? `${u.name} is now a Designated Safeguarding Lead`
+          : `${u.name} is no longer a Safeguarding Lead`,
+        'success'
+      )
+    } catch (err) {
+      // Roll back on failure.
+      setUsers((prev) =>
+        prev.map((x) =>
+          x.id === u.id
+            ? { ...x, isDesignatedSafeguardingLead: u.isDesignatedSafeguardingLead }
+            : x
+        )
+      )
+      showToast(err instanceof Error ? err.message : 'Failed to update', 'error')
+    }
+  }
+
   function openCreateModal() {
     setForm({ name: '', email: '', phoneNumber: '', password: '', position: groupOptions[0] ?? '' })
     setFormError('')
@@ -246,6 +284,7 @@ export default function UsersPage() {
                   <Th>Email</Th>
                   <Th>Position</Th>
                   <Th>Status</Th>
+                  <Th>Safeguarding Lead</Th>
                   <Th>Created</Th>
                   <Th className="text-right">Actions</Th>
                 </tr>
@@ -274,6 +313,32 @@ export default function UsersPage() {
                           Active
                         </span>
                       )}
+                    </Td>
+                    <Td>
+                      <button
+                        type="button"
+                        onClick={() => handleToggleDsl(u)}
+                        role="switch"
+                        aria-checked={u.isDesignatedSafeguardingLead}
+                        title={
+                          u.isDesignatedSafeguardingLead
+                            ? 'Designated Safeguarding Lead — can view the safeguarding concern log. Click to remove.'
+                            : 'Click to designate as a Safeguarding Lead (can view the concern log).'
+                        }
+                        className={`inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-semibold transition-colors ${
+                          u.isDesignatedSafeguardingLead
+                            ? 'bg-green-100 text-green-800 hover:bg-green-200'
+                            : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                        }`}
+                      >
+                        <span
+                          aria-hidden="true"
+                          className={`h-2 w-2 rounded-full ${
+                            u.isDesignatedSafeguardingLead ? 'bg-green-600' : 'bg-gray-400'
+                          }`}
+                        />
+                        {u.isDesignatedSafeguardingLead ? 'DSL' : 'Not DSL'}
+                      </button>
                     </Td>
                     <Td>
                       <span className="text-sm text-gray-500">{formatDate(u.createdAt)}</span>

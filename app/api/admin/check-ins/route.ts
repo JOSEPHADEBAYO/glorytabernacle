@@ -21,6 +21,17 @@ type AdminCheckInRow = {
     photoUrl: string | null
     allergies: string | null
     specialNeeds: string | null
+    primaryGuardianName: string
+    primaryGuardianPhone: string
+    primaryGuardianEmail: string | null
+    authorisedCollectors: {
+      id: string
+      name: string
+      relationship: string
+      phone: string | null
+      photoUrl: string | null
+      notes: string | null
+    }[]
   }
   signedInBy: { id: string; name: string; email: string }
   signedOutBy: { id: string; name: string; email: string } | null
@@ -87,6 +98,12 @@ export async function GET(request: NextRequest) {
             photoUrl: true,
             allergies: true,
             specialNeeds: true,
+            primaryGuardianName: true,
+            primaryGuardianPhone: true,
+            primaryGuardianEmail: true,
+            authorisedCollectors: {
+              orderBy: { createdAt: 'asc' },
+            },
           },
         },
         signedInBy: { select: { id: true, name: true, email: true } },

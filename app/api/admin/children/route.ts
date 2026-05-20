@@ -56,17 +56,30 @@ export async function GET(request: NextRequest) {
       MAX_PAGE_SIZE
     )
 
+    // Status filter: ?status=pending returns parent submissions awaiting
+    // approval; otherwise the list returns only approved (active) children.
+    const statusParam = request.nextUrl.searchParams.get('status')
+    const approvedFilter =
+      statusParam === 'pending'
+        ? { approved: false }
+        : statusParam === 'all'
+          ? {}
+          : { approved: true }
+
     // search across firstName, lastName, primaryGuardianName
     const search = validation.data.search?.trim()
-    const where = search
-      ? {
-          OR: [
-            { firstName: { contains: search, mode: 'insensitive' as const } },
-            { lastName: { contains: search, mode: 'insensitive' as const } },
-            { primaryGuardianName: { contains: search, mode: 'insensitive' as const } },
-          ],
-        }
-      : {}
+    const where = {
+      ...approvedFilter,
+      ...(search
+        ? {
+            OR: [
+              { firstName: { contains: search, mode: 'insensitive' as const } },
+              { lastName: { contains: search, mode: 'insensitive' as const } },
+              { primaryGuardianName: { contains: search, mode: 'insensitive' as const } },
+            ],
+          }
+        : {}),
+    }
 
     const [total, children] = await Promise.all([
       prisma.child.count({ where }),
@@ -80,6 +93,9 @@ export async function GET(request: NextRequest) {
             where: { signedOutAt: null },
             orderBy: { signedInAt: 'desc' },
             take: 1,
+          },
+          authorisedCollectors: {
+            orderBy: { createdAt: 'asc' },
           },
         },
       }),
@@ -141,7 +157,9 @@ export async function POST(request: NextRequest) {
 
     const data = validation.data
 
-    // Normalise empty strings to null for optional text columns.
+    // Normalise empty strings to null for optional text columns. Collectors
+    // are created as part of the same transaction via Prisma's nested
+    // create — empty trimmed strings become null where the column allows.
     const child = await prisma.child.create({
       data: {
         firstName: data.firstName,
@@ -158,7 +176,27 @@ export async function POST(request: NextRequest) {
         emergencyContactName: data.emergencyContactName,
         emergencyContactPhone: data.emergencyContactPhone,
         emergencyContactRelation: data.emergencyContactRelation,
+        // GDPR consent — the schema guarantees the mandatory ones are true.
+        consentDataProcessing: data.consentDataProcessing,
+        consentMedicalInfoSharing: data.consentMedicalInfoSharing,
+        consentEmergencyTreatment: data.consentEmergencyTreatment,
+        consentPhotography: data.consentPhotography ?? false,
+        consentByName: data.consentByName,
+        consentCapturedAt: new Date(),
+        authorisedCollectors:
+          data.authorisedCollectors && data.authorisedCollectors.length > 0
+            ? {
+                create: data.authorisedCollectors.map((c) => ({
+                  name: c.name,
+                  relationship: c.relationship,
+                  phone: c.phone?.trim() || null,
+                  photoUrl: c.photoUrl?.trim() || null,
+                  notes: c.notes?.trim() || null,
+                })),
+              }
+            : undefined,
       },
+      include: { authorisedCollectors: true },
     })
 
     return NextResponse.json({ child }, { status: 201 })

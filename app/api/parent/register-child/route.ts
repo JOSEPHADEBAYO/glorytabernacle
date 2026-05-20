@@ -50,6 +50,30 @@ export async function POST(request: NextRequest) {
         emergencyContactName: data.emergencyContactName,
         emergencyContactPhone: data.emergencyContactPhone,
         emergencyContactRelation: data.emergencyContactRelation,
+        // GDPR consent captured from the public form (Zod guarantees the
+        // mandatory consents are true before we reach here).
+        consentDataProcessing: data.consentDataProcessing,
+        consentMedicalInfoSharing: data.consentMedicalInfoSharing,
+        consentEmergencyTreatment: data.consentEmergencyTreatment,
+        consentPhotography: data.consentPhotography ?? false,
+        consentByName: data.consentByName,
+        consentCapturedAt: new Date(),
+        authorisedCollectors:
+          data.authorisedCollectors && data.authorisedCollectors.length > 0
+            ? {
+                create: data.authorisedCollectors.map((c) => ({
+                  name: c.name,
+                  relationship: c.relationship,
+                  phone: c.phone?.trim() || null,
+                  photoUrl: c.photoUrl?.trim() || null,
+                  notes: c.notes?.trim() || null,
+                })),
+              }
+            : undefined,
+        // Public submissions go into the Pending queue. A Children Leader
+        // must approve from /dashboard/children → Pending before the child
+        // appears on the active roster or can be signed in.
+        approved: false,
       },
       select: { id: true, firstName: true, lastName: true },
     })
