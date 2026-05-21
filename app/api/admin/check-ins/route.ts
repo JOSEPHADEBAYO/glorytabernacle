@@ -6,6 +6,7 @@ import {
   CHILDREN_ADMIN_ROLES,
   type ChildrenAdminRole,
 } from '@/lib/types/child'
+import { resolvePhotoUrl } from '@/lib/cloudinary'
 
 type AdminCheckInRow = {
   id: string
@@ -19,6 +20,7 @@ type AdminCheckInRow = {
     firstName: string
     lastName: string
     photoUrl: string | null
+    photoPublicId: string | null
     allergies: string | null
     specialNeeds: string | null
     primaryGuardianName: string
@@ -30,6 +32,7 @@ type AdminCheckInRow = {
       relationship: string
       phone: string | null
       photoUrl: string | null
+      photoPublicId: string | null
       notes: string | null
     }[]
   }
@@ -96,6 +99,7 @@ export async function GET(request: NextRequest) {
             firstName: true,
             lastName: true,
             photoUrl: true,
+            photoPublicId: true,
             allergies: true,
             specialNeeds: true,
             primaryGuardianName: true,
@@ -111,6 +115,19 @@ export async function GET(request: NextRequest) {
       },
     })
 
+    // Re-sign authenticated child + collector photos for delivery.
+    const signedCheckIns = checkIns.map((ci) => ({
+      ...ci,
+      child: {
+        ...ci.child,
+        photoUrl: resolvePhotoUrl(ci.child),
+        authorisedCollectors: ci.child.authorisedCollectors.map((col) => ({
+          ...col,
+          photoUrl: resolvePhotoUrl(col),
+        })),
+      },
+    }))
+
     // Also surface a simple summary the live-board UI can show without an
     // additional fetch.
     const activeCount = onlyActive
@@ -119,7 +136,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(
       {
-        checkIns,
+        checkIns: signedCheckIns,
         activeCount,
         totalToday: onlyActive ? null : checkIns.length,
       },

@@ -53,3 +53,17 @@ export function signedChildImageUrl(
     sign_url: true,
   })
 }
+
+/**
+ * Resolve the deliverable photo URL for a child / collector record:
+ * a freshly-signed authenticated URL when a public_id is stored, else the
+ * legacy public photoUrl. Call this in every read path before returning the
+ * record to the client.
+ */
+export function resolvePhotoUrl(item: {
+  photoUrl?: string | null
+  photoPublicId?: string | null
+}): string | null {
+  if (item.photoPublicId) return signedChildImageUrl(item.photoPublicId)
+  return item.photoUrl ?? null
+}

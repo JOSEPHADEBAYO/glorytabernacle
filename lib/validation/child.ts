@@ -74,6 +74,7 @@ const collectorSchema = z.object({
     .optional()
     .or(z.literal('')),
   photoUrl: z.string().url('Photo URL must be a valid URL').optional().or(z.literal('')),
+  photoPublicId: z.string().trim().max(300).optional().or(z.literal('')),
   notes: optionalText(2000),
 })
 
@@ -102,6 +103,7 @@ export const createChildSchema = z.object({
   medicalNotes: optionalText(2000),
   specialNeeds: optionalText(2000),
   photoUrl: z.string().url('Photo URL must be a valid URL').optional().or(z.literal('')),
+  photoPublicId: z.string().trim().max(300).optional().or(z.literal('')),
   primaryGuardianName: z
     .string()
     .trim()
@@ -162,6 +164,7 @@ export const updateChildSchema = z
     medicalNotes: optionalText(2000),
     specialNeeds: optionalText(2000),
     photoUrl: z.string().url().optional().or(z.literal('')),
+    photoPublicId: z.string().trim().max(300).optional().or(z.literal('')),
     primaryGuardianName: z.string().trim().min(1).max(100).optional(),
     primaryGuardianPhone: ukPhoneSchema.optional(),
     primaryGuardianEmail: optionalEmail,

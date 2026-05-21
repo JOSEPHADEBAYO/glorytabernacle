@@ -42,6 +42,16 @@
 
 All gated to `CHILDREN_LEADER` or `SUPER_ADMIN`.
 
+### Authenticated (signed) child photos (17 May 2026 follow-up migration)
+
+Children's and authorised-collectors' photos are no longer publicly viewable by URL. New uploads go to Cloudinary as `type: authenticated` assets; we store the `public_id` (`photoPublicId`) and generate a **signed delivery URL** on every read. Without the signature — which can't be computed without the Cloudinary API secret — the URL returns 401, so a leaked/shared link is useless. Everything else (gallery, events, books, tracts) stays publicly deliverable; only the `children/*` folders are locked down (driven by `isProtectedFolder()` in `lib/cloudinary.ts`).
+
+Flow: the upload endpoints return `{ url: <signed>, publicId }`; the form persists the `publicId`; create/update/parent-register store `photoPublicId` (and null the raw `photoUrl`); the read endpoints (`/api/admin/children`, `/api/admin/children/[id]`, `/api/admin/check-ins`) call `resolvePhotoUrl()` to swap in a freshly-signed URL. The signature is deterministic, so it's cache-friendly and won't thrash `<next/image>`.
+
+Schema: `Child.photoPublicId`, `AuthorisedCollector.photoPublicId`. Migration: `prisma/migrations/20260517140000_child_photo_authenticated/migration.sql`.
+
+**Notes:** (1) Photos uploaded *before* this change remain public (`type: upload`); re-upload to secure them. (2) Signed URLs don't expire by default — for time-limited links, enable Cloudinary token-based auth and switch `signedChildImageUrl()` to use `auth_token`. (3) Requires the standard `CLOUDINARY_API_SECRET` env var (already set for uploads).
+
 ### Safeguarding concern log + DSL role (17 May 2026 follow-up migration)
 
 A confidential safeguarding concern log with a strict need-to-know access model:

@@ -35,7 +35,7 @@ export function YouthAttendancePanel({
 
   return (
     <div>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
         <StatChip
           label="Currently signed in"
           value={String(initialActiveCheckIns.length)}
@@ -44,6 +44,9 @@ export function YouthAttendancePanel({
         <StatChip label="Check-ins today" value={String(initialTotalCheckInsToday)} />
         <StatChip label="Registered youth" value={String(initialTotalYouth)} />
       </div>
+
+      <NotifyCheckoutButton />
+
 
       <div className="border-b border-gray-200 mb-6">
         <nav className="-mb-px flex gap-6" role="tablist">
@@ -493,6 +496,86 @@ function AnalyticsTab() {
 // ---------------------------------------------------------------------------
 // Shared UI bits
 // ---------------------------------------------------------------------------
+
+/**
+ * "Remind checked-in youth to sign out" — sends a web push to every youth
+ * currently signed in who has opted into reminders. Restricted server-side
+ * to SUPER_ADMIN + YOUTH_LEADER.
+ */
+function NotifyCheckoutButton() {
+  const [busy, setBusy] = useState(false)
+  const [status, setStatus] = useState<{ kind: 'ok' | 'err'; text: string } | null>(
+    null
+  )
+
+  async function handleClick() {
+    setBusy(true)
+    setStatus(null)
+    try {
+      const res = await fetch('/api/admin/youth/notify-checkout', { method: 'POST' })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(json.error ?? 'Could not send reminders.')
+
+      if ((json.checkedInCount ?? 0) === 0) {
+        setStatus({ kind: 'ok', text: 'No youth are currently signed in.' })
+      } else if ((json.sent ?? 0) === 0) {
+        setStatus({
+          kind: 'err',
+          text: `${json.checkedInCount} signed in, but none have reminders enabled on their device yet.`,
+        })
+      } else {
+        setStatus({
+          kind: 'ok',
+          text: `Reminder sent to ${json.sent} youth${
+            json.failed ? ` (${json.failed} failed)` : ''
+          }.`,
+        })
+      }
+    } catch (err) {
+      setStatus({
+        kind: 'err',
+        text: err instanceof Error ? err.message : 'Something went wrong.',
+      })
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div className="mb-6 flex flex-wrap items-center gap-3">
+      <button
+        type="button"
+        onClick={handleClick}
+        disabled={busy}
+        className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+        style={{ backgroundColor: 'rgba(27, 34, 119, 1)' }}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={2}
+          stroke="currentColor"
+          className="h-4 w-4"
+          aria-hidden="true"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+        </svg>
+        {busy ? 'Sending…' : 'Remind checked-in youth to sign out'}
+      </button>
+      {status && (
+        <span
+          className={`text-xs font-medium ${
+            status.kind === 'ok' ? 'text-green-700' : 'text-red-700'
+          }`}
+          role="status"
+        >
+          {status.text}
+        </span>
+      )}
+    </div>
+  )
+}
 
 function StatChip({
   label,

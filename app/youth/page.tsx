@@ -1,6 +1,7 @@
 import { requireYouth } from '@/lib/auth/youth-session'
 import { prisma } from '@/lib/prisma'
 import { YouthDashboardPanel } from '@/components/youth/youth-dashboard-panel'
+import { YouthPushOptIn } from '@/components/youth/youth-push-opt-in'
 
 export default async function YouthDashboardPage() {
   const youth = await requireYouth()
@@ -39,6 +40,8 @@ export default async function YouthDashboardPage() {
           leave. Browse today&apos;s daily scripture below.
         </p>
       </div>
+
+      <YouthPushOptIn vapidPublicKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? ''} />
 
       <YouthDashboardPanel
         youth={youth}

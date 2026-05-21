@@ -9,6 +9,7 @@ import {
   CHILDREN_ADMIN_ROLES,
   type ChildrenAdminRole,
 } from '@/lib/types/child'
+import { resolvePhotoUrl } from '@/lib/cloudinary'
 
 function isAdmin(role: string | undefined): role is ChildrenAdminRole {
   return CHILDREN_ADMIN_ROLES.includes(role as ChildrenAdminRole)
@@ -101,9 +102,20 @@ export async function GET(request: NextRequest) {
       }),
     ])
 
+    // Re-sign child + collector photos so the client receives deliverable
+    // (signed) URLs for authenticated assets.
+    const signedChildren = children.map((c) => ({
+      ...c,
+      photoUrl: resolvePhotoUrl(c),
+      authorisedCollectors: c.authorisedCollectors.map((col) => ({
+        ...col,
+        photoUrl: resolvePhotoUrl(col),
+      })),
+    }))
+
     return NextResponse.json(
       {
-        children,
+        children: signedChildren,
         total,
         page,
         pageSize,
@@ -169,7 +181,10 @@ export async function POST(request: NextRequest) {
         allergies: data.allergies?.trim() || null,
         medicalNotes: data.medicalNotes?.trim() || null,
         specialNeeds: data.specialNeeds?.trim() || null,
-        photoUrl: data.photoUrl?.trim() || null,
+        // Prefer the authenticated public_id; only keep a raw photoUrl when
+        // there's no publicId (legacy / external image).
+        photoPublicId: data.photoPublicId?.trim() || null,
+        photoUrl: data.photoPublicId?.trim() ? null : data.photoUrl?.trim() || null,
         primaryGuardianName: data.primaryGuardianName,
         primaryGuardianPhone: data.primaryGuardianPhone,
         primaryGuardianEmail: data.primaryGuardianEmail?.trim() || null,
@@ -190,7 +205,8 @@ export async function POST(request: NextRequest) {
                   name: c.name,
                   relationship: c.relationship,
                   phone: c.phone?.trim() || null,
-                  photoUrl: c.photoUrl?.trim() || null,
+                  photoPublicId: c.photoPublicId?.trim() || null,
+                  photoUrl: c.photoPublicId?.trim() ? null : c.photoUrl?.trim() || null,
                   notes: c.notes?.trim() || null,
                 })),
               }

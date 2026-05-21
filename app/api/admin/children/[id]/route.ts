@@ -6,6 +6,7 @@ import {
   CHILDREN_ADMIN_ROLES,
   type ChildrenAdminRole,
 } from '@/lib/types/child'
+import { resolvePhotoUrl } from '@/lib/cloudinary'
 
 function isAdmin(role: string | undefined): role is ChildrenAdminRole {
   return CHILDREN_ADMIN_ROLES.includes(role as ChildrenAdminRole)
@@ -58,7 +59,16 @@ export async function GET(_request: NextRequest, { params }: RouteContext) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 })
     }
 
-    return NextResponse.json({ child }, { status: 200 })
+    const signed = {
+      ...child,
+      photoUrl: resolvePhotoUrl(child),
+      authorisedCollectors: child.authorisedCollectors.map((col) => ({
+        ...col,
+        photoUrl: resolvePhotoUrl(col),
+      })),
+    }
+
+    return NextResponse.json({ child: signed }, { status: 200 })
   } catch (error) {
     console.error('Error reading child (admin):', {
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -119,6 +129,7 @@ export async function PUT(request: NextRequest, { params }: RouteContext) {
           'medicalNotes',
           'specialNeeds',
           'photoUrl',
+          'photoPublicId',
           'primaryGuardianEmail',
         ])
         if (optional.has(key)) {
@@ -127,6 +138,12 @@ export async function PUT(request: NextRequest, { params }: RouteContext) {
         }
       }
       cleaned[key] = value
+    }
+
+    // When a new authenticated photo is set, store the public_id and clear
+    // any stale photoUrl (we re-sign from the public_id on read).
+    if (typeof cleaned.photoPublicId === 'string' && cleaned.photoPublicId) {
+      cleaned.photoUrl = null
     }
 
     // If any consent flag changed in this update, re-stamp when consent
@@ -160,7 +177,8 @@ export async function PUT(request: NextRequest, { params }: RouteContext) {
               name: c.name,
               relationship: c.relationship,
               phone: c.phone?.trim() || null,
-              photoUrl: c.photoUrl?.trim() || null,
+              photoPublicId: c.photoPublicId?.trim() || null,
+              photoUrl: c.photoPublicId?.trim() ? null : c.photoUrl?.trim() || null,
               notes: c.notes?.trim() || null,
             })),
           })
@@ -174,7 +192,16 @@ export async function PUT(request: NextRequest, { params }: RouteContext) {
       })
     })
 
-    return NextResponse.json({ child: updated }, { status: 200 })
+    const signed = {
+      ...updated,
+      photoUrl: resolvePhotoUrl(updated),
+      authorisedCollectors: updated.authorisedCollectors.map((col) => ({
+        ...col,
+        photoUrl: resolvePhotoUrl(col),
+      })),
+    }
+
+    return NextResponse.json({ child: signed }, { status: 200 })
   } catch (error) {
     console.error('Error updating child (admin):', {
       error: error instanceof Error ? error.message : 'Unknown error',

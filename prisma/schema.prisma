@@ -59,18 +59,39 @@ model User {
 
   // Youth ministry check-ins
   youthCheckIns    YouthCheckIn[]
+  // Web-push subscriptions (youth opt in on the youth portal to receive
+  // "please sign out" reminders).
+  pushSubscriptions PushSubscription[]
 
   @@index([email])
   @@index([role])
+}
+
+// A browser Web-Push subscription belonging to a youth member. One youth
+// may have several (different devices/browsers). Pruned automatically when
+// the push service reports the subscription gone (HTTP 404/410).
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 enum UserRole {
   SUPER_ADMIN
   CONTENT_EDITOR
   CHILDREN_LEADER
+  YOUTH_LEADER     // Staff who manage the youth ministry (dashboard access).
   VIEWER
   PARENT  // Deprecated — see User docblock.
-  YOUTH
+  YOUTH   // Youth *members* — Google-OAuth youth-portal accounts.
 }
 
 // =========================================================================

@@ -12,6 +12,7 @@ export interface ChildFormCollector {
   relationship: string
   phone: string
   photoUrl: string
+  photoPublicId: string
   notes: string
 }
 
@@ -20,6 +21,7 @@ export const EMPTY_COLLECTOR: ChildFormCollector = {
   relationship: '',
   phone: '',
   photoUrl: '',
+  photoPublicId: '',
   notes: '',
 }
 
@@ -32,6 +34,7 @@ export const EMPTY_CHILD_FORM = {
   medicalNotes: '',
   specialNeeds: '',
   photoUrl: '',
+  photoPublicId: '',
   primaryGuardianName: '',
   primaryGuardianPhone: '',
   primaryGuardianEmail: '',
@@ -119,7 +122,13 @@ export function ChildForm({
         return
       }
       const data = await res.json()
-      set('photoUrl', data.url)
+      // Store the signed URL for preview AND the publicId to persist —
+      // the publicId is what gets re-signed on every future read.
+      setValues((v) => ({
+        ...v,
+        photoUrl: data.url,
+        photoPublicId: data.publicId ?? '',
+      }))
       setError(null)
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Photo upload failed.'
@@ -228,7 +237,9 @@ export function ChildForm({
                 </div>
                 <button
                   type="button"
-                  onClick={() => set('photoUrl', '')}
+                  onClick={() =>
+                    setValues((v) => ({ ...v, photoUrl: '', photoPublicId: '' }))
+                  }
                   className="text-xs font-medium text-red-600 hover:text-red-800"
                 >
                   Remove photo
@@ -486,7 +497,7 @@ function CollectorRow({
         return
       }
       const data = await res.json()
-      onUpdate({ photoUrl: data.url })
+      onUpdate({ photoUrl: data.url, photoPublicId: data.publicId ?? '' })
     } catch (err) {
       onUploadError?.(err instanceof Error ? err.message : 'Photo upload failed.')
     } finally {
@@ -552,7 +563,7 @@ function CollectorRow({
               </div>
               <button
                 type="button"
-                onClick={() => onUpdate({ photoUrl: '' })}
+                onClick={() => onUpdate({ photoUrl: '', photoPublicId: '' })}
                 className="text-xs font-medium text-red-600 hover:text-red-800"
               >
                 Remove photo
@@ -823,6 +834,7 @@ export function childToFormValues(child: {
   medicalNotes: string | null
   specialNeeds: string | null
   photoUrl: string | null
+  photoPublicId?: string | null
   primaryGuardianName: string
   primaryGuardianPhone: string
   primaryGuardianEmail: string | null
@@ -834,6 +846,7 @@ export function childToFormValues(child: {
     relationship: string
     phone: string | null
     photoUrl: string | null
+    photoPublicId?: string | null
     notes: string | null
   }>
   consentDataProcessing?: boolean
@@ -851,6 +864,7 @@ export function childToFormValues(child: {
     medicalNotes: child.medicalNotes ?? '',
     specialNeeds: child.specialNeeds ?? '',
     photoUrl: child.photoUrl ?? '',
+    photoPublicId: child.photoPublicId ?? '',
     primaryGuardianName: child.primaryGuardianName,
     primaryGuardianPhone: child.primaryGuardianPhone,
     primaryGuardianEmail: child.primaryGuardianEmail ?? '',
@@ -862,6 +876,7 @@ export function childToFormValues(child: {
       relationship: c.relationship,
       phone: c.phone ?? '',
       photoUrl: c.photoUrl ?? '',
+      photoPublicId: c.photoPublicId ?? '',
       notes: c.notes ?? '',
     })),
     consentDataProcessing: child.consentDataProcessing ?? false,

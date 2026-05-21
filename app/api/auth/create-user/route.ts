@@ -53,12 +53,16 @@ export async function POST(request: NextRequest) {
 
     const passwordHash = await bcrypt.hash(oneTimePassword, 12)
 
-    // Position → role mapping. We intentionally only elevate to YOUTH /
-    // CHILDREN_LEADER for the dedicated department heads; everyone else
-    // defaults to CONTENT_EDITOR. SUPER_ADMIN cannot be created here.
+    // Position → role mapping. We intentionally only elevate to
+    // YOUTH_LEADER / CHILDREN_LEADER for the dedicated department heads;
+    // everyone else defaults to CONTENT_EDITOR. SUPER_ADMIN cannot be
+    // created here.
+    //
+    // NB: YOUTH_LEADER (staff) is distinct from YOUTH, which is reserved for
+    // youth *members* who sign in via Google OAuth on the youth portal.
     let role: UserRole
     if (position === 'Head of Youth Department') {
-      role = 'YOUTH'
+      role = 'YOUTH_LEADER'
     } else if (position === 'Head of Children Department') {
       role = 'CHILDREN_LEADER'
     } else {

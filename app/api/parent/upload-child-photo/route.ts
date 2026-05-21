@@ -1,12 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { v2 as cloudinary } from 'cloudinary'
-
-// Configure Cloudinary once at module load.
-cloudinary.config({
-  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-})
+import { cloudinary, signedChildImageUrl } from '@/lib/cloudinary'
 
 const MAX_BYTES = 5 * 1024 * 1024 // 5 MB
 // Accept the formats mobile cameras / galleries produce, including iPhone
@@ -59,9 +52,18 @@ export async function POST(request: NextRequest) {
 
     const buffer = Buffer.from(await file.arrayBuffer())
 
+    // Child photos are access-controlled: uploaded as `authenticated` and
+    // delivered only via a signed URL. The bare secure_url would 401, so we
+    // return a signed URL for the preview plus the publicId to persist.
     const result = await new Promise<unknown>((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
-        { folder: 'children/photos', resource_type: 'image' },
+        {
+          folder: 'children/photos',
+          resource_type: 'image',
+          type: 'authenticated',
+          use_filename: true,
+          unique_filename: true,
+        },
         (error, result) => {
           if (error) reject(error)
           else resolve(result)
@@ -78,8 +80,9 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({
-      url: upload.secure_url,
+      url: signedChildImageUrl(upload.public_id) ?? upload.secure_url,
       publicId: upload.public_id,
+      authenticated: true,
       width: upload.width,
       height: upload.height,
     })
