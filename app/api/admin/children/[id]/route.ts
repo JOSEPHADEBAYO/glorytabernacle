@@ -7,6 +7,7 @@ import {
   type ChildrenAdminRole,
 } from '@/lib/types/child'
 import { resolvePhotoUrl } from '@/lib/cloudinary'
+import { eraseChild } from '@/lib/children/erase-child'
 
 function isAdmin(role: string | undefined): role is ChildrenAdminRole {
   return CHILDREN_ADMIN_ROLES.includes(role as ChildrenAdminRole)
@@ -214,8 +215,16 @@ export async function PUT(request: NextRequest, { params }: RouteContext) {
 /**
  * DELETE /api/admin/children/[id]
  *
- * Permanently removes a child record. Cascade deletes all of the child's
- * check-in history. Restricted to CHILDREN_LEADER + SUPER_ADMIN.
+ * Permanently erases a child record. This is a *true* erasure for the right-
+ * to-erasure flow:
+ *   - destroys the child's authenticated Cloudinary photo,
+ *   - destroys every authorised collector's photo,
+ *   - then deletes the DB row (cascade removes check-in history + collectors).
+ *
+ * Safeguarding concerns linked to the child are NOT deleted: the FK is
+ * ON DELETE SET NULL, so a concern survives with `childId` cleared (it keeps
+ * the free-text details the DSL recorded). Restricted to CHILDREN_LEADER +
+ * SUPER_ADMIN.
  */
 export async function DELETE(_request: NextRequest, { params }: RouteContext) {
   try {
@@ -230,12 +239,10 @@ export async function DELETE(_request: NextRequest, { params }: RouteContext) {
     }
 
     const { id } = await params
-    const existing = await prisma.child.findUnique({ where: { id } })
-    if (!existing) {
+    const result = await eraseChild(id)
+    if (!result.ok) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 })
     }
-
-    await prisma.child.delete({ where: { id } })
     return NextResponse.json({ success: true }, { status: 200 })
   } catch (error) {
     console.error('Error deleting child (admin):', {

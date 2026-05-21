@@ -161,6 +161,11 @@ export default function PrivacyNoticePage() {
                 <a className="text-blue-700 underline" href="mailto:admin@glorytabernacle.co.uk">
                   admin@glorytabernacle.co.uk
                 </a>
+                . To ask us to erase your child&apos;s data specifically, you
+                can also use our{' '}
+                <a className="text-blue-700 underline" href="/parent/data-request">
+                  data erasure request form
+                </a>
                 . We will respond within one month.
               </p>
             </Section>

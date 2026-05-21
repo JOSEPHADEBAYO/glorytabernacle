@@ -67,3 +67,35 @@ export function resolvePhotoUrl(item: {
   if (item.photoPublicId) return signedChildImageUrl(item.photoPublicId)
   return item.photoUrl ?? null
 }
+
+/**
+ * Permanently destroy an authenticated children's-ministry image. Used when a
+ * child record is erased (right to erasure / data retention) so the photo
+ * doesn't linger in Cloudinary after the DB row is gone.
+ *
+ * Best-effort: a failed destroy (already-deleted asset, transient Cloudinary
+ * error) is logged but does NOT throw, so a single bad asset can't block the
+ * erasure of the rest of the record. Returns true when Cloudinary reports the
+ * asset was removed (or was already absent).
+ */
+export async function deleteChildImage(
+  publicId: string | null | undefined
+): Promise<boolean> {
+  if (!publicId) return false
+  try {
+    const result = await cloudinary.uploader.destroy(publicId, {
+      type: 'authenticated',
+      resource_type: 'image',
+      invalidate: true,
+    })
+    // `ok` on success, `not found` when the asset is already gone — both are
+    // fine for an erasure (the end state is "no asset").
+    return result.result === 'ok' || result.result === 'not found'
+  } catch (error) {
+    console.error('Failed to delete Cloudinary child image:', {
+      publicId,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    })
+    return false
+  }
+}

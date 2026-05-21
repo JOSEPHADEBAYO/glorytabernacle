@@ -13,6 +13,10 @@ import {
   childToFormValues,
   type ChildFormValues,
 } from '@/components/dashboard/child-form'
+import {
+  ERASURE_STATUS_LABELS,
+  type ErasureStatus,
+} from '@/lib/types/erasure'
 
 // ---------------------------------------------------------------------------
 // Types — match the API response shapes
@@ -87,7 +91,13 @@ interface ChildrenAdminPanelProps {
   totalCheckInsToday: number
 }
 
-type Tab = 'live' | 'children' | 'pending' | 'performance' | 'analytics'
+type Tab =
+  | 'live'
+  | 'children'
+  | 'pending'
+  | 'performance'
+  | 'analytics'
+  | 'data-requests'
 
 const POLL_INTERVAL_MS = 5000
 
@@ -124,6 +134,7 @@ export function ChildrenAdminPanel({
             { id: 'pending' as const, label: 'Pending' },
             { id: 'performance' as const, label: 'Performance' },
             { id: 'analytics' as const, label: 'Analytics' },
+            { id: 'data-requests' as const, label: 'Data requests' },
           ].map((t) => (
             <button
               key={t.id}
@@ -148,6 +159,7 @@ export function ChildrenAdminPanel({
       {tab === 'pending' && <PendingTab />}
       {tab === 'performance' && <PerformanceTab />}
       {tab === 'analytics' && <AnalyticsTab />}
+      {tab === 'data-requests' && <DataRequestsTab />}
     </div>
   )
 }
@@ -1383,6 +1395,389 @@ function PendingField({
       </dt>
       <dd className="mt-0.5 text-gray-800">{children}</dd>
     </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Tab: Data requests — UK GDPR right-to-erasure queue. Parents submit via
+// /parent/data-request; the leader verifies identity, picks the matching
+// child, then runs "Erase data & complete" (hard-deletes the child + photos +
+// check-in history) or dismisses the request. Safeguarding concerns are
+// retained (de-linked) by the API regardless.
+// ---------------------------------------------------------------------------
+
+interface ErasureCandidate {
+  id: string
+  firstName: string
+  lastName: string
+}
+
+interface ErasureRequestRow {
+  id: string
+  childName: string
+  guardianName: string
+  guardianEmail: string
+  message: string | null
+  status: ErasureStatus
+  childId: string | null
+  handledAt: string | null
+  createdAt: string
+  child: { id: string; firstName: string; lastName: string } | null
+  handledBy: { id: string; name: string; email: string } | null
+  candidateChildren: ErasureCandidate[]
+}
+
+type ErasureStatusFilter = ErasureStatus | 'ALL'
+
+function formatDate(value: string): string {
+  return new Date(value).toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  })
+}
+
+function DataRequestsTab() {
+  const { toast } = useToast()
+  const [statusFilter, setStatusFilter] = useState<ErasureStatusFilter>('PENDING')
+  const [requests, setRequests] = useState<ErasureRequestRow[] | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [busyId, setBusyId] = useState<string | null>(null)
+  // Per-request child selection (which record to erase). Keyed by request id.
+  const [picked, setPicked] = useState<Record<string, string>>({})
+  const {
+    isOpen: eraseIsOpen,
+    pendingItem: erasePending,
+    openDelete: openErase,
+    closeDelete: closeErase,
+  } = useConfirmDelete<{ requestId: string; childId: string; childName: string }>()
+
+  const fetchRequests = useCallback(async () => {
+    setError(null)
+    try {
+      const qs =
+        statusFilter === 'ALL' ? '?pageSize=100' : `?status=${statusFilter}&pageSize=100`
+      const res = await fetch(`/api/admin/erasure-requests${qs}`, {
+        cache: 'no-store',
+      })
+      if (!res.ok) throw new Error('Could not load data requests')
+      const json = await res.json()
+      const rows: ErasureRequestRow[] = json.requests ?? []
+      setRequests(rows)
+      // Seed the child picker: prefer the stored match, else the only
+      // candidate, else blank.
+      setPicked((prev) => {
+        const next = { ...prev }
+        for (const r of rows) {
+          if (next[r.id] === undefined) {
+            next[r.id] =
+              r.childId ??
+              (r.candidateChildren.length === 1 ? r.candidateChildren[0].id : '')
+          }
+        }
+        return next
+      })
+    } catch (err) {
+      console.error('Erasure requests fetch error:', err)
+      setError(err instanceof Error ? err.message : 'Network error')
+    }
+  }, [statusFilter])
+
+  useEffect(() => {
+    fetchRequests()
+  }, [fetchRequests])
+
+  async function patchRequest(
+    id: string,
+    body: { status?: ErasureStatus; childId?: string }
+  ): Promise<boolean> {
+    setBusyId(id)
+    try {
+      const res = await fetch(`/api/admin/erasure-requests/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}))
+        throw new Error(json.error ?? 'Update failed')
+      }
+      return true
+    } catch (err) {
+      toast({
+        title: 'Action failed',
+        description: err instanceof Error ? err.message : 'Please try again.',
+        variant: 'error',
+      })
+      return false
+    } finally {
+      setBusyId(null)
+    }
+  }
+
+  async function handleErase(requestId: string, childId: string) {
+    const ok = await patchRequest(requestId, { status: 'COMPLETED', childId })
+    if (ok) {
+      toast({
+        title: 'Data erased',
+        description: "The child's record, photos, and history were permanently deleted.",
+        variant: 'success',
+      })
+      await fetchRequests()
+    }
+  }
+
+  async function handleCompleteNoData(requestId: string) {
+    const ok = await patchRequest(requestId, { status: 'COMPLETED', childId: '' })
+    if (ok) {
+      toast({
+        title: 'Marked complete',
+        description: 'Request closed — no matching record was held.',
+        variant: 'success',
+      })
+      await fetchRequests()
+    }
+  }
+
+  async function handleDismiss(requestId: string) {
+    const ok = await patchRequest(requestId, { status: 'DISMISSED' })
+    if (ok) {
+      toast({ title: 'Request dismissed', variant: 'success' })
+      await fetchRequests()
+    }
+  }
+
+  async function handleReopen(requestId: string) {
+    const ok = await patchRequest(requestId, { status: 'PENDING' })
+    if (ok) {
+      toast({ title: 'Request reopened', variant: 'success' })
+      await fetchRequests()
+    }
+  }
+
+  const filters: { id: ErasureStatusFilter; label: string }[] = [
+    { id: 'PENDING', label: 'Pending' },
+    { id: 'COMPLETED', label: 'Completed' },
+    { id: 'DISMISSED', label: 'Dismissed' },
+    { id: 'ALL', label: 'All' },
+  ]
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-gray-600">
+          UK GDPR right-to-erasure requests submitted via the public{' '}
+          <span className="font-mono text-xs">/parent/data-request</span> form.
+          Verify the requester before erasing — erasure is permanent.
+        </p>
+        <div className="flex gap-1 rounded-lg bg-gray-100 p-1">
+          {filters.map((f) => (
+            <button
+              key={f.id}
+              type="button"
+              onClick={() => {
+                setStatusFilter(f.id)
+                setRequests(null)
+              }}
+              className={`rounded-md px-3 py-1 text-xs font-semibold transition-colors ${
+                statusFilter === f.id
+                  ? 'bg-white text-blue-700 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {error && (
+        <div
+          role="alert"
+          className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700"
+        >
+          {error}
+        </div>
+      )}
+
+      {requests === null ? (
+        <p className="text-sm text-gray-500">Loading data requests…</p>
+      ) : requests.length === 0 ? (
+        <p className="text-sm text-gray-500">
+          No {statusFilter === 'ALL' ? '' : statusFilter.toLowerCase()} requests.
+          Submissions from the public erasure form will appear here.
+        </p>
+      ) : (
+        <div className="space-y-4">
+          {requests.map((r) => {
+            const selected = picked[r.id] ?? ''
+            const isPending = r.status === 'PENDING'
+            const busy = busyId === r.id
+            return (
+              <article
+                key={r.id}
+                className={`rounded-2xl border p-5 shadow-sm ${
+                  isPending
+                    ? 'border-red-200 bg-red-50/40'
+                    : 'border-gray-200 bg-white'
+                }`}
+              >
+                <header className="flex flex-wrap items-start justify-between gap-3 mb-3">
+                  <div className="min-w-0">
+                    <StatusPill status={r.status} />
+                    <h3
+                      className="mt-1 text-base font-bold"
+                      style={{ color: 'rgba(27, 34, 119, 1)' }}
+                    >
+                      Erase data for: {r.childName}
+                    </h3>
+                    <p className="text-xs text-gray-500">
+                      Requested {formatDate(r.createdAt)}
+                    </p>
+                  </div>
+                </header>
+
+                <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm mb-3">
+                  <PendingField label="Requested by">
+                    {r.guardianName}
+                    <br />
+                    <a
+                      href={`mailto:${r.guardianEmail}`}
+                      className="text-xs text-blue-600 hover:underline"
+                    >
+                      {r.guardianEmail}
+                    </a>
+                  </PendingField>
+                  {r.message && (
+                    <PendingField label="Message">{r.message}</PendingField>
+                  )}
+                  {!isPending && r.handledBy && (
+                    <PendingField label="Handled by">
+                      {r.handledBy.name}
+                      {r.handledAt && (
+                        <>
+                          <br />
+                          <span className="text-xs text-gray-500">
+                            {formatDate(r.handledAt)}
+                          </span>
+                        </>
+                      )}
+                    </PendingField>
+                  )}
+                </dl>
+
+                {isPending ? (
+                  <div className="rounded-xl bg-white border border-gray-200 p-4 space-y-3">
+                    <label className="block">
+                      <span className="block text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-1">
+                        Matching child record to erase
+                      </span>
+                      <select
+                        value={selected}
+                        onChange={(e) =>
+                          setPicked((p) => ({ ...p, [r.id]: e.target.value }))
+                        }
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      >
+                        <option value="">— No matching record held —</option>
+                        {r.candidateChildren.map((c) => (
+                          <option key={c.id} value={c.id}>
+                            {c.firstName} {c.lastName}
+                          </option>
+                        ))}
+                      </select>
+                      {r.candidateChildren.length === 0 && (
+                        <span className="mt-1 block text-xs text-amber-700">
+                          No child is registered under this email. Confirm
+                          identity manually before completing.
+                        </span>
+                      )}
+                    </label>
+
+                    <div className="flex flex-wrap gap-2">
+                      {selected ? (
+                        <button
+                          type="button"
+                          disabled={busy}
+                          onClick={() =>
+                            openErase({
+                              requestId: r.id,
+                              childId: selected,
+                              childName:
+                                r.candidateChildren.find((c) => c.id === selected)
+                                  ?.firstName ?? r.childName,
+                            })
+                          }
+                          className="rounded-lg px-3 py-1.5 text-xs font-bold text-white hover:opacity-90 disabled:opacity-50"
+                          style={{ backgroundColor: 'rgba(230, 17, 17, 1)' }}
+                        >
+                          {busy ? 'Working…' : 'Erase data & complete'}
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          disabled={busy}
+                          onClick={() => handleCompleteNoData(r.id)}
+                          className="rounded-lg px-3 py-1.5 text-xs font-bold text-white hover:opacity-90 disabled:opacity-50"
+                          style={{ backgroundColor: 'rgb(27, 109, 36)' }}
+                        >
+                          {busy ? 'Working…' : 'Complete (no record held)'}
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        disabled={busy}
+                        onClick={() => handleDismiss(r.id)}
+                        className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                      >
+                        Dismiss
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  r.status === 'DISMISSED' && (
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => handleReopen(r.id)}
+                      className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                    >
+                      {busy ? 'Working…' : 'Reopen'}
+                    </button>
+                  )
+                )}
+              </article>
+            )
+          })}
+        </div>
+      )}
+
+      <ConfirmDeleteModal
+        open={eraseIsOpen}
+        title="Permanently erase this child's data?"
+        message="This deletes the child's record, photo, authorised collectors, and entire check-in history, and cannot be undone. Any linked safeguarding concern is kept but de-linked. The request will be marked completed."
+        onConfirm={async () => {
+          if (erasePending) await handleErase(erasePending.requestId, erasePending.childId)
+          closeErase()
+        }}
+        onCancel={closeErase}
+      />
+    </div>
+  )
+}
+
+function StatusPill({ status }: { status: ErasureStatus }) {
+  const styles: Record<ErasureStatus, string> = {
+    PENDING: 'bg-red-200/70 text-red-900',
+    COMPLETED: 'bg-green-200/70 text-green-900',
+    DISMISSED: 'bg-gray-200 text-gray-700',
+  }
+  return (
+    <span
+      className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${styles[status]}`}
+    >
+      {ERASURE_STATUS_LABELS[status]}
+    </span>
   )
 }
 

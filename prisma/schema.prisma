@@ -46,6 +46,8 @@ model User {
   // Safeguarding concerns this user has raised.
   concernsRaised SafeguardingConcern[] @relation("ConcernRaisedBy")
   concernsClosed SafeguardingConcern[] @relation("ConcernClosedBy")
+  // Right-to-erasure requests this user has actioned (completed/dismissed).
+  erasureRequestsHandled ErasureRequest[] @relation("ErasureHandledBy")
 
   // Auth.js (NextAuth v5) relations — populated for OAuth-authenticated
   // YOUTH users. Empty for admin-cookie users.
@@ -204,12 +206,48 @@ model Child {
   checkIns             ChildCheckIn[]
   authorisedCollectors AuthorisedCollector[]
   safeguardingConcerns SafeguardingConcern[]
+  erasureRequests      ErasureRequest[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([lastName, firstName])
   @@index([approved])
+}
+
+// UK GDPR right-to-erasure request raised by a parent/guardian via the
+// public form. Staff review the queue and run the "erase all data" action.
+// `childId` is a best-effort match made at submission time (exact name +
+// guardian email); it's nullable because the parent doesn't know record IDs
+// and there may be no/ambiguous match — the admin confirms the child when
+// actioning. On the child being deleted, `childId` is set null (the request
+// is retained as a record that the erasure was carried out).
+model ErasureRequest {
+  id            String         @id @default(cuid())
+  childName     String
+  guardianName  String
+  guardianEmail String
+  message       String?        @db.Text
+  status        ErasureStatus  @default(PENDING)
+  childId       String?
+  handledById   String?
+  handledAt     DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  child     Child? @relation(fields: [childId], references: [id], onDelete: SetNull)
+  // The staff member who actioned the request. Kept (SetNull) if that user is
+  // later removed, so the request's audit trail survives.
+  handledBy User?  @relation("ErasureHandledBy", fields: [handledById], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+enum ErasureStatus {
+  PENDING
+  COMPLETED
+  DISMISSED
 }
 
 // Adults authorised by the guardian to collect a specific child. The
