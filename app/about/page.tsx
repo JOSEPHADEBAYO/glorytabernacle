@@ -25,10 +25,10 @@ const PASTORS = [
   },
   {
     id: 'p3',
-    name: 'Pastor Seye Adebayo',
-    title: 'Pastor-in-Charge, RCCG Glory Tabernacle, Barnstaple, Barnstaple',
-    bio: 'Pastor Seye is passionate about raising the next generation of leaders who will impact their world for Christ.',
-    image: 'https://res.cloudinary.com/deckwmsth/image/upload/v1778771805/Removed_background_puapoi.png',
+    name: 'Pastor Seye & Tolu Adebayo',
+    title: 'Lead Pastors, RCCG Glory Tabernacle, Barnstaple',
+    bio: "Pastor Seye and Pastor (Mrs.) Tolu Adebayo are passionate about furnishing the saints unto good works thereby becoming a transformed people inside out, resulting to influence in the marketplace as disciples.",
+    image: 'https://res.cloudinary.com/deckwmsth/image/upload/v1779568018/WhatsApp_Image_2026-05-23_at_11.20.45_bvx5mp.jpg',
   },
 ]
 
