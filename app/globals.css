@@ -170,4 +170,22 @@ body {
     @apply font-sans;
     scroll-padding-top: 4rem;
   }
+
+  /* Form controls inherit body text color by default. The body's foreground
+     token resolves to a light value in some themes, which makes typed text
+     invisible against the inputs' white backgrounds (events / groups /
+     ministry create + edit dialogs, etc). Force dark text on every native
+     form control so what the user types is always visible. Any specific
+     input that needs different coloured text can still override with a
+     Tailwind utility class (e.g. `text-white`), which has higher CSS layer
+     precedence than these base rules. */
+  input:not([type='checkbox']):not([type='radio']):not([type='file']):not([type='color']):not([type='range']):not([type='submit']):not([type='button']):not([type='reset']),
+  textarea,
+  select {
+    color: #111827; /* tailwind text-gray-900 */
+  }
+  input::placeholder,
+  textarea::placeholder {
+    color: #9ca3af; /* tailwind text-gray-400 */
+  }
 }
