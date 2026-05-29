@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useToast } from '@/components/ui/toast-provider'
 import type { VolunteerAreaStrength } from '@/lib/types/volunteer-interest'
+import { GENDER_LABELS, type Gender } from '@/lib/types/group-member'
 import {
   ConfirmDeleteModal,
   useConfirmDelete,
@@ -20,6 +21,8 @@ export interface DashboardVolunteerInterest {
   name: string
   email: string
   phoneNumber: string
+  /** Null only for rows created before the 2026-05-29 migration. */
+  gender: Gender | null
   address: string
   areaStrengths: VolunteerAreaStrength[] | unknown
   pastExperience: string
@@ -207,6 +210,7 @@ export function VolunteerInterestsManager({
               <Th>Name</Th>
               <Th>Email</Th>
               <Th>Phone</Th>
+              <Th>Gender</Th>
               <Th>Strengths</Th>
               <Th>Born again</Th>
               <Th>Holy Ghost</Th>
@@ -217,7 +221,7 @@ export function VolunteerInterestsManager({
           <tbody className="divide-y divide-gray-200">
             {interests.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-6 py-12 text-center text-sm text-gray-500">
+                <td colSpan={9} className="px-6 py-12 text-center text-sm text-gray-500">
                   Volunteer interest submissions will appear here.
                 </td>
               </tr>
@@ -233,6 +237,13 @@ export function VolunteerInterestsManager({
                       </Td>
                       <Td>{interest.email}</Td>
                       <Td>{interest.phoneNumber}</Td>
+                      <Td>
+                        {interest.gender ? (
+                          GENDER_LABELS[interest.gender]
+                        ) : (
+                          <span className="text-gray-400">—</span>
+                        )}
+                      </Td>
                       <Td>
                         <div className="flex flex-wrap gap-1.5">
                           {strengths.map((strength) => (
@@ -303,7 +314,7 @@ export function VolunteerInterestsManager({
                     </tr>
                     {expanded && (
                       <tr>
-                        <td colSpan={8} className="bg-gray-50 px-6 py-5">
+                        <td colSpan={9} className="bg-gray-50 px-6 py-5">
                           <div className="grid gap-5 text-sm md:grid-cols-2">
                             <Detail title="Address" body={interest.address} />
                             <Detail title="Past experience" body={interest.pastExperience} />

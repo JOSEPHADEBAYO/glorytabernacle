@@ -103,6 +103,7 @@ export function VolunteerInterestForm({ groups }: VolunteerInterestFormProps) {
       name: formData.get('name'),
       email: formData.get('email'),
       phoneNumber: formData.get('phoneNumber'),
+      gender: formData.get('gender'),
       address: formData.get('address'),
       areaStrengthIds: selectedStrengths,
       pastExperience: formData.get('pastExperience'),
@@ -164,7 +165,7 @@ export function VolunteerInterestForm({ groups }: VolunteerInterestFormProps) {
           Why you should volunteer
         </h1>
         <p className="mt-5 max-w-5xl text-sm leading-7 text-gray-600 md:text-base">
-          At RCCG Glory Tabernacle, Barnstaple, volunteering is more than serving-it is becoming part of God&apos;s purpose. We believe God does not only use people to serve His purposes, He also makes them transgenerational blessings. If God can use you, He can bless you. Through serving, people are FURNISHED for good works, TRANSFORMED in character and purpose, and empowered to INFLUENCE their world for Jesus Christ. Whatever your gift or experience, there is a place for you to grow, belong, and make kingdom impact
+          At RCCG Glory Tabernacle, Barnstaple, volunteering is more than serving-it is becoming part of God&apos;s purpose. We believe God does not only use people to serve His purposes, He also makes them transgenerational blessings. If God can use you, He can bless you. Through service, people are FURNISHED unto good works, TRANSFORMED within and without, and empowered to INFLUENCE their world for Jesus Christ. Whatever your gift or experience is, there is a place for you to grow, belong, and make kingdom impact
         </p>
       </div>
 
@@ -177,7 +178,24 @@ export function VolunteerInterestForm({ groups }: VolunteerInterestFormProps) {
           <Field name="name" label="Name" placeholder="Your full name" />
           <Field name="email" label="Email" placeholder="you@example.com" type="email" />
           <Field name="phoneNumber" label="Phone" placeholder="+44..." />
-          <Field name="address" label="Address" placeholder="Your residential address" />
+          <label className="block">
+            <span className="mb-2 block text-[0.7rem] font-extrabold uppercase tracking-[0.18em] text-gray-500">
+              Gender
+            </span>
+            <select
+              name="gender"
+              required
+              defaultValue=""
+              className="h-12 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none focus:border-[#000666] focus:ring-2 focus:ring-[#000666]/20"
+            >
+              <option value="" disabled>Select gender</option>
+              <option value="MALE">Male</option>
+              <option value="FEMALE">Female</option>
+            </select>
+          </label>
+          <div className="md:col-span-2">
+            <Field name="address" label="Address" placeholder="Your residential address" />
+          </div>
         </div>
       </section>
 

@@ -620,6 +620,7 @@ model VolunteerInterest {
   name                  String
   email                 String
   phoneNumber           String
+  gender                Gender?  // nullable in DB so existing rows survive the migration without a backfill; Zod requires it on every new submission
   address               String   @db.Text
   areaStrengths         Json
   pastExperience        String   @db.Text

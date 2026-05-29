@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { GENDERS } from '@/lib/types/group-member'
 
 const requiredText = (label: string, max = 500) =>
   z.string().trim().min(1, `${label} is required`).max(max, `${label} is too long`)
@@ -7,6 +8,7 @@ export const createVolunteerInterestSchema = z.object({
   name: requiredText('Name', 160),
   email: z.string().trim().email('Email address must be valid').max(200),
   phoneNumber: requiredText('Phone number', 60),
+  gender: z.enum(GENDERS, { message: 'Please select a gender' }),
   address: requiredText('Address', 500),
   areaStrengthIds: z
     .array(z.string().trim().min(1))

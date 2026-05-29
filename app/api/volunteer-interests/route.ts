@@ -58,6 +58,7 @@ export async function POST(request: NextRequest) {
         name: data.name,
         email: data.email,
         phoneNumber: data.phoneNumber,
+        gender: data.gender,
         address: data.address,
         areaStrengths: groups,
         pastExperience: data.pastExperience,
