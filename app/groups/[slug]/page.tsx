@@ -129,12 +129,15 @@ export default async function GroupDetailPage({
       </section>
 
       {/* ── Departmental Board (only if there is any content) ── */}
+
+
       {hasBoardContent && (
         <section className="w-full bg-white py-12 px-6 md:px-16">
           <div className="mx-auto max-w-[var(--container-max)]">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Column 1 — Head of [Ministry] */}
-              {(group.headTitle || hasResponsibilities) && (
+              {/* Column 1 — Head of [Ministry]
+                
+                {(group.headTitle || hasResponsibilities) && (
                 <div className="rounded-2xl overflow-hidden border border-gray-100 bg-white shadow-sm">
                   <div
                     className="px-5 py-3 text-white font-bold tracking-wide text-sm uppercase"
@@ -160,6 +163,11 @@ export default async function GroupDetailPage({
                   )}
                 </div>
               )}
+                
+                
+                */}
+              
+              
 
               {/* Column 2 — Programmes & Sub-Units */}
               {(hasProgrammes || specialRole) && (
