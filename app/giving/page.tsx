@@ -108,17 +108,17 @@ export default function GivingPage() {
               <CardHeader
                 icon={<Building2 className="h-4 w-4" style={{ color: 'rgba(0,6,102,1)' }} />}
                 title="Bank Transfer (UK)"
-                subtitle="Wise · Calvary Place"
+                subtitle="RCCG GLORY TABERNACLE"
               />
               <div className="flex flex-col gap-1.5 rounded-xl bg-gray-50 p-3">
-                <DetailRow label="Name" value="Calvary Place" />
-                <DetailRow label="Sort Code" value="23-94-64" />
-                <DetailRow label="Account" value="75345144" />
+                <DetailRow label="Name" value="RCCG GLORY TABERNACLE" />
+                <DetailRow label="Sort Code" value="30-54-66" />
+                <DetailRow label="Account" value="12399462" />
               </div>
             </GivingCard>
 
             {/* Bank Transfer Nigeria */}
-            <GivingCard>
+            {/* <GivingCard>
               <CardHeader
                 icon={<Landmark className="h-4 w-4" style={{ color: 'rgba(0,6,102,1)' }} />}
                 title="Bank Transfer (Nigeria)"
@@ -133,10 +133,10 @@ export default function GivingPage() {
                   </span>
                 </div>
               </div>
-            </GivingCard>
+            </GivingCard> */}
 
             {/* PayPal */}
-            <GivingCard>
+            {/* <GivingCard>
               <CardHeader
                 icon={<CreditCard className="h-4 w-4" style={{ color: 'rgba(0,6,102,1)' }} />}
                 title="PayPal"
@@ -154,10 +154,10 @@ export default function GivingPage() {
                   Give via PayPal
                 </a>
               </div>
-            </GivingCard>
+            </GivingCard> */}
 
             {/* International Transfers */}
-            <GivingCard>
+            {/* <GivingCard>
               <CardHeader
                 icon={<Globe className="h-4 w-4" style={{ color: 'rgba(0,6,102,1)' }} />}
                 title="International Transfers"
@@ -176,10 +176,10 @@ export default function GivingPage() {
                 </a>{' '}
                 using the UK account details above. Please include your full name in the transaction reference to ensure proper allocation.
               </p>
-            </GivingCard>
+            </GivingCard> */}
 
             {/* Zelle */}
-            <GivingCard>
+            {/* <GivingCard>
               <CardHeader
                 icon={<Smartphone className="h-4 w-4" style={{ color: 'rgba(0,6,102,1)' }} />}
                 title="Zelle (US)"
@@ -191,7 +191,7 @@ export default function GivingPage() {
                   calvaryplace1@gmail.com
                 </p>
               </div>
-            </GivingCard>
+            </GivingCard> */}
 
           </div>
         </div>
