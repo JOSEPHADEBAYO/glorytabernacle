@@ -3,7 +3,26 @@ import Link from 'next/link'
 import { TopNavBar } from '@/components/church/nav-bar'
 import { Footer } from '@/components/church/footer'
 import { NewsletterForm } from '@/components/church/newsletter-form'
-import { Calendar, Clock, MapPin, Church, CalendarRange, Users, Dumbbell, Info, PersonStanding } from 'lucide-react'
+import {
+  Calendar,
+  CalendarDays,
+  Clock,
+  Clock3,
+  MapPin,
+  Church,
+  CalendarRange,
+  Users,
+  Dumbbell,
+  Info,
+  Briefcase,
+  Sparkles,
+  HeartHandshake,
+  Sunrise,
+  Megaphone,
+  Footprints,
+  Music,
+  type LucideIcon,
+} from 'lucide-react'
 import { prisma } from '@/lib/prisma'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -125,172 +144,50 @@ export default async function EventsPage() {
             />
           </div>
 
-          {/* 3-column grid */}
+          {/* 3-column grid with unified service-card pattern: each entry has
+              an accent icon tile, bold service name, and day/time meta rows.
+              Visual consistency with the homepage's service-days-section. */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8">
 
             {/* ── Column 1: Sunday Services ── */}
-            <div>
-              <div className="flex items-center gap-2 mb-5">
-                <Church
-                  className="size-5 flex-none"
-                  style={{ color: 'var(--church-green)' }}
-                  aria-hidden="true"
-                />
-                <h3
-                  className="text-base font-extrabold"
-                  style={{ color: 'var(--church-green)' }}
-                >
-                  Sunday Services
-                </h3>
-              </div>
-              <div className="flex flex-col gap-3">
-                {[
-                  { label: 'Weekly Services', detail: '2 Services held every Sunday.', accent: 'green' },
-                  { label: '2nd Service', detail: 'Dedicated Business Service. (5:00pm)', accent: 'red' },
-                  { label: 'First Sunday', detail: 'CELEBRATION SERVICE (10:00am)', accent: 'green' },
-                  { label: 'Last Sunday', detail: 'Anointing & Healing Service. (10:00am)', accent: 'red' },
-                ].map((item) => (
-                  <div
-                    key={item.label}
-                    className="rounded-lg bg-gray-50 px-4 py-3 border border-gray-100"
-                    style={{
-                      borderLeft: `3px solid ${item.accent === 'green' ? 'var(--church-green)' : 'var(--church-red)'}`,
-                    }}
-                  >
-                    <p
-                      className="text-sm font-bold"
-                      style={{ color: 'rgba(27,34,119,1)' }}
-                    >
-                      {item.label}
-                    </p>
-                    <p className="text-xs text-gray-500 mt-0.5">{item.detail}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <RhythmColumn
+              title="Sunday Services"
+              headerIcon={Church}
+              items={[
+                { icon: Church, name: '1st Service', day: 'Every Sunday', time: '9:00am' },
+                { icon: Briefcase, name: 'Business Service', day: 'Every Sunday', time: '5:00pm' },
+                { icon: Sparkles, name: 'Celebration Service', day: '1st Sunday of the month', time: '10:00am' },
+                { icon: HeartHandshake, name: 'Anointing & Healing', day: 'Last Sunday of the month', time: '10:00am' },
+              ]}
+            />
 
             {/* ── Column 2: Weekly Activities ── */}
-            <div>
-              <div className="flex items-center gap-2 mb-5">
-                <CalendarRange
-                  className="size-5 flex-none"
-                  style={{ color: 'var(--church-green)' }}
-                  aria-hidden="true"
-                />
-                <h3
-                  className="text-base font-extrabold"
-                  style={{ color: 'var(--church-green)' }}
-                >
-                  Weekly Activities
-                </h3>
-              </div>
-              <div className="flex flex-col gap-5">
-                {[
-                  {
-                    icon: <PersonStanding className="size-5 flex-none text-gray-400" aria-hidden="true" />,
-                    label: 'Mount Up',
-                    detail: 'Daily: 12:00 am – 12:30 am',
-                  },
-                  {
-                    icon: <Users className="size-5 flex-none text-gray-400" aria-hidden="true" />,
-                    label: 'S2S',
-                    detail: 'Script2Street (Evangelism) Every Saturday',
-                  },
-                  {
-                    icon: <Users className="size-5 flex-none text-gray-400" aria-hidden="true" />,
-                    label: 'Prayer Walk',
-                    detail: 'Prayer Walk. Every Saturday.',
-                  },
-                  {
-                    icon: <Dumbbell className="size-5 flex-none text-gray-400" aria-hidden="true" />,
-                    label: 'Physical Exercise',
-                    detail: 'Every Saturday.',
-                  },
-                  {
-                    icon: <Info className="size-5 flex-none text-gray-400" aria-hidden="true" />,
-                    label: 'Information Center',
-                    detail: 'Weekly Information for Immigration and Jobs.',
-                  },
-                ].map((item) => (
-                  <div key={item.label} className="flex items-start gap-3">
-                    <div className="mt-0.5 flex-none">{item.icon}</div>
-                    <div>
-                      <p
-                        className="text-sm font-bold"
-                        style={{ color: 'rgba(27,34,119,1)' }}
-                      >
-                        {item.label}
-                      </p>
-                      <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">
-                        {item.detail}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <RhythmColumn
+              title="Weekly Activities"
+              headerIcon={CalendarRange}
+              items={[
+                { icon: Sunrise, name: 'Mount Up', day: 'Every day', time: '12:00am – 12:30am' },
+                { icon: Megaphone, name: 'Scripts2Streets (S2S)', day: 'Saturdays · Evangelism' },
+                { icon: Footprints, name: 'Prayer Walk', day: 'Saturdays' },
+                { icon: Dumbbell, name: 'Physical Exercise', day: 'Saturdays' },
+                { icon: Info, name: 'Information Centre', day: 'Weekly · Immigration & Jobs' },
+              ]}
+            />
 
             {/* ── Column 3: Special Gatherings ── */}
-            <div>
-              <div className="flex items-center gap-2 mb-5">
-                <Users
-                  className="size-5 flex-none"
-                  style={{ color: 'var(--church-green)' }}
-                  aria-hidden="true"
-                />
-                <h3
-                  className="text-base font-extrabold"
-                  style={{ color: 'var(--church-green)' }}
-                >
-                  Special Gatherings
-                </h3>
-              </div>
-
-              {/* Card with double-border effect */}
-              <div className="relative">
-                {/* Offset shadow border */}
-                <div
-                  className="absolute inset-0 rounded-2xl translate-x-2 translate-y-2"
-                  style={{ border: '2px solid rgba(27,34,119,0.25)', borderRadius: '1rem' }}
-                  aria-hidden="true"
-                />
-                {/* Main card */}
-                <div
-                  className="relative rounded-2xl bg-white p-6 flex flex-col gap-3"
-                  style={{ border: '2px solid rgba(27,34,119,1)' }}
-                >
-                  <span
-                    className="text-[10px] font-extrabold uppercase tracking-[0.18em]"
-                    style={{ color: 'var(--church-green)' }}
-                  >
-                    Quarterly Event
-                  </span>
-                  <h4
-                    className="text-xl font-extrabold leading-tight"
-                    style={{ color: 'rgba(27,34,119,1)' }}
-                  >
-                    Gathering of Worshippers
-                  </h4>
-                  <p className="text-xs text-gray-500 leading-relaxed">
-                    A profound spiritual experience occurring quarterly. Join us for a powerful time of
-                    deep worship and connection.
-                  </p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Calendar
-                      className="size-4 flex-none"
-                      style={{ color: 'rgba(27,34,119,1)' }}
-                      aria-hidden="true"
-                    />
-                    <span
-                      className="text-sm font-bold"
-                      style={{ color: 'rgba(27,34,119,1)' }}
-                    >
-                      Friday Evenings
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <RhythmColumn
+              title="Special Gatherings"
+              headerIcon={Users}
+              items={[
+                {
+                  icon: Music,
+                  name: 'Gathering of Worshippers',
+                  day: 'Quarterly · Friday evenings',
+                  description:
+                    'A profound spiritual experience occurring quarterly. Join us for a powerful time of deep worship and connection.',
+                },
+              ]}
+            />
 
           </div>
         </div>
@@ -727,6 +624,8 @@ export default async function EventsPage() {
       </section>
 
       {/* ── Footer ── */}
+      {/* (RhythmColumn / RhythmCard components defined below the page export
+          for readability — they're only used by the Weekly Rhythm section.) */}
       <Footer
         logo={{ src: '/logo.png', alt: 'RCCG Glory Tabernacle, Barnstaple' }}
         tagline="Furnish  ·  Transform  ·  Influence"
@@ -767,5 +666,108 @@ export default async function EventsPage() {
         copyrightText={`© ${new Date().getFullYear()} RCCG Glory Tabernacle, Barnstaple. All rights reserved.`}
       />
     </>
+  )
+}
+
+// ─── Weekly Rhythm helpers ────────────────────────────────────────────────────
+// Unified card pattern shared by all three columns in the Weekly Rhythm
+// section. Mirrors the homepage's service-days-section so the two pages look
+// like one designed system.
+
+interface RhythmItem {
+  /** Lucide icon for the accent tile. */
+  icon: LucideIcon
+  /** Bold service name. */
+  name: string
+  /** When it runs — e.g. "Every Sunday", "Saturdays". */
+  day?: string
+  /** Start time — e.g. "10:00am", "12:00am – 12:30am". Optional. */
+  time?: string
+  /** Longer-form description (only used for highlighted gatherings). */
+  description?: string
+}
+
+function RhythmColumn({
+  title,
+  headerIcon: HeaderIcon,
+  items,
+}: {
+  title: string
+  headerIcon: LucideIcon
+  items: RhythmItem[]
+}) {
+  return (
+    <div>
+      <div className="flex items-center gap-2 mb-5">
+        <HeaderIcon
+          className="size-5 flex-none"
+          style={{ color: 'var(--church-green)' }}
+          aria-hidden="true"
+        />
+        <h3
+          className="text-base font-extrabold"
+          style={{ color: 'var(--church-green)' }}
+        >
+          {title}
+        </h3>
+      </div>
+      <div className="flex flex-col gap-3">
+        {items.map((item) => (
+          <RhythmCard key={item.name} item={item} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function RhythmCard({ item }: { item: RhythmItem }) {
+  const Icon = item.icon
+  return (
+    <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-[0_1px_2px_rgba(0,6,102,0.04)] transition hover:-translate-y-0.5 hover:shadow-[0_8px_24px_-12px_rgba(0,6,102,0.18)]">
+      <div className="flex items-start gap-3">
+        <div
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg"
+          style={{ backgroundColor: 'rgba(27, 109, 36, 0.10)' }}
+          aria-hidden="true"
+        >
+          <Icon className="h-5 w-5" style={{ color: 'var(--church-green)' }} />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p
+            className="text-sm font-extrabold leading-tight"
+            style={{ color: 'rgba(27,34,119,1)' }}
+          >
+            {item.name}
+          </p>
+          {item.description && (
+            <p className="mt-1.5 text-xs leading-relaxed text-gray-500">
+              {item.description}
+            </p>
+          )}
+          {(item.day || item.time) && (
+            <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+              {item.day && (
+                <span className="inline-flex items-center gap-1.5 text-xs leading-tight text-gray-600">
+                  <CalendarDays
+                    className="size-3.5 shrink-0 text-gray-400"
+                    aria-hidden="true"
+                  />
+                  {item.day}
+                </span>
+              )}
+              {item.time && (
+                <span className="inline-flex items-center gap-1.5 text-xs leading-tight text-gray-600">
+                  <Clock3
+                    className="size-3.5 shrink-0 text-gray-400"
+                    aria-hidden="true"
+                  />
+                  {item.time}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   )
 }
