@@ -112,7 +112,7 @@ export function AboutSection({
                 >
                   3
                 </span>
-                When God commanded a Tabernacle to be built, He was asking for a place — a life to host His presence.
+                When God commanded a Tabernacle to be built, He was asking for a place and a life to host His presence.
               </li>
             </ol>
           </div>
