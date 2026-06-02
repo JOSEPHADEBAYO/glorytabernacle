@@ -10,19 +10,32 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
-  // Determine whether to show the Safeguarding nav item (DSL + Super Admin
-  // only). The page itself also enforces this — the sidebar flag just
-  // avoids showing a link that would bounce.
+  // Look up the signed-in user once and forward what the sidebar needs:
+  //   - canSeeSafeguarding: DSL + Super Admin only. The page itself also
+  //     enforces this — the sidebar flag just avoids showing a link that
+  //     would bounce.
+  //   - userName / userRole: rendered in the sidebar's user section so it
+  //     reflects who's actually signed in (was previously hardcoded).
   let canSeeSafeguarding = false
+  let userName: string | null = null
+  let userRole: string | null = null
   const sessionToken = (await cookies()).get('session_token')?.value
   if (sessionToken) {
     const session = await prisma.session.findUnique({
       where: { token: sessionToken },
       include: {
-        user: { select: { role: true, isDesignatedSafeguardingLead: true } },
+        user: {
+          select: {
+            name: true,
+            role: true,
+            isDesignatedSafeguardingLead: true,
+          },
+        },
       },
     })
     if (session && session.expiresAt >= new Date()) {
+      userName = session.user.name
+      userRole = session.user.role
       canSeeSafeguarding = canManageConcerns(
         session.user.role,
         session.user.isDesignatedSafeguardingLead
@@ -39,7 +52,11 @@ export default async function DashboardLayout({
       />
 
       {/* Sidebar */}
-      <Sidebar canSeeSafeguarding={canSeeSafeguarding} />
+      <Sidebar
+        canSeeSafeguarding={canSeeSafeguarding}
+        userName={userName}
+        userRole={userRole}
+      />
       
       {/* Main Content Area */}
       <div className="pl-64">

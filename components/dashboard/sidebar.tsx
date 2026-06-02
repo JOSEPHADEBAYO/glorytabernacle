@@ -217,10 +217,47 @@ const NAV_ITEMS: NavItem[] = [
   },
 ]
 
+// Map raw enum values from the User.role column to human-friendly labels for
+// the sidebar user-section subtitle. Keep this in sync with the UserRole
+// enum in prisma/schema.prisma.
+const ROLE_LABELS: Record<string, string> = {
+  SUPER_ADMIN: 'Super Admin',
+  CONTENT_EDITOR: 'Content Editor',
+  CHILDREN_LEADER: "Children's Leader",
+  YOUTH_LEADER: 'Youth Leader',
+  VIEWER: 'Viewer',
+  PARENT: 'Parent',
+  YOUTH: 'Youth',
+}
+
+function formatRole(role: string | null): string {
+  if (!role) return ''
+  return ROLE_LABELS[role] ?? role
+}
+
+/**
+ * Build initials for the avatar circle from a full name.
+ * "David Oluwasegun" → "DO"; "Cher" → "C"; empty → "?".
+ */
+function initialsFor(name: string | null): string {
+  if (!name) return '?'
+  const parts = name
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+  if (parts.length === 0) return '?'
+  if (parts.length === 1) return parts[0]!.charAt(0).toUpperCase()
+  return (parts[0]!.charAt(0) + parts[parts.length - 1]!.charAt(0)).toUpperCase()
+}
+
 export function Sidebar({
   canSeeSafeguarding = false,
+  userName = null,
+  userRole = null,
 }: {
   canSeeSafeguarding?: boolean
+  userName?: string | null
+  userRole?: string | null
 }) {
   const pathname = usePathname()
 
@@ -282,15 +319,25 @@ export function Sidebar({
         </div>
       </nav>
 
-      {/* User Section */}
+      {/* User Section — reflects the signed-in user from the session
+          (passed in from the dashboard layout). Initials are derived from
+          the user's name; role is mapped to a friendly label via
+          ROLE_LABELS. */}
       <div className="border-t border-gray-200 p-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-semibold">
-            DO
+          <div
+            className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-semibold"
+            aria-hidden="true"
+          >
+            {initialsFor(userName)}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900 truncate">David Oluwasegun</p>
-            <p className="text-xs text-gray-500 truncate">Super Admin</p>
+            <p className="text-sm font-medium text-gray-900 truncate">
+              {userName ?? 'Signed out'}
+            </p>
+            <p className="text-xs text-gray-500 truncate">
+              {formatRole(userRole) || '—'}
+            </p>
           </div>
         </div>
       </div>

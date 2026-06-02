@@ -2,6 +2,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
+import { MountUpNotifyCard } from '@/components/dashboard/mount-up-notify-card'
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -95,6 +96,27 @@ export default async function DashboardPage() {
     redirect('/login')
   }
 
+  // Resolve the current user's role so we can gate the Super-Admin-only
+  // Mount Up reminder card. Falls back to null on lookup failure rather than
+  // crashing — the overview still renders without the card in that case.
+  let userRole: string | null = null
+  let mountUpSubscribers = 0
+  try {
+    const session = await prisma.session.findUnique({
+      where: { token: sessionToken },
+      include: { user: { select: { role: true } } },
+    })
+    userRole = session?.user?.role ?? null
+    if (userRole === 'SUPER_ADMIN') {
+      mountUpSubscribers = await prisma.pushSubscription.count({
+        where: { topic: 'MOUNT_UP' },
+      })
+    }
+  } catch (err) {
+    console.error('Dashboard: failed to resolve session/role', err)
+  }
+  const isSuperAdmin = userRole === 'SUPER_ADMIN'
+
   const data = await loadOverviewData()
 
   // Helper to build a "trend" line that's actually informative
@@ -145,6 +167,10 @@ export default async function DashboardPage() {
           trend={bookTrend}
         />
       </div>
+
+      {/* Mount Up reminder — Super Admin only. Replaces the daily 11:45pm
+          cron that used to blast emails; now a manual, opt-in push. */}
+      {isSuperAdmin && <MountUpNotifyCard subscriberCount={mountUpSubscribers} />}
 
       {/* Members callout — prominent because every submission needs follow-up */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">

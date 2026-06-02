@@ -69,21 +69,35 @@ model User {
   @@index([role])
 }
 
-// A browser Web-Push subscription belonging to a youth member. One youth
-// may have several (different devices/browsers). Pruned automatically when
-// the push service reports the subscription gone (HTTP 404/410).
+// A browser Web-Push subscription. Originally per-youth (FK to User), now
+// generalised so anonymous visitors can also subscribe to topical pushes
+// (e.g. the daily Mount Up prayer reminder). userId is nullable for those
+// anonymous subscriptions; topic distinguishes what the subscriber opted in
+// to. Pruned automatically when the push service reports the subscription
+// gone (HTTP 404/410).
 model PushSubscription {
-  id        String   @id @default(cuid())
-  userId    String
-  endpoint  String   @unique
+  id        String     @id @default(cuid())
+  userId    String?
+  topic     PushTopic  @default(YOUTH_CHECKOUT)
+  endpoint  String     @unique
   p256dh    String
   auth      String
   userAgent String?
-  createdAt DateTime @default(now())
+  createdAt DateTime   @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([topic])
+}
+
+enum PushTopic {
+  // Youth ministry — "please sign out" reminders sent by Super Admin / Youth
+  // Leader to youth currently checked in. Subscribers are logged-in youth.
+  YOUTH_CHECKOUT
+  // Daily Mount Up prayer meeting (midnight–12:30am). Anonymous subscribers
+  // from the public site receive a push when Super Admin triggers it.
+  MOUNT_UP
 }
 
 enum UserRole {

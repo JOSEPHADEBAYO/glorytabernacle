@@ -1,16 +1,1 @@
-{
-  "crons": [
-    {
-      "path": "/api/cron/send-event-notifications",
-      "schedule": "*/5 * * * *"
-    },
-    {
-      "path": "/api/cron/send-mount-up-reminder",
-      "schedule": "45 23 * * *"
-    },
-    {
-      "path": "/api/cron/erasure-reminders",
-      "schedule": "0 8 * * 1"
-    }
-  ]
-}
+{}

@@ -9,6 +9,7 @@ import {
   VOLUNTEER_INTEREST_ADMIN_ROLES,
   type VolunteerInterestAdminRole,
 } from '@/lib/types/volunteer-interest'
+import { sendVolunteerConfirmation } from '@/lib/email/send-volunteer-confirmation'
 
 const DEFAULT_PAGE_SIZE = 25
 const MAX_PAGE_SIZE = 100
@@ -67,6 +68,26 @@ export async function POST(request: NextRequest) {
         filledWithHolyGhost: data.filledWithHolyGhost,
       },
     })
+
+    // Fire-and-forget confirmation email. We deliberately don't await this:
+    // a transient Resend failure shouldn't block a successful form submit.
+    // Failures are logged so they show up in the server console.
+    void sendVolunteerConfirmation({
+      to: data.email,
+      name: data.name,
+      areaStrengthTitles: groups.map((g) => g.title),
+    })
+      .then((result) => {
+        if (!result.ok) {
+          console.error('Volunteer confirmation email failed:', {
+            email: data.email,
+            reason: result.detail,
+          })
+        }
+      })
+      .catch((err) => {
+        console.error('Volunteer confirmation email threw:', err)
+      })
 
     return NextResponse.json({ interest }, { status: 201 })
   } catch (error) {

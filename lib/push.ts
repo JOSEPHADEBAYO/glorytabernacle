@@ -22,6 +22,17 @@ export function canNotifyYouth(role: string | undefined): boolean {
   return YOUTH_NOTIFY_ROLES.includes(role as YouthNotifyRole)
 }
 
+/** Roles permitted to trigger the Mount Up daily prayer push reminder. */
+export const MOUNT_UP_NOTIFY_ROLES = ['SUPER_ADMIN'] as const
+export type MountUpNotifyRole = (typeof MOUNT_UP_NOTIFY_ROLES)[number]
+
+export function canNotifyMountUp(role: string | undefined): boolean {
+  return MOUNT_UP_NOTIFY_ROLES.includes(role as MountUpNotifyRole)
+}
+
+/** Push topic mirrors the PushTopic enum in prisma/schema.prisma. */
+export type PushTopic = 'YOUTH_CHECKOUT' | 'MOUNT_UP'
+
 const DEFAULT_VAPID_SUBJECT = 'mailto:admin@glorytabernacle.co.uk'
 
 /**
@@ -105,6 +116,63 @@ export async function sendPushToUsers(
             ? (err as { statusCode?: number }).statusCode
             : undefined
         // 404/410 = subscription gone; prune it. Other errors = transient.
+        if (statusCode === 404 || statusCode === 410) {
+          deadIds.push(sub.id)
+        } else {
+          failed++
+        }
+      }
+    })
+  )
+
+  if (deadIds.length > 0) {
+    await prisma.pushSubscription.deleteMany({ where: { id: { in: deadIds } } })
+  }
+
+  return { sent, failed, pruned: deadIds.length }
+}
+
+/**
+ * Send a payload to every push subscription with the given topic, regardless
+ * of whether the subscription is tied to a user (Mount Up subscriptions are
+ * anonymous — no `userId`). Dead subscriptions (404/410) are pruned, same as
+ * sendPushToUsers. Returns aggregate counts.
+ */
+export async function sendPushToTopic(
+  topic: PushTopic,
+  payload: PushPayload
+): Promise<{ sent: number; failed: number; pruned: number }> {
+  if (!ensureConfigured()) {
+    throw new Error('Web push is not configured (VAPID keys missing).')
+  }
+
+  const subs = await prisma.pushSubscription.findMany({
+    where: { topic },
+  })
+
+  if (subs.length === 0) return { sent: 0, failed: 0, pruned: 0 }
+
+  const data = JSON.stringify(payload)
+  let sent = 0
+  let failed = 0
+  const deadIds: string[] = []
+
+  await Promise.all(
+    subs.map(async (sub) => {
+      try {
+        await webpush.sendNotification(
+          {
+            endpoint: sub.endpoint,
+            keys: { p256dh: sub.p256dh, auth: sub.auth },
+          },
+          data
+        )
+        sent++
+      } catch (err: unknown) {
+        const statusCode =
+          typeof err === 'object' && err !== null && 'statusCode' in err
+            ? (err as { statusCode?: number }).statusCode
+            : undefined
         if (statusCode === 404 || statusCode === 410) {
           deadIds.push(sub.id)
         } else {

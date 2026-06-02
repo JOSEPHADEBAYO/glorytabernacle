@@ -60,7 +60,7 @@ Set these in your hosting provider (Vercel project settings) **and** locally in 
 | `CLOUDINARY_API_SECRET` | Cloudinary uploads **and** signing of authenticated children's photos. |
 | `RESEND_API_KEY` | All transactional email. |
 | `NOTIFICATION_FROM_EMAIL` | "From" address — **must be on a verified Resend domain** in production (e.g. `RCCG Glory Tabernacle, Barnstaple <notifications@glorytabernacle.co.uk>`). |
-| `CRON_SECRET` | Bearer token protecting all three cron routes. |
+| `CRON_SECRET` | Bearer token protecting the cron routes. Used now by Railway scheduler (see `RAILWAY_CRON_SETUP.md`). |
 | `GOOGLE_CLIENT_ID` | Youth portal Google sign-in. |
 | `GOOGLE_CLIENT_SECRET` | Youth portal Google sign-in. |
 | `NEXTAUTH_SECRET` | **Signs NextAuth JWTs. Read internally by NextAuth, so it never appears in app code — easy to forget.** Generate with `openssl rand -base64 32`. |
@@ -95,22 +95,31 @@ Set these in your hosting provider (Vercel project settings) **and** locally in 
 
 ---
 
-## 5. Cron jobs (Vercel)
+## 5. Cron jobs (Railway)
 
-`vercel.json` schedules three crons; all are protected by `Authorization: Bearer ${CRON_SECRET}` and live under `app/api/cron/`. Confirmed: every scheduled path has a matching route file.
+Scheduling has moved from Vercel Cron to **Railway**. The Next.js app
+itself stays on Vercel; Railway is the scheduler, making authenticated HTTPS
+calls to the same `/api/cron/*` endpoints. `vercel.json` ships empty (`{}`).
+See `RAILWAY_CRON_SETUP.md` for the exact Railway commands and schedules.
 
 | Path | Schedule (UTC) | What it does |
 | --- | --- | --- |
 | `/api/cron/send-event-notifications` | `*/5 * * * *` (every 5 min) | Sends due event reminder emails. |
-| `/api/cron/send-mount-up-reminder` | `45 23 * * *` (daily 23:45) | Daily Mount Up reminder. |
 | `/api/cron/erasure-reminders` | `0 8 * * 1` (Mondays 08:00) | Weekly digest of the pending right-to-erasure queue; flags requests > 21 days as overdue. |
 
-- [ ] `CRON_SECRET` set in the hosting env so the crons authorise.
-- [ ] *(Optional)* Manually test once deployed:
+The previous Mount Up daily-email cron has been **removed**. Mount Up
+reminders are now a manual Web-Push notification — Super Admin clicks "Send
+reminder now" on `/dashboard`, push goes to every subscriber who opted in
+from the public site.
+
+- [ ] `CRON_SECRET` set in the Railway environment so the crons authorise.
+- [ ] Railway crons configured per `RAILWAY_CRON_SETUP.md` and "Run now"
+      executed once on each to confirm they reach the production URL.
+- [ ] *(Optional)* Manually test the endpoints:
 
 ```bash
-curl -i -H "Authorization: Bearer $CRON_SECRET" https://<your-domain>/api/cron/erasure-reminders
-curl -i -H "Authorization: Bearer $CRON_SECRET" https://<your-domain>/api/cron/send-event-notifications
+curl -i -X POST -H "Authorization: Bearer $CRON_SECRET" https://<your-domain>/api/cron/erasure-reminders
+curl -i -X POST -H "Authorization: Bearer $CRON_SECRET" https://<your-domain>/api/cron/send-event-notifications
 ```
 
 ---
@@ -177,7 +186,7 @@ A scan of every `process.env.*` reference in the codebase. **Variable names are 
 
 1. **Base URL is read from several different variables, with different hardcoded fallbacks.** This is the most important fix — set them all to the same production URL to avoid wrong/localhost links in emails:
    - Welcome email login link → `NEXT_PUBLIC_APP_URL` (fallback `http://localhost:3000`).
-   - Mount Up reminder → `SITE_URL` (fallback `https://rccgglory.org`).
+   - ~~Mount Up email reminder~~ — removed; Mount Up is now a Web-Push notification, not an email, so this base-URL fallback no longer matters.
    - Erasure digest & broadcast emails → `SITE_URL` → `NEXT_PUBLIC_SITE_URL` → `NEXTAUTH_URL` (fallback `https://glorytabernacle.co.uk`).
    - **Recommendation:** set `SITE_URL`, `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_APP_URL`, and `NEXTAUTH_URL` all to `https://glorytabernacle.co.uk` (or whatever the final domain is).
 

@@ -1,4 +1,5 @@
 import { CalendarDays, Clock3, UsersRound } from 'lucide-react'
+import { MountUpPushOptIn } from './mount-up-push-opt-in'
 
 interface ServiceItem {
   label: string
@@ -117,6 +118,13 @@ function ServiceColumnBlock({ column }: { column: ServiceColumn }) {
             <p className="mt-2 text-lg font-medium leading-tight text-black lg:text-[1.35rem]">
               {column.highlight.detail}
             </p>
+          )}
+          {/* Mount Up push opt-in lives inside the daily-prayer highlight
+              so it's discoverable exactly where the meeting is shown. */}
+          {column.title === 'Daily' && (
+            <MountUpPushOptIn
+              vapidPublicKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? ''}
+            />
           )}
         </div>
       )}
