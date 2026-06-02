@@ -2,6 +2,7 @@ import { cookies } from 'next/headers'
 import { SessionManager } from '@/components/dashboard/session-manager'
 import { Sidebar } from '@/components/dashboard/sidebar'
 import { DashboardHeader } from '@/components/dashboard/dashboard-header'
+import { MobileSidebarProvider } from '@/components/dashboard/mobile-sidebar-context'
 import { prisma } from '@/lib/prisma'
 import { canManageConcerns } from '@/lib/types/safeguarding'
 
@@ -51,23 +52,24 @@ export default async function DashboardLayout({
         warningTime={10000} // 10 seconds warning before logout
       />
 
-      {/* Sidebar */}
-      <Sidebar
-        canSeeSafeguarding={canSeeSafeguarding}
-        userName={userName}
-        userRole={userRole}
-      />
-      
-      {/* Main Content Area */}
-      <div className="pl-64">
-        {/* Top Header */}
-        <DashboardHeader />
-        
-        {/* Page Content */}
-        <main className="p-8">
-          {children}
-        </main>
-      </div>
+      {/* MobileSidebarProvider coordinates the slide-in drawer between the
+          Sidebar and the DashboardHeader hamburger button. On lg+ the
+          sidebar is permanently visible and the provider state is unused. */}
+      <MobileSidebarProvider>
+        <Sidebar
+          canSeeSafeguarding={canSeeSafeguarding}
+          userName={userName}
+          userRole={userRole}
+        />
+
+        {/* Main content area — full width on mobile, offset for the sidebar
+            on lg+ where the sidebar is permanently visible. */}
+        <div className="lg:pl-64">
+          <DashboardHeader />
+
+          <main className="p-4 sm:p-6 lg:p-8">{children}</main>
+        </div>
+      </MobileSidebarProvider>
     </div>
   )
 }

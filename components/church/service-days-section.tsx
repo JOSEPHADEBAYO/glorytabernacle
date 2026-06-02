@@ -12,6 +12,7 @@ import {
   Dumbbell,
   Music,
   type LucideIcon,
+  Book,
 } from 'lucide-react'
 import { MountUpPushOptIn } from './mount-up-push-opt-in'
 
@@ -25,7 +26,7 @@ type ItemIcon =
   | 'footprints'
   | 'dumbbell'
   | 'music'
-
+  | 'book'
 interface ServiceItem {
   /** Bold service name, displayed prominently on the card. */
   name: string
@@ -56,6 +57,7 @@ const ITEM_ICON_MAP: Record<ItemIcon, LucideIcon> = {
   footprints: Footprints,
   dumbbell: Dumbbell,
   music: Music,
+  book: Book,
 }
 
 const SERVICE_COLUMNS: ServiceColumn[] = [
@@ -82,7 +84,7 @@ const SERVICE_COLUMNS: ServiceColumn[] = [
         icon: 'sparkles',
       },
       {
-        name: 'Anointing & Healing',
+        name: 'Anointing & Healing Service',
         day: 'Last Sunday of the month',
         time: '10:00am',
         icon: 'heart-handshake',
@@ -93,6 +95,12 @@ const SERVICE_COLUMNS: ServiceColumn[] = [
     title: 'Weekly Activities',
     icon: 'calendar',
     items: [
+      {
+        name: 'Exploratory Bible Study',
+        day: 'Wednesday',
+        time: '7:00pm',
+        icon: 'book',
+      },
       {
         name: 'Scripts2Streets (S2S)',
         day: 'Saturdays',
@@ -129,6 +137,11 @@ const SERVICE_COLUMNS: ServiceColumn[] = [
         name: 'Gathering of Worshippers',
         day: 'Quarterly · Friday evenings',
         icon: 'music',
+      },
+      {
+        name: 'Divine Visitation',
+        day: 'Monthly · Special 3-day prayer meeting',
+        icon: 'heart-handshake',
       },
     ],
   },

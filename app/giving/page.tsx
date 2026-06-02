@@ -108,7 +108,7 @@ export default function GivingPage() {
               <CardHeader
                 icon={<Building2 className="h-4 w-4" style={{ color: 'rgba(0,6,102,1)' }} />}
                 title="Bank Transfer (UK)"
-                subtitle="RCCG GLORY TABERNACLE"
+                subtitle="Llyods bank"
               />
               <div className="flex flex-col gap-1.5 rounded-xl bg-gray-50 p-3">
                 <DetailRow label="Name" value="RCCG GLORY TABERNACLE" />

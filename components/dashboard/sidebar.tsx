@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import Image from 'next/image'
+import { useMobileSidebar } from './mobile-sidebar-context'
 
 interface NavItem {
   id: string
@@ -260,6 +261,7 @@ export function Sidebar({
   userRole?: string | null
 }) {
   const pathname = usePathname()
+  const { isOpen, close } = useMobileSidebar()
 
   const isActive = (href: string) => {
     if (href === '/dashboard') {
@@ -274,17 +276,51 @@ export function Sidebar({
   )
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 bg-white border-r border-gray-200 flex flex-col z-40">
-      {/* Logo */}
-      <div className="h-16 flex items-center px-6 border-b border-gray-200">
-        <Image
-          src="/logo-with-no-bg.png"
-          alt="RCCG Glory Tabernacle, Barnstaple"
-          width={140}
-          height={40}
-          className="object-contain"
+    <>
+      {/* Mobile backdrop — only renders below lg, and only while the drawer
+          is open. Tapping it closes the sidebar. */}
+      {isOpen && (
+        <button
+          type="button"
+          aria-label="Close menu"
+          onClick={close}
+          className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm lg:hidden"
         />
-      </div>
+      )}
+
+      <aside
+        aria-label="Dashboard navigation"
+        className={`fixed left-0 top-0 h-screen w-64 max-w-[85vw] bg-white border-r border-gray-200 flex flex-col z-40 transition-transform duration-300 ease-in-out ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        } lg:translate-x-0`}
+      >
+        {/* Logo + mobile close button */}
+        <div className="h-16 flex items-center justify-between px-6 border-b border-gray-200">
+          <Image
+            src="/logo-with-no-bg.png"
+            alt="RCCG Glory Tabernacle, Barnstaple"
+            width={140}
+            height={40}
+            className="object-contain"
+          />
+          <button
+            type="button"
+            onClick={close}
+            aria-label="Close menu"
+            className="lg:hidden p-2 -mr-2 rounded-lg text-gray-500 hover:bg-gray-100"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="w-5 h-5"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto py-6 px-3">
@@ -295,6 +331,7 @@ export function Sidebar({
               <Link
                 key={item.id}
                 href={item.href}
+                onClick={close}
                 className={`
                   flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all
                   ${
@@ -342,5 +379,6 @@ export function Sidebar({
         </div>
       </div>
     </aside>
+    </>
   )
 }
