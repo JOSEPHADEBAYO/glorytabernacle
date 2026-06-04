@@ -68,7 +68,7 @@ const SERVICE_COLUMNS: ServiceColumn[] = [
       {
         name: '1st Service',
         day: 'Every Sunday',
-        time: '9:00am',
+        time: '10:00am',
         icon: 'church',
       },
       {
