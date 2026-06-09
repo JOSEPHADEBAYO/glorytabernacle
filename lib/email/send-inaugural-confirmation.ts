@@ -11,7 +11,11 @@
  */
 
 import { Resend } from 'resend'
-import { INAUGURAL_THEME } from '@/lib/types/inaugural-registration'
+import {
+  INAUGURAL_THEME,
+  INAUGURAL_SERVICE_TIME,
+  INAUGURAL_SERVICE_VENUE,
+} from '@/lib/types/inaugural-registration'
 
 export interface SendInauguralConfirmationArgs {
   to: string
@@ -125,6 +129,26 @@ function buildHtml(args: SendInauguralConfirmationArgs): string {
                   </tr>
                 </table>
 
+                <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin:0 0 24px 0;border:1px solid #eee;border-radius:8px;">
+                  <tr>
+                    <td style="padding:16px 22px;font-size:13px;line-height:1.6;color:#1a1a1a;border-bottom:1px solid #eee;">
+                      <strong style="color:rgba(27,34,119,1);">Starts:</strong> ${escapeHtml(INAUGURAL_SERVICE_TIME)}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding:16px 22px;font-size:13px;line-height:1.6;color:#1a1a1a;border-bottom:1px solid #eee;">
+                      <strong style="color:rgba(27,34,119,1);">Venue:</strong> ${escapeHtml(INAUGURAL_SERVICE_VENUE.name)}<br />
+                      <span style="color:#666;">${escapeHtml(INAUGURAL_SERVICE_VENUE.address)}</span><br />
+                      <a href="${escapeHtml(INAUGURAL_SERVICE_VENUE.directionsUrl)}" style="display:inline-block;margin-top:6px;color:rgb(27,109,36);text-decoration:none;font-weight:bold;font-size:12px;">Get directions →</a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding:16px 22px;font-size:13px;line-height:1.6;color:#1a1a1a;">
+                      <strong style="color:rgba(27,34,119,1);">Parking:</strong> ${escapeHtml(INAUGURAL_SERVICE_VENUE.parkingNotes)}
+                    </td>
+                  </tr>
+                </table>
+
                 <p style="margin:0 0 24px 0;"><a href="${escapeHtml(programmeUrl)}" style="display:inline-block;padding:12px 24px;background:rgba(27,109,36,1);color:#ffffff;text-decoration:none;border-radius:8px;font-weight:bold;font-size:14px;">View the programme</a></p>
 
                 <p style="margin:0 0 8px 0;font-size:14px;line-height:1.7;color:#555;">In Christ,</p>
@@ -150,6 +174,10 @@ function buildText(args: SendInauguralConfirmationArgs): string {
   )
   lines.push('')
   lines.push(`Service date: ${formatEventDate(args.eventDate)}`)
+  lines.push(`Starts: ${INAUGURAL_SERVICE_TIME}`)
+  lines.push(`Venue: ${INAUGURAL_SERVICE_VENUE.name}, ${INAUGURAL_SERVICE_VENUE.address}`)
+  lines.push(`Parking: ${INAUGURAL_SERVICE_VENUE.parkingNotes}`)
+  lines.push(`Directions: ${INAUGURAL_SERVICE_VENUE.directionsUrl}`)
   lines.push('')
   lines.push(`Your registration ID: ${args.registrationId}`)
   lines.push("Please save this email — you'll need this ID at the door so we can issue your printed badge.")

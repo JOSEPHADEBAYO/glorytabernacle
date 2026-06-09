@@ -3,12 +3,28 @@ import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import {
   INAUGURAL_ADMIN_ROLES,
+  CHILDREN_AGE_GROUPS,
   formatRegistrationId,
+  type ChildrenAgeGroup,
 } from '@/lib/types/inaugural-registration'
 import {
   InauguralManager,
   type DashboardInauguralRegistration,
 } from '@/components/dashboard/inaugural-manager'
+
+/**
+ * Narrow Prisma's JsonValue into the typed ChildrenAgeGroup[] the dashboard
+ * expects. Defensive — keeps only known age-group labels and drops anything
+ * malformed (legacy rows, hand-edited DB writes, etc.).
+ */
+function narrowAgeGroups(value: unknown): ChildrenAgeGroup[] | null {
+  if (!Array.isArray(value)) return null
+  const known = new Set<string>(CHILDREN_AGE_GROUPS)
+  const filtered = value.filter(
+    (v): v is ChildrenAgeGroup => typeof v === 'string' && known.has(v)
+  )
+  return filtered.length > 0 ? filtered : null
+}
 
 const PAGE_SIZE = 25
 
@@ -47,6 +63,7 @@ export default async function InauguralServiceDashboardPage() {
   const initialRows: DashboardInauguralRegistration[] = rows.map((r) => ({
     ...r,
     registrationId: formatRegistrationId(r.serialNumber),
+    childrenAgeGroups: narrowAgeGroups(r.childrenAgeGroups),
   }))
 
   return (

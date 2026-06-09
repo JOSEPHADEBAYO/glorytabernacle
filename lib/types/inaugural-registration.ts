@@ -19,6 +19,36 @@ export const INAUGURAL_THEME = {
   scripture: 'Haggai 2:9',
 } as const
 
+/** Service start time displayed alongside the date everywhere — kept here
+ *  rather than parsed off the date so the format stays consistent. */
+export const INAUGURAL_SERVICE_TIME = '1:00pm'
+
+/** Venue details displayed on the registration page hero, confirmation
+ *  email, programme page, and homepage CTA. Single source of truth so the
+ *  address (and the parking note) only needs editing in one place. */
+export const INAUGURAL_SERVICE_VENUE = {
+  name: 'North Devon College',
+  address: 'Old Sticklepath Hill, Barnstaple, EX31 2BQ',
+  // Free-text parking note. Tweak this when the parking plan is finalised
+  // (overflow lot, marshals, etc.) and every touchpoint picks it up.
+  parkingNotes: 'Free on-site parking available. Stewards will direct you on arrival.',
+  // Google Maps deep link so the email and CTA can offer a "Get directions"
+  // button. Update if the parking entrance differs from the venue postcode.
+  directionsUrl:
+    'https://maps.google.com/?q=North+Devon+College+Old+Sticklepath+Hill+Barnstaple+EX31+2BQ',
+} as const
+
+/** Multi-select options for the "Bringing children?" registration question.
+ *  Kept short and unambiguous so checkbox labels read cleanly on mobile and
+ *  the dashboard chips stay scannable. */
+export const CHILDREN_AGE_GROUPS = [
+  'Under 2',
+  '2-5',
+  '6-11',
+  '12-17',
+] as const
+export type ChildrenAgeGroup = (typeof CHILDREN_AGE_GROUPS)[number]
+
 /** Year embedded in the human-readable ID. Update if the badge series ever
  *  rolls over to a new year. */
 export const INAUGURAL_ID_YEAR = 2026
@@ -60,5 +90,9 @@ export interface InauguralRegistration {
   fromOutsideBarnstaple: boolean
   homeChurch: string | null
   photographyConsent: boolean
+  bringingChildren: boolean
+  numberOfChildren: number | null
+  childrenAgeGroups: ChildrenAgeGroup[] | null
+  childrenSpecialNeeds: string | null
   createdAt: Date
 }

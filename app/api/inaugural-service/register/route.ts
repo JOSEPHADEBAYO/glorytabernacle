@@ -42,6 +42,19 @@ export async function POST(request: NextRequest) {
       ? data.homeChurch ?? null
       : null
 
+    // Same coherence pattern for the children block: null everything when
+    // the registrant isn't bringing kids, so the DB never carries orphan
+    // counts / age groups / special-needs notes.
+    const numberOfChildren = data.bringingChildren
+      ? data.numberOfChildren ?? null
+      : null
+    const childrenAgeGroups = data.bringingChildren
+      ? data.childrenAgeGroups ?? null
+      : null
+    const childrenSpecialNeeds = data.bringingChildren
+      ? data.childrenSpecialNeeds?.trim() || null
+      : null
+
     try {
       const created = await prisma.inauguralRegistration.create({
         data: {
@@ -54,6 +67,10 @@ export async function POST(request: NextRequest) {
           fromOutsideBarnstaple: data.fromOutsideBarnstaple,
           homeChurch,
           photographyConsent: data.photographyConsent,
+          bringingChildren: data.bringingChildren,
+          numberOfChildren,
+          childrenAgeGroups: childrenAgeGroups ?? undefined,
+          childrenSpecialNeeds,
         },
       })
 

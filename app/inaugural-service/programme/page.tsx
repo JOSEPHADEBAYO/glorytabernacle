@@ -8,8 +8,10 @@ import {
   parseRegistrationId,
   INAUGURAL_SERVICE_DATE,
   INAUGURAL_THEME,
+  INAUGURAL_SERVICE_TIME,
+  INAUGURAL_SERVICE_VENUE,
 } from '@/lib/types/inaugural-registration'
-import { Sparkles } from 'lucide-react'
+import { Sparkles, Clock3, MapPin, Car } from 'lucide-react'
 
 export const metadata = {
   title: 'Inaugural Service — Programme | RCCG Glory Tabernacle, Barnstaple',
@@ -79,8 +81,32 @@ export default async function ProgrammePage({ searchParams }: PageProps) {
               Theme: <span className="font-bold not-italic">{INAUGURAL_THEME.title}</span> · {INAUGURAL_THEME.scripture}
             </p>
             <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-white/80">
-              {eventDate} · RCCG Glory Tabernacle, Barnstaple
+              {eventDate}
             </p>
+            <div className="mx-auto mt-6 grid max-w-3xl grid-cols-1 gap-3 text-left text-sm sm:grid-cols-3">
+              <div className="flex items-start gap-3 rounded-xl border border-white/20 bg-white/5 px-4 py-3 backdrop-blur-sm">
+                <Clock3 className="mt-0.5 h-4 w-4 shrink-0 text-[rgba(163,246,156,1)]" aria-hidden="true" />
+                <div>
+                  <p className="text-[0.65rem] font-extrabold uppercase tracking-[0.2em] text-white/60">Starts</p>
+                  <p className="font-bold text-white">{INAUGURAL_SERVICE_TIME}</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 rounded-xl border border-white/20 bg-white/5 px-4 py-3 backdrop-blur-sm">
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[rgba(163,246,156,1)]" aria-hidden="true" />
+                <div className="min-w-0">
+                  <p className="text-[0.65rem] font-extrabold uppercase tracking-[0.2em] text-white/60">Venue</p>
+                  <p className="font-bold leading-tight text-white">{INAUGURAL_SERVICE_VENUE.name}</p>
+                  <p className="text-xs leading-tight text-white/70">{INAUGURAL_SERVICE_VENUE.address}</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 rounded-xl border border-white/20 bg-white/5 px-4 py-3 backdrop-blur-sm">
+                <Car className="mt-0.5 h-4 w-4 shrink-0 text-[rgba(163,246,156,1)]" aria-hidden="true" />
+                <div>
+                  <p className="text-[0.65rem] font-extrabold uppercase tracking-[0.2em] text-white/60">Parking</p>
+                  <p className="text-xs leading-relaxed text-white/85">{INAUGURAL_SERVICE_VENUE.parkingNotes}</p>
+                </div>
+              </div>
+            </div>
             {parsedId && (
               <p className="mt-4 inline-block rounded-full border border-white/30 px-4 py-1.5 font-mono text-sm tracking-wider text-white/90">
                 {parsedId}

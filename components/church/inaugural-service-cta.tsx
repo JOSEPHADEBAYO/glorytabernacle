@@ -1,6 +1,10 @@
 import Link from 'next/link'
-import { Calendar, Sparkles, ArrowRight } from 'lucide-react'
-import { INAUGURAL_THEME } from '@/lib/types/inaugural-registration'
+import { Calendar, Sparkles, ArrowRight, MapPin } from 'lucide-react'
+import {
+  INAUGURAL_THEME,
+  INAUGURAL_SERVICE_TIME,
+  INAUGURAL_SERVICE_VENUE,
+} from '@/lib/types/inaugural-registration'
 
 /**
  * Eye-catching CTA banner on the homepage pointing to the inaugural-service
@@ -44,9 +48,15 @@ export function InauguralServiceCta() {
             Theme: <span className="font-bold not-italic">{INAUGURAL_THEME.title}</span> · {INAUGURAL_THEME.scripture}
           </p>
 
-          <div className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-white/80 md:text-base">
-            <Calendar className="h-4 w-4" aria-hidden="true" />
-            Sunday, 19 July 2026 · 10:00am
+          <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-semibold text-white/80 md:text-base">
+            <span className="inline-flex items-center gap-2">
+              <Calendar className="h-4 w-4" aria-hidden="true" />
+              Sunday, 19 July 2026 · {INAUGURAL_SERVICE_TIME}
+            </span>
+            <span className="inline-flex items-center gap-2 text-white/70">
+              <MapPin className="h-4 w-4" aria-hidden="true" />
+              {INAUGURAL_SERVICE_VENUE.name}, {INAUGURAL_SERVICE_VENUE.address}
+            </span>
           </div>
 
           <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/70 md:text-base">

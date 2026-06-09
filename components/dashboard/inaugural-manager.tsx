@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useToast } from '@/components/ui/toast-provider'
 import { GENDER_LABELS, type Gender } from '@/lib/types/group-member'
+import { type ChildrenAgeGroup } from '@/lib/types/inaugural-registration'
 import { InauguralBadge, type BadgeData } from './inaugural-badge'
 
 export interface DashboardInauguralRegistration {
@@ -18,6 +19,10 @@ export interface DashboardInauguralRegistration {
   fromOutsideBarnstaple: boolean
   homeChurch: string | null
   photographyConsent: boolean
+  bringingChildren: boolean
+  numberOfChildren: number | null
+  childrenAgeGroups: ChildrenAgeGroup[] | null
+  childrenSpecialNeeds: string | null
   createdAt: Date | string
 }
 
@@ -192,6 +197,7 @@ export function InauguralManager({
               <Th>RCCG?</Th>
               <Th>From</Th>
               <Th>Photo</Th>
+              <Th>Children</Th>
               <Th>Submitted</Th>
               <th className="px-4 py-3" aria-label="Actions" />
             </tr>
@@ -199,7 +205,7 @@ export function InauguralManager({
           <tbody className="divide-y divide-gray-200 bg-white">
             {data.registrations.length === 0 ? (
               <tr>
-                <td colSpan={9} className="px-6 py-12 text-center text-sm text-gray-500">
+                <td colSpan={10} className="px-6 py-12 text-center text-sm text-gray-500">
                   {isLoading ? 'Loading…' : 'No registrations match your search.'}
                 </td>
               </tr>
@@ -245,6 +251,37 @@ export function InauguralManager({
                     <Pill kind={r.photographyConsent ? 'green' : 'gray'}>
                       {r.photographyConsent ? '📸 Yes' : 'No'}
                     </Pill>
+                  </Td>
+                  <Td>
+                    {r.bringingChildren ? (
+                      <div className="flex flex-col gap-1">
+                        <span className="text-xs font-bold text-[#000666]">
+                          👨‍👩‍👧 {r.numberOfChildren ?? '—'}
+                        </span>
+                        {r.childrenAgeGroups && r.childrenAgeGroups.length > 0 && (
+                          <span className="flex flex-wrap gap-1">
+                            {r.childrenAgeGroups.map((age) => (
+                              <span
+                                key={age}
+                                className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-700"
+                              >
+                                {age}
+                              </span>
+                            ))}
+                          </span>
+                        )}
+                        {r.childrenSpecialNeeds && (
+                          <span
+                            className="text-[10px] italic text-gray-500"
+                            title={r.childrenSpecialNeeds}
+                          >
+                            ⚠ note
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-xs text-gray-400">None</span>
+                    )}
                   </Td>
                   <Td>{formatDate(r.createdAt)}</Td>
                   <td className="px-4 py-3 whitespace-nowrap text-right">

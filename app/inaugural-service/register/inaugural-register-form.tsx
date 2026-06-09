@@ -3,6 +3,10 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { CheckCircle2, Send } from 'lucide-react'
+import {
+  CHILDREN_AGE_GROUPS,
+  type ChildrenAgeGroup,
+} from '@/lib/types/inaugural-registration'
 
 interface SuccessState {
   registrationId: string
@@ -18,6 +22,16 @@ export function InauguralRegisterForm() {
   const [success, setSuccess] = useState<SuccessState | null>(null)
   const [fromOutside, setFromOutside] = useState(false)
   const [photoConsent, setPhotoConsent] = useState<boolean | null>(null)
+  const [bringingChildren, setBringingChildren] = useState<boolean | null>(null)
+  const [childAgeGroups, setChildAgeGroups] = useState<ChildrenAgeGroup[]>([])
+
+  function toggleAgeGroup(group: ChildrenAgeGroup) {
+    setChildAgeGroups((current) =>
+      current.includes(group)
+        ? current.filter((g) => g !== group)
+        : [...current, group]
+    )
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -26,6 +40,11 @@ export function InauguralRegisterForm() {
 
     const form = event.currentTarget
     const formData = new FormData(form)
+    const rawNumberOfChildren = formData.get('numberOfChildren')
+    const numberOfChildren =
+      bringingChildren && typeof rawNumberOfChildren === 'string' && rawNumberOfChildren.trim()
+        ? Number(rawNumberOfChildren)
+        : undefined
     const payload = {
       firstName: formData.get('firstName'),
       lastName: formData.get('lastName'),
@@ -36,11 +55,20 @@ export function InauguralRegisterForm() {
       fromOutsideBarnstaple: fromOutside,
       homeChurch: fromOutside ? formData.get('homeChurch') : undefined,
       photographyConsent: photoConsent ?? false,
+      bringingChildren: bringingChildren ?? false,
+      numberOfChildren,
+      childrenAgeGroups: bringingChildren ? childAgeGroups : undefined,
+      childrenSpecialNeeds: bringingChildren
+        ? (formData.get('childrenSpecialNeeds') as string | null) ?? undefined
+        : undefined,
     }
 
     try {
       if (photoConsent === null) {
         throw new Error('Please answer the photography question before submitting.')
+      }
+      if (bringingChildren === null) {
+        throw new Error('Please tell us whether you are bringing children.')
       }
       const res = await fetch('/api/inaugural-service/register', {
         method: 'POST',
@@ -58,6 +86,8 @@ export function InauguralRegisterForm() {
         form.reset()
         setFromOutside(false)
         setPhotoConsent(null)
+        setBringingChildren(null)
+        setChildAgeGroups([])
         return
       }
 
@@ -168,6 +198,97 @@ export function InauguralRegisterForm() {
           />
         </section>
       )}
+
+      <section className="mt-6">
+        <fieldset className="rounded-lg bg-gray-50 p-5">
+          <legend className="mb-1 text-sm font-bold text-gray-900">
+            Are you bringing children?
+          </legend>
+          <p className="mb-3 text-xs leading-relaxed text-gray-600">
+            We&apos;d like to plan space, activities, and supervision in advance, so let us know if children will be joining you.
+          </p>
+          <div className="flex items-center gap-7">
+            {(['Yes', 'No'] as const).map((answer) => (
+              <label
+                key={answer}
+                className="flex items-center gap-2 text-sm text-gray-700"
+              >
+                <input
+                  type="radio"
+                  name="bringingChildren"
+                  value={answer.toLowerCase()}
+                  required
+                  checked={bringingChildren === (answer === 'Yes')}
+                  onChange={() => setBringingChildren(answer === 'Yes')}
+                  className="h-4 w-4 border-gray-400 text-[#000666] focus:ring-[#000666]"
+                />
+                {answer}
+              </label>
+            ))}
+          </div>
+
+          {bringingChildren && (
+            <div className="mt-5 space-y-5 border-t border-gray-200 pt-5">
+              <label className="block max-w-xs">
+                <span className="mb-2 block text-[0.7rem] font-extrabold uppercase tracking-[0.18em] text-gray-500">
+                  How many children?
+                </span>
+                <input
+                  type="number"
+                  name="numberOfChildren"
+                  min={1}
+                  max={20}
+                  required
+                  placeholder="e.g. 2"
+                  className="h-12 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none focus:border-[#000666] focus:ring-2 focus:ring-[#000666]/20"
+                />
+              </label>
+
+              <div>
+                <span className="mb-2 block text-[0.7rem] font-extrabold uppercase tracking-[0.18em] text-gray-500">
+                  Age group(s) — tick all that apply
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {CHILDREN_AGE_GROUPS.map((group) => {
+                    const checked = childAgeGroups.includes(group)
+                    return (
+                      <label
+                        key={group}
+                        className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-semibold transition ${
+                          checked
+                            ? 'border-[#1b6d24] bg-[#1b6d24]/10 text-[#1b6d24]'
+                            : 'border-gray-300 bg-white text-gray-700 hover:border-[#000666]'
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => toggleAgeGroup(group)}
+                          className="h-3.5 w-3.5 rounded border-gray-400 text-[#1b6d24] focus:ring-[#1b6d24]"
+                        />
+                        {group}
+                      </label>
+                    )
+                  })}
+                </div>
+              </div>
+
+              <label className="block">
+                <span className="mb-2 block text-[0.7rem] font-extrabold uppercase tracking-[0.18em] text-gray-500">
+                  Any special needs we should be aware of? <span className="lowercase text-gray-400">(optional)</span>
+                </span>
+                <textarea
+                  name="childrenSpecialNeeds"
+                  rows={3}
+                  maxLength={1000}
+                  placeholder="Allergies, mobility, sensory needs, etc."
+                  className="w-full resize-none rounded-lg border border-gray-300 bg-white p-4 text-sm leading-6 text-gray-900 outline-none focus:border-[#000666] focus:ring-2 focus:ring-[#000666]/20"
+                />
+              </label>
+            </div>
+          )}
+        </fieldset>
+      </section>
 
       <section className="mt-6">
         <fieldset className="rounded-lg bg-gray-50 p-5">

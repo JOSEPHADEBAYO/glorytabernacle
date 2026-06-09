@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { GENDERS } from '@/lib/types/group-member'
+import { CHILDREN_AGE_GROUPS } from '@/lib/types/inaugural-registration'
 
 const requiredText = (label: string, max = 200) =>
   z
@@ -36,6 +37,26 @@ export const createInauguralRegistrationSchema = z
     // get an explicit answer rather than an absent field defaulting to
     // false silently.
     photographyConsent: z.boolean(),
+    // Children-attending block. Server treats numberOfChildren / age
+    // groups / special needs as optional at the field level, then the
+    // .refine() below enforces the conditional pairing when
+    // bringingChildren is true.
+    bringingChildren: z.boolean(),
+    numberOfChildren: z
+      .number()
+      .int()
+      .min(1, 'Please enter at least 1 child.')
+      .max(20, 'Please contact us directly for groups of more than 20 children.')
+      .optional(),
+    childrenAgeGroups: z
+      .array(z.enum(CHILDREN_AGE_GROUPS))
+      .max(CHILDREN_AGE_GROUPS.length)
+      .optional(),
+    childrenSpecialNeeds: z
+      .string()
+      .trim()
+      .max(1000, 'Special needs note is too long.')
+      .optional(),
   })
   .refine(
     (data) => {
@@ -47,6 +68,30 @@ export const createInauguralRegistrationSchema = z
     {
       path: ['homeChurch'],
       message: "Please tell us which church you'll be travelling from.",
+    }
+  )
+  .refine(
+    (data) => {
+      if (data.bringingChildren) {
+        return typeof data.numberOfChildren === 'number' && data.numberOfChildren >= 1
+      }
+      return true
+    },
+    {
+      path: ['numberOfChildren'],
+      message: 'Please tell us how many children you are bringing.',
+    }
+  )
+  .refine(
+    (data) => {
+      if (data.bringingChildren) {
+        return Array.isArray(data.childrenAgeGroups) && data.childrenAgeGroups.length >= 1
+      }
+      return true
+    },
+    {
+      path: ['childrenAgeGroups'],
+      message: 'Please tick at least one age group.',
     }
   )
 

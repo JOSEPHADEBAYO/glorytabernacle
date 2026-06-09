@@ -672,6 +672,14 @@ model InauguralRegistration {
   // to know which attendees consented to appearing in church publications /
   // social posts. Defaults to false so a missing answer = no photography.
   photographyConsent    Boolean  @default(false)
+  // Children-attending fields. `bringingChildren` is the binary; the rest
+  // are only meaningful when it's true (Zod enforces that on the public
+  // POST endpoint). Storing age groups as JSON keeps the multi-select
+  // intact while still allowing aggregate analytics later.
+  bringingChildren      Boolean  @default(false)
+  numberOfChildren      Int?
+  childrenAgeGroups     Json?
+  childrenSpecialNeeds  String?  @db.Text
   createdAt             DateTime @default(now())
 
   @@index([createdAt])

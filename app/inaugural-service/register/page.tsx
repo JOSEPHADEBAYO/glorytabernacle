@@ -1,7 +1,12 @@
 import Image from 'next/image'
+import { Clock3, MapPin, Car } from 'lucide-react'
 import { TopNavBar } from '@/components/church/nav-bar'
 import { Footer } from '@/components/church/footer'
-import { INAUGURAL_THEME } from '@/lib/types/inaugural-registration'
+import {
+  INAUGURAL_THEME,
+  INAUGURAL_SERVICE_TIME,
+  INAUGURAL_SERVICE_VENUE,
+} from '@/lib/types/inaugural-registration'
 import { InauguralRegisterForm } from './inaugural-register-form'
 
 export const metadata = {
@@ -44,8 +49,33 @@ export default function InauguralRegisterPage() {
               </span>
             </div>
             <p className="mt-5 max-w-2xl text-base leading-7 text-white/80">
-              Sunday, 19 July 2026 · RCCG Glory Tabernacle, Barnstaple. Save your seat and pick up a personal printed badge at the door.
+              Sunday, 19 July 2026. Save your seat and pick up a personal printed badge at the door.
             </p>
+
+            <div className="mt-6 grid max-w-3xl grid-cols-1 gap-3 text-sm sm:grid-cols-3">
+              <div className="flex items-start gap-3 rounded-xl border border-white/20 bg-white/5 px-4 py-3 backdrop-blur-sm">
+                <Clock3 className="mt-0.5 h-4 w-4 shrink-0 text-[rgba(163,246,156,1)]" aria-hidden="true" />
+                <div>
+                  <p className="text-[0.65rem] font-extrabold uppercase tracking-[0.2em] text-white/60">Starts</p>
+                  <p className="font-bold text-white">{INAUGURAL_SERVICE_TIME}</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 rounded-xl border border-white/20 bg-white/5 px-4 py-3 backdrop-blur-sm">
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[rgba(163,246,156,1)]" aria-hidden="true" />
+                <div className="min-w-0">
+                  <p className="text-[0.65rem] font-extrabold uppercase tracking-[0.2em] text-white/60">Venue</p>
+                  <p className="font-bold leading-tight text-white">{INAUGURAL_SERVICE_VENUE.name}</p>
+                  <p className="text-xs leading-tight text-white/70">{INAUGURAL_SERVICE_VENUE.address}</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 rounded-xl border border-white/20 bg-white/5 px-4 py-3 backdrop-blur-sm">
+                <Car className="mt-0.5 h-4 w-4 shrink-0 text-[rgba(163,246,156,1)]" aria-hidden="true" />
+                <div>
+                  <p className="text-[0.65rem] font-extrabold uppercase tracking-[0.2em] text-white/60">Parking</p>
+                  <p className="text-xs leading-relaxed text-white/85">{INAUGURAL_SERVICE_VENUE.parkingNotes}</p>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
