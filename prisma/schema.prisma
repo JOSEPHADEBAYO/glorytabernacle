@@ -647,6 +647,33 @@ model VolunteerInterest {
   @@index([createdAt])
 }
 
+// Inaugural Service registration — one row per person who registers for the
+// 19 July 2026 inaugural service at RCCG Glory Tabernacle, Barnstaple. The
+// `serialNumber` is the source of the human-readable badge ID
+// (e.g. GT-2026-0001), assigned automatically by Postgres so concurrent
+// registrations can't collide. `id` (cuid) is what URLs and the QR code
+// reference internally.
+model InauguralRegistration {
+  id                    String   @id @default(cuid())
+  serialNumber          Int      @default(autoincrement()) @unique
+  firstName             String
+  lastName              String
+  email                 String   @unique
+  gender                Gender
+  address               String   @db.Text
+  // True if the registrant says they're an RCCG member.
+  isRccgMember          Boolean
+  // True if they're travelling to the service from outside Barnstaple.
+  fromOutsideBarnstaple Boolean
+  // Only populated when fromOutsideBarnstaple = true. Zod enforces that
+  // constraint on the public POST endpoint.
+  homeChurch            String?
+  createdAt             DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([serialNumber])
+}
+
 // Program Interest — general "stay in the loop" signups captured by the
 // "Get Notified" modal on the homepage live-stream section. Distinct from
 // EventNotification (which is tied to a specific event for cron reminders).

@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic'
 import { TopNavBar } from '@/components/church/nav-bar'
 import { HeroSection } from '@/components/church/hero'
 import { LiveStreamSection } from '@/components/church/live-stream-section'
+import { InauguralServiceCta } from '@/components/church/inaugural-service-cta'
 import {
   EventAnnouncementModal,
   type AnnouncementEvent,
@@ -531,6 +532,9 @@ export default async function Home() {
           eventId={nextEvent.id}
         />
       )}
+      {/* Inaugural service CTA — high-priority, sits right after the
+          countdown so it gets a prominent slot above the About section. */}
+      <InauguralServiceCta />
       <AboutSection
         eyebrow="Our Foundation"
         heading="A Tabernacle for His Glory"

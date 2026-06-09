@@ -1,0 +1,144 @@
+import Image from 'next/image'
+import Link from 'next/link'
+import { TopNavBar } from '@/components/church/nav-bar'
+import { Footer } from '@/components/church/footer'
+import { prisma } from '@/lib/prisma'
+import {
+  formatRegistrationId,
+  parseRegistrationId,
+  INAUGURAL_SERVICE_DATE,
+} from '@/lib/types/inaugural-registration'
+import { Sparkles } from 'lucide-react'
+
+export const metadata = {
+  title: 'Inaugural Service — Programme | RCCG Glory Tabernacle, Barnstaple',
+}
+
+export const dynamic = 'force-dynamic'
+
+interface PageProps {
+  searchParams: Promise<{ id?: string }>
+}
+
+/**
+ * Programme landing page hit when a badge's QR code is scanned. Today it's
+ * a placeholder — verifies the registration ID exists, welcomes the
+ * registrant by name, and tells them the schedule is coming soon. The real
+ * schedule + booklet UI will replace the placeholder content below without
+ * needing changes to the badge or the URL pattern.
+ */
+export default async function ProgrammePage({ searchParams }: PageProps) {
+  const { id } = await searchParams
+  const eventDate = INAUGURAL_SERVICE_DATE.toLocaleDateString('en-GB', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
+
+  let registrant: { firstName: string; serialNumber: number } | null = null
+  let parsedId: string | null = null
+  if (id) {
+    const serial = parseRegistrationId(id)
+    if (serial !== null) {
+      try {
+        registrant = await prisma.inauguralRegistration.findUnique({
+          where: { serialNumber: serial },
+          select: { firstName: true, serialNumber: true },
+        })
+        if (registrant) parsedId = formatRegistrationId(registrant.serialNumber)
+      } catch (err) {
+        console.error('Programme page: registrant lookup failed', err)
+      }
+    }
+  }
+
+  return (
+    <>
+      <TopNavBar />
+      <main className="bg-[#f4f4f4]">
+        <section className="relative flex min-h-[28rem] items-center overflow-hidden pt-16">
+          <Image
+            src="https://images.unsplash.com/photo-1438032005730-c779502df39b?w=1920&auto=format&fit=crop&q=80"
+            alt=""
+            fill
+            priority
+            className="object-cover object-center"
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-[#000666]/85" />
+          <div className="relative z-10 mx-auto w-full max-w-[var(--container-max)] px-[var(--section-padding-x)] py-16 text-center text-white">
+            <p className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-[rgba(163,246,156,1)]">
+              Inaugural Service · Programme
+            </p>
+            <h1 className="mx-auto max-w-3xl text-4xl font-extrabold leading-tight md:text-6xl">
+              {registrant ? `Welcome, ${registrant.firstName}` : 'Welcome'}
+            </h1>
+            <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-white/80">
+              {eventDate} · RCCG Glory Tabernacle, Barnstaple
+            </p>
+            {parsedId && (
+              <p className="mt-4 inline-block rounded-full border border-white/30 px-4 py-1.5 font-mono text-sm tracking-wider text-white/90">
+                {parsedId}
+              </p>
+            )}
+          </div>
+        </section>
+
+        <section className="px-[var(--section-padding-x)] py-16">
+          <div className="mx-auto max-w-3xl rounded-2xl bg-white px-6 py-12 text-center shadow-[0_18px_50px_rgba(0,6,102,0.08)] md:px-10">
+            <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-[#1b6d24]/10">
+              <Sparkles className="h-7 w-7 text-[#1b6d24]" aria-hidden="true" />
+            </div>
+            <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#1b6d24]">
+              Programme coming soon
+            </p>
+            <h2 className="mt-3 text-3xl font-extrabold text-[#000666] md:text-4xl">
+              We&apos;re finalising the order of service
+            </h2>
+            <p className="mt-4 text-sm leading-relaxed text-gray-600 md:text-base">
+              {registrant
+                ? `Thank you for registering, ${registrant.firstName}. The full schedule and programme booklet will appear here ahead of the service. Save this page or scan your badge again any time — it&apos;ll update automatically.`
+                : 'The full schedule and programme booklet will appear here ahead of the service. If you registered, scan the QR on your badge to come back and see your personal welcome page.'}
+            </p>
+            <Link
+              href="/"
+              className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-[#000666] underline-offset-4 hover:underline"
+            >
+              Back to homepage
+            </Link>
+          </div>
+        </section>
+      </main>
+      <Footer
+        logo={{ src: '/logo.png', alt: 'RCCG Glory Tabernacle, Barnstaple' }}
+        tagline="Furnish  ·  Transform  ·  Influence"
+        columns={[
+          {
+            heading: 'Quick Links',
+            links: [
+              { label: 'Home', href: '/' },
+              { label: 'Events', href: '/events' },
+              { label: 'Volunteer', href: '/volunteer' },
+              { label: 'Contact', href: '/contact' },
+            ],
+          },
+        ]}
+        socialLinks={[
+          { platform: 'instagram', href: 'https://www.instagram.com/glorytabernaclebarnstaple?igsh=MWkxaTF0Yjd1czk3Mg%3D%3D&utm_source=qr' },
+          { platform: 'youtube', href: 'https://www.youtube.com/@glorytabernaclehq' },
+          { platform: 'facebook', href: 'https://www.facebook.com/share/1CDurcWmxG/?mibextid=wwXIfr' },
+          { platform: 'x', href: 'https://x.com/rccggthq' },
+          { platform: 'tiktok', href: 'https://www.tiktok.com/@rccgglorytabernaclebarns?_r=1&_t=ZN-965RffiNMP8X' },
+        ]}
+        contactInfo={{
+          address: 'North Devon College, Old Sticklepath Hill Barnstaple EX31 2BQ England',
+          phone: '+447478137599',
+          email: 'admin@glorytabernacle.co.uk',
+          directionsHref: 'https://maps.google.com',
+        }}
+        copyrightText={`Copyright ${new Date().getFullYear()} RCCG Glory Tabernacle, Barnstaple. All rights reserved.`}
+      />
+    </>
+  )
+}
