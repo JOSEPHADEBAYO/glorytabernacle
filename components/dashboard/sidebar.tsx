@@ -5,17 +5,42 @@ import { usePathname } from 'next/navigation'
 import Image from 'next/image'
 import { useMobileSidebar } from './mobile-sidebar-context'
 
+/**
+ * Non-Super-Admin roles that can be granted sidebar visibility. SUPER_ADMIN
+ * is intentionally not listed here — it always sees every nav item without
+ * needing to appear in any allowlist.
+ */
+type DashboardRole = 'CONTENT_EDITOR' | 'CHILDREN_LEADER' | 'YOUTH_LEADER' | 'VIEWER'
+
+/** Convenience groupings so the NAV_ITEMS table reads cleanly. */
+const ALL_ROLES: DashboardRole[] = [
+  'CONTENT_EDITOR',
+  'CHILDREN_LEADER',
+  'YOUTH_LEADER',
+  'VIEWER',
+]
+const CONTENT_ONLY: DashboardRole[] = ['CONTENT_EDITOR']
+const CHILDREN_ONLY: DashboardRole[] = ['CHILDREN_LEADER']
+const YOUTH_ONLY: DashboardRole[] = ['YOUTH_LEADER']
+
 interface NavItem {
   id: string
   label: string
   href: string
   icon: React.ReactNode
   badge?: number
+  /**
+   * Non-SUPER_ADMIN roles allowed to see this item. Omit to make the item
+   * SUPER_ADMIN-only. Safeguarding is a special case: it carries its own DSL
+   * gate on top of role checking (see filter logic below).
+   */
+  roles?: DashboardRole[]
 }
 
 const NAV_ITEMS: NavItem[] = [
   {
     id: 'overview',
+    roles: ALL_ROLES,
     label: 'Overview',
     href: '/dashboard',
     icon: (
@@ -26,6 +51,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     id: 'events',
+    roles: CONTENT_ONLY,
     label: 'Events',
     href: '/dashboard/content/events',
     icon: (
@@ -36,6 +62,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     id: 'information',
+    roles: CONTENT_ONLY,
     label: 'Information Hub',
     href: '/dashboard/content/information',
     icon: (
@@ -46,6 +73,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     id: 'program-interest',
+    roles: CONTENT_ONLY,
     label: 'Program Interest',
     href: '/dashboard/program-interest',
     icon: (
@@ -56,6 +84,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     id: 'attendance',
+    roles: CONTENT_ONLY,
     label: 'Attendance',
     href: '/dashboard/attendance',
     icon: (
@@ -66,6 +95,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     id: 'children',
+    roles: CHILDREN_ONLY,
     label: 'Children',
     href: '/dashboard/children',
     icon: (
@@ -87,6 +117,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     id: 'youth',
+    roles: YOUTH_ONLY,
     label: 'Youth Ministry',
     href: '/dashboard/content/youth',
     icon: (
@@ -97,6 +128,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     id: 'members',
+    roles: CONTENT_ONLY,
     label: 'Members',
     href: '/dashboard/members',
     icon: (
@@ -107,6 +139,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     id: 'new-members',
+    roles: CONTENT_ONLY,
     label: 'New Member',
     href: '/dashboard/new-members',
     icon: (
@@ -117,6 +150,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     id: 'volunteers',
+    roles: CONTENT_ONLY,
     label: 'Volunteers',
     href: '/dashboard/volunteers',
     icon: (
@@ -127,6 +161,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     id: 'inaugural-service',
+    roles: CONTENT_ONLY,
     label: 'Inaugural Service',
     href: '/dashboard/inaugural-service',
     icon: (
@@ -137,6 +172,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     id: 'groups',
+    roles: CONTENT_ONLY,
     label: 'Groups & Ministries',
     href: '/dashboard/content/groups',
     icon: (
@@ -147,6 +183,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     id: 'sermons',
+    roles: CONTENT_ONLY,
     label: 'Sermons',
     href: '/dashboard/content/sermons',
     icon: (
@@ -157,6 +194,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     id: 'books',
+    roles: CONTENT_ONLY,
     label: 'Books',
     href: '/dashboard/content/books',
     icon: (
@@ -167,6 +205,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     id: 'tracts',
+    roles: CONTENT_ONLY,
     label: 'Tracts',
     href: '/dashboard/content/tracts',
     icon: (
@@ -177,6 +216,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     id: 'testimonials',
+    roles: CONTENT_ONLY,
     label: 'Testimonials',
     href: '/dashboard/content/testimonials',
     icon: (
@@ -187,6 +227,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     id: 'gallery',
+    roles: CONTENT_ONLY,
     label: 'Gallery',
     href: '/dashboard/content/gallery',
     icon: (
@@ -197,6 +238,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     id: 'media',
+    roles: CONTENT_ONLY,
     label: 'Media Library',
     href: '/dashboard/media',
     icon: (
@@ -217,6 +259,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   {
     id: 'settings',
+    roles: ALL_ROLES,
     label: 'Settings',
     href: '/dashboard/settings',
     icon: (
@@ -280,10 +323,18 @@ export function Sidebar({
     return pathname.startsWith(href)
   }
 
-  // The Safeguarding log is restricted to DSL + Super Admin.
-  const navItems = NAV_ITEMS.filter(
-    (item) => item.id !== 'safeguarding' || canSeeSafeguarding
-  )
+  // Filter sidebar items by role:
+  //   • SUPER_ADMIN sees everything.
+  //   • Safeguarding is a special case — visible only when DSL flag is set
+  //     (canSeeSafeguarding); the role check is skipped for that item.
+  //   • Anything without a `roles` allowlist is SUPER_ADMIN-only (e.g. Users).
+  //   • Otherwise the user's role must be present in item.roles.
+  const navItems = NAV_ITEMS.filter((item) => {
+    if (item.id === 'safeguarding') return canSeeSafeguarding
+    if (userRole === 'SUPER_ADMIN') return true
+    if (!userRole || !item.roles) return false
+    return item.roles.includes(userRole as DashboardRole)
+  })
 
   return (
     <>
