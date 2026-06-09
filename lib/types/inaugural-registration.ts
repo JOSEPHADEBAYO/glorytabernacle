@@ -31,7 +31,7 @@ export const INAUGURAL_SERVICE_VENUE = {
   address: 'Old Sticklepath Hill, Barnstaple, EX31 2BQ',
   // Free-text parking note. Tweak this when the parking plan is finalised
   // (overflow lot, marshals, etc.) and every touchpoint picks it up.
-  parkingNotes: 'Free on-site parking available. Stewards will direct you on arrival.',
+  parkingNotes: 'Free on-site parking available. Our volunteers will direct you on arrival.',
   // Google Maps deep link so the email and CTA can offer a "Get directions"
   // button. Update if the parking entrance differs from the venue postcode.
   directionsUrl:
