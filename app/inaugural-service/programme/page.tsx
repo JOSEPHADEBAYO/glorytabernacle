@@ -7,6 +7,7 @@ import {
   formatRegistrationId,
   parseRegistrationId,
   INAUGURAL_SERVICE_DATE,
+  INAUGURAL_THEME,
 } from '@/lib/types/inaugural-registration'
 import { Sparkles } from 'lucide-react'
 
@@ -74,6 +75,9 @@ export default async function ProgrammePage({ searchParams }: PageProps) {
             <h1 className="mx-auto max-w-3xl text-4xl font-extrabold leading-tight md:text-6xl">
               {registrant ? `Welcome, ${registrant.firstName}` : 'Welcome'}
             </h1>
+            <p className="mx-auto mt-4 max-w-2xl font-serif text-lg italic text-white/90 md:text-2xl">
+              Theme: <span className="font-bold not-italic">{INAUGURAL_THEME.title}</span> · {INAUGURAL_THEME.scripture}
+            </p>
             <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-white/80">
               {eventDate} · RCCG Glory Tabernacle, Barnstaple
             </p>

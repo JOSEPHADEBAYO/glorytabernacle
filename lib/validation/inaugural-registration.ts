@@ -32,6 +32,10 @@ export const createInauguralRegistrationSchema = z
       .trim()
       .max(200, 'Home church name is too long')
       .optional(),
+    // Explicit photo opt-in. The form forces a yes/no choice so we always
+    // get an explicit answer rather than an absent field defaulting to
+    // false silently.
+    photographyConsent: z.boolean(),
   })
   .refine(
     (data) => {

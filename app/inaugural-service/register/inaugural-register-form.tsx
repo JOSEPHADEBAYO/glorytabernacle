@@ -17,6 +17,7 @@ export function InauguralRegisterForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [success, setSuccess] = useState<SuccessState | null>(null)
   const [fromOutside, setFromOutside] = useState(false)
+  const [photoConsent, setPhotoConsent] = useState<boolean | null>(null)
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -34,9 +35,13 @@ export function InauguralRegisterForm() {
       isRccgMember: formData.get('isRccgMember') === 'yes',
       fromOutsideBarnstaple: fromOutside,
       homeChurch: fromOutside ? formData.get('homeChurch') : undefined,
+      photographyConsent: photoConsent ?? false,
     }
 
     try {
+      if (photoConsent === null) {
+        throw new Error('Please answer the photography question before submitting.')
+      }
       const res = await fetch('/api/inaugural-service/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -52,6 +57,7 @@ export function InauguralRegisterForm() {
         })
         form.reset()
         setFromOutside(false)
+        setPhotoConsent(null)
         return
       }
 
@@ -127,7 +133,7 @@ export function InauguralRegisterForm() {
           Register your place
         </h1>
         <p className="mt-3 text-sm leading-relaxed text-gray-600 md:text-base">
-          A brand-new beginning. Tell us a little about you and we&apos;ll send you a registration ID — bring it to the door and we&apos;ll have a printed badge waiting.
+        We are delighted to invite you to this great banquet. The King of glory is here, come expectant
         </p>
       </div>
 
@@ -162,6 +168,36 @@ export function InauguralRegisterForm() {
           />
         </section>
       )}
+
+      <section className="mt-6">
+        <fieldset className="rounded-lg bg-gray-50 p-5">
+          <legend className="mb-1 text-sm font-bold text-gray-900">
+            Would you like to be photographed?
+          </legend>
+          <p className="mb-3 text-xs leading-relaxed text-gray-600">
+            We capture photos at the service for church publications and our website. Your answer here lets the photography team know in advance.
+          </p>
+          <div className="flex items-center gap-7">
+            {(['Yes', 'No'] as const).map((answer) => (
+              <label
+                key={answer}
+                className="flex items-center gap-2 text-sm text-gray-700"
+              >
+                <input
+                  type="radio"
+                  name="photographyConsent"
+                  value={answer.toLowerCase()}
+                  required
+                  checked={photoConsent === (answer === 'Yes')}
+                  onChange={() => setPhotoConsent(answer === 'Yes')}
+                  className="h-4 w-4 border-gray-400 text-[#000666] focus:ring-[#000666]"
+                />
+                {answer}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      </section>
 
       <div className="mx-auto mt-10 max-w-md text-center">
         {status && (

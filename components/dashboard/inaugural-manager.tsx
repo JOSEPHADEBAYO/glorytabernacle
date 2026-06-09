@@ -17,6 +17,7 @@ export interface DashboardInauguralRegistration {
   isRccgMember: boolean
   fromOutsideBarnstaple: boolean
   homeChurch: string | null
+  photographyConsent: boolean
   createdAt: Date | string
 }
 
@@ -190,6 +191,7 @@ export function InauguralManager({
               <Th>Gender</Th>
               <Th>RCCG?</Th>
               <Th>From</Th>
+              <Th>Photo</Th>
               <Th>Submitted</Th>
               <th className="px-4 py-3" aria-label="Actions" />
             </tr>
@@ -197,7 +199,7 @@ export function InauguralManager({
           <tbody className="divide-y divide-gray-200 bg-white">
             {data.registrations.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-6 py-12 text-center text-sm text-gray-500">
+                <td colSpan={9} className="px-6 py-12 text-center text-sm text-gray-500">
                   {isLoading ? 'Loading…' : 'No registrations match your search.'}
                 </td>
               </tr>
@@ -238,6 +240,11 @@ export function InauguralManager({
                     ) : (
                       <span className="text-xs text-gray-400">Barnstaple</span>
                     )}
+                  </Td>
+                  <Td>
+                    <Pill kind={r.photographyConsent ? 'green' : 'gray'}>
+                      {r.photographyConsent ? '📸 Yes' : 'No'}
+                    </Pill>
                   </Td>
                   <Td>{formatDate(r.createdAt)}</Td>
                   <td className="px-4 py-3 whitespace-nowrap text-right">

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Calendar, Sparkles, ArrowRight } from 'lucide-react'
+import { INAUGURAL_THEME } from '@/lib/types/inaugural-registration'
 
 /**
  * Eye-catching CTA banner on the homepage pointing to the inaugural-service
@@ -38,6 +39,10 @@ export function InauguralServiceCta() {
           >
             Inaugural Service
           </h2>
+
+          <p className="mt-3 font-serif text-lg italic text-white/90 md:text-xl">
+            Theme: <span className="font-bold not-italic">{INAUGURAL_THEME.title}</span> · {INAUGURAL_THEME.scripture}
+          </p>
 
           <div className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-white/80 md:text-base">
             <Calendar className="h-4 w-4" aria-hidden="true" />

@@ -11,6 +11,7 @@
  */
 
 import { Resend } from 'resend'
+import { INAUGURAL_THEME } from '@/lib/types/inaugural-registration'
 
 export interface SendInauguralConfirmationArgs {
   to: string
@@ -100,6 +101,8 @@ function buildHtml(args: SendInauguralConfirmationArgs): string {
               <td align="center" style="padding:32px 32px 16px 32px;background:rgba(0,6,102,1);">
                 <img src="${escapeHtml(logoUrl)}" alt="RCCG Glory Tabernacle, Barnstaple" width="64" height="64" style="display:block;border-radius:12px;border:0;outline:none;text-decoration:none;" />
                 <p style="margin:14px 0 4px 0;font-size:11px;font-weight:bold;letter-spacing:0.22em;color:rgba(163,246,156,1);text-transform:uppercase;">Inaugural Service</p>
+                <p style="margin:0 0 6px 0;font-size:22px;font-weight:bold;color:#ffffff;font-family:Georgia,serif;">${escapeHtml(INAUGURAL_THEME.title)}</p>
+                <p style="margin:0 0 14px 0;font-size:12px;color:rgba(163,246,156,1);letter-spacing:0.08em;">${escapeHtml(INAUGURAL_THEME.scripture)}</p>
                 <p style="margin:0 0 24px 0;font-size:14px;color:#ffffff;">${dateLabel}</p>
               </td>
             </tr>

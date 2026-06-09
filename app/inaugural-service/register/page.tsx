@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import { TopNavBar } from '@/components/church/nav-bar'
 import { Footer } from '@/components/church/footer'
+import { INAUGURAL_THEME } from '@/lib/types/inaugural-registration'
 import { InauguralRegisterForm } from './inaugural-register-form'
 
 export const metadata = {
@@ -31,6 +32,17 @@ export default function InauguralRegisterPage() {
             <h1 className="max-w-3xl text-4xl font-extrabold leading-tight md:text-6xl">
               Inaugural Service
             </h1>
+            <div className="mt-5 inline-flex items-baseline gap-3 rounded-full border border-white/20 bg-white/5 px-4 py-2 backdrop-blur-sm">
+              <span className="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-[rgba(163,246,156,1)]">
+                Theme
+              </span>
+              <span className="font-serif text-lg font-bold text-white md:text-xl">
+                {INAUGURAL_THEME.title}
+              </span>
+              <span className="text-xs italic text-white/70">
+                {INAUGURAL_THEME.scripture}
+              </span>
+            </div>
             <p className="mt-5 max-w-2xl text-base leading-7 text-white/80">
               Sunday, 19 July 2026 · RCCG Glory Tabernacle, Barnstaple. Save your seat and pick up a personal printed badge at the door.
             </p>

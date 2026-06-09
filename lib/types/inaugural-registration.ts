@@ -10,6 +10,15 @@ export type InauguralAdminRole = (typeof INAUGURAL_ADMIN_ROLES)[number]
  *  the email template, the dashboard, and the programme page. */
 export const INAUGURAL_SERVICE_DATE = new Date('2026-07-19T10:00:00Z')
 
+/** Public-facing service theme. Referenced from the registration form hero,
+ *  the confirmation email header, the programme placeholder page, the
+ *  homepage CTA, and the printed badge so every touchpoint reads as one
+ *  designed campaign. */
+export const INAUGURAL_THEME = {
+  title: 'Glory Ahead',
+  scripture: 'Haggai 2:9',
+} as const
+
 /** Year embedded in the human-readable ID. Update if the badge series ever
  *  rolls over to a new year. */
 export const INAUGURAL_ID_YEAR = 2026
@@ -50,5 +59,6 @@ export interface InauguralRegistration {
   isRccgMember: boolean
   fromOutsideBarnstaple: boolean
   homeChurch: string | null
+  photographyConsent: boolean
   createdAt: Date
 }

@@ -668,6 +668,10 @@ model InauguralRegistration {
   // Only populated when fromOutsideBarnstaple = true. Zod enforces that
   // constraint on the public POST endpoint.
   homeChurch            String?
+  // Explicit photography opt-in. The photography team uses this on the day
+  // to know which attendees consented to appearing in church publications /
+  // social posts. Defaults to false so a missing answer = no photography.
+  photographyConsent    Boolean  @default(false)
   createdAt             DateTime @default(now())
 
   @@index([createdAt])

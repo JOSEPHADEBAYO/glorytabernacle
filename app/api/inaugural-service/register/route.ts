@@ -53,6 +53,7 @@ export async function POST(request: NextRequest) {
           isRccgMember: data.isRccgMember,
           fromOutsideBarnstaple: data.fromOutsideBarnstaple,
           homeChurch,
+          photographyConsent: data.photographyConsent,
         },
       })
 

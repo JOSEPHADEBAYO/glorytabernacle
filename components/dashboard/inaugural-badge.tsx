@@ -2,6 +2,7 @@
 
 import QRCode from 'react-qr-code'
 import { Printer, X } from 'lucide-react'
+import { INAUGURAL_THEME } from '@/lib/types/inaugural-registration'
 
 export interface BadgeData {
   registrationId: string
@@ -137,7 +138,13 @@ export function BadgeCard({ data }: { data: BadgeData }) {
         <h2 className="mt-1 font-serif text-xl font-extrabold leading-tight">
           Inaugural Service
         </h2>
-        <p className="mt-1 text-[0.65rem] font-semibold tracking-wider text-white/80">
+        <p
+          className="mt-1.5 font-serif text-[0.78rem] italic leading-tight"
+          style={{ color: 'rgba(163,246,156,1)' }}
+        >
+          Theme: <span className="font-bold not-italic">{INAUGURAL_THEME.title}</span> · {INAUGURAL_THEME.scripture}
+        </p>
+        <p className="mt-1.5 text-[0.65rem] font-semibold tracking-wider text-white/80">
           Sunday · 19 July 2026
         </p>
       </div>
