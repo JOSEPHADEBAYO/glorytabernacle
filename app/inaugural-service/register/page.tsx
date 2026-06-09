@@ -27,7 +27,7 @@ export default function InauguralRegisterPage() {
           <div className="absolute inset-0 bg-[#000666]/82" />
           <div className="relative z-10 mx-auto w-full max-w-[var(--container-max)] px-[var(--section-padding-x)] py-16 text-white">
             <p className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-white/70">
-              A Brand New Beginning
+              Glory Ahead
             </p>
             <h1 className="max-w-3xl text-4xl font-extrabold leading-tight md:text-6xl">
               Inaugural Service

@@ -133,7 +133,7 @@ export function BadgeCard({ data }: { data: BadgeData }) {
           className="text-[0.55rem] font-bold uppercase tracking-[0.3em]"
           style={{ color: 'rgba(163,246,156,1)' }}
         >
-          A Brand New Beginning
+          Glory Ahead
         </p>
         <h2 className="mt-1 font-serif text-xl font-extrabold leading-tight">
           Inaugural Service

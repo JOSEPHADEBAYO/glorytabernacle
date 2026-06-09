@@ -30,7 +30,7 @@ export function InauguralServiceCta() {
         <div className="text-white">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-[rgba(163,246,156,1)] backdrop-blur-sm">
             <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-            A Brand New Beginning
+            Glory Ahead
           </div>
 
           <h2
