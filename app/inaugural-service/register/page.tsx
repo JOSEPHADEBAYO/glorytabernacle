@@ -1,13 +1,24 @@
 import Image from 'next/image'
-import { Clock3, MapPin, Car } from 'lucide-react'
+import { CalendarDays, Clock3, MapPin, Car } from 'lucide-react'
 import { TopNavBar } from '@/components/church/nav-bar'
 import { Footer } from '@/components/church/footer'
 import {
   INAUGURAL_THEME,
   INAUGURAL_SERVICE_TIME,
   INAUGURAL_SERVICE_VENUE,
+  INAUGURAL_SERVICE_DATE,
 } from '@/lib/types/inaugural-registration'
 import { InauguralRegisterForm } from './inaugural-register-form'
+
+const FORMATTED_SERVICE_DATE = INAUGURAL_SERVICE_DATE.toLocaleDateString(
+  'en-GB',
+  {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }
+)
 
 export const metadata = {
   title: 'Inaugural Service — Register | RCCG Glory Tabernacle, Barnstaple',
@@ -49,10 +60,17 @@ export default function InauguralRegisterPage() {
               </span>
             </div>
             <p className="mt-5 max-w-2xl text-base leading-7 text-white/80">
-              Sunday, 19 July 2026. Save your seat and pick up a personal printed badge at the door.
+              Save your seat and pick up a personal printed badge at the door.
             </p>
 
-            <div className="mt-6 grid max-w-3xl grid-cols-1 gap-3 text-sm sm:grid-cols-3">
+            <div className="mt-6 grid max-w-4xl grid-cols-1 gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
+              <div className="flex items-start gap-3 rounded-xl border border-white/20 bg-white/5 px-4 py-3 backdrop-blur-sm">
+                <CalendarDays className="mt-0.5 h-4 w-4 shrink-0 text-[rgba(163,246,156,1)]" aria-hidden="true" />
+                <div className="min-w-0">
+                  <p className="text-[0.65rem] font-extrabold uppercase tracking-[0.2em] text-white/60">Date</p>
+                  <p className="font-bold leading-tight text-white">{FORMATTED_SERVICE_DATE}</p>
+                </div>
+              </div>
               <div className="flex items-start gap-3 rounded-xl border border-white/20 bg-white/5 px-4 py-3 backdrop-blur-sm">
                 <Clock3 className="mt-0.5 h-4 w-4 shrink-0 text-[rgba(163,246,156,1)]" aria-hidden="true" />
                 <div>

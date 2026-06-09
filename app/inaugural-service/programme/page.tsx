@@ -11,7 +11,7 @@ import {
   INAUGURAL_SERVICE_TIME,
   INAUGURAL_SERVICE_VENUE,
 } from '@/lib/types/inaugural-registration'
-import { Sparkles, Clock3, MapPin, Car } from 'lucide-react'
+import { Sparkles, CalendarDays, Clock3, MapPin, Car } from 'lucide-react'
 
 export const metadata = {
   title: 'Inaugural Service — Programme | RCCG Glory Tabernacle, Barnstaple',
@@ -80,10 +80,14 @@ export default async function ProgrammePage({ searchParams }: PageProps) {
             <p className="mx-auto mt-4 max-w-2xl font-serif text-lg italic text-white/90 md:text-2xl">
               Theme: <span className="font-bold not-italic">{INAUGURAL_THEME.title}</span> · {INAUGURAL_THEME.scripture}
             </p>
-            <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-white/80">
-              {eventDate}
-            </p>
-            <div className="mx-auto mt-6 grid max-w-3xl grid-cols-1 gap-3 text-left text-sm sm:grid-cols-3">
+            <div className="mx-auto mt-6 grid max-w-4xl grid-cols-1 gap-3 text-left text-sm sm:grid-cols-2 lg:grid-cols-4">
+              <div className="flex items-start gap-3 rounded-xl border border-white/20 bg-white/5 px-4 py-3 backdrop-blur-sm">
+                <CalendarDays className="mt-0.5 h-4 w-4 shrink-0 text-[rgba(163,246,156,1)]" aria-hidden="true" />
+                <div className="min-w-0">
+                  <p className="text-[0.65rem] font-extrabold uppercase tracking-[0.2em] text-white/60">Date</p>
+                  <p className="font-bold leading-tight text-white">{eventDate}</p>
+                </div>
+              </div>
               <div className="flex items-start gap-3 rounded-xl border border-white/20 bg-white/5 px-4 py-3 backdrop-blur-sm">
                 <Clock3 className="mt-0.5 h-4 w-4 shrink-0 text-[rgba(163,246,156,1)]" aria-hidden="true" />
                 <div>
