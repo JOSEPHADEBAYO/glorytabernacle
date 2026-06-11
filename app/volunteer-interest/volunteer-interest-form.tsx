@@ -66,7 +66,12 @@ function RadioPair({ question, name }: { question: string; name: string }) {
 export function VolunteerInterestForm({ groups }: VolunteerInterestFormProps) {
   const { toast } = useToast()
   const [selectedStrengths, setSelectedStrengths] = useState<string[]>([])
-  const [status, setStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+  // `info` is a softer non-error state used for the "you've already
+  // submitted" case — distinct visual treatment from a real error so the
+  // user understands it's not a failure on their end.
+  const [status, setStatus] = useState<
+    { type: 'success' | 'error' | 'info'; message: string } | null
+  >(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   function toggleStrength(id: string) {
@@ -120,6 +125,34 @@ export function VolunteerInterestForm({ groups }: VolunteerInterestFormProps) {
         body: JSON.stringify(payload),
       })
       const data = await response.json().catch(() => ({}))
+
+      // 409 + alreadySubmitted is the dedicated "duplicate" path. Show a
+      // softer banner with the previous submission date so the user
+      // knows we already have them on file rather than feeling rejected.
+      if (response.status === 409 && data.alreadySubmitted) {
+        const submittedAt = data.submittedAt ? new Date(data.submittedAt) : null
+        const friendlyDate = submittedAt && !Number.isNaN(submittedAt.getTime())
+          ? submittedAt.toLocaleDateString('en-GB', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+            })
+          : null
+        setStatus({
+          type: 'info',
+          message: friendlyDate
+            ? `You've already filled this form (submitted on ${friendlyDate}). We have your details on file and our team will be in touch — there's no need to submit again. If anything has changed, please email admin@glorytabernacle.co.uk.`
+            : "You've already filled this form. We have your details on file and our team will be in touch — there's no need to submit again.",
+        })
+        toast({
+          title: "We've got your interest already",
+          description: friendlyDate
+            ? `You filled this form on ${friendlyDate}.`
+            : 'Our records show a previous submission with this email.',
+          variant: 'warning',
+        })
+        return
+      }
 
       if (!response.ok) {
         const details = Array.isArray(data.details) ? data.details.join(' ') : undefined
@@ -281,7 +314,9 @@ export function VolunteerInterestForm({ groups }: VolunteerInterestFormProps) {
             className={`mb-6 rounded-md px-4 py-3 text-sm font-medium ${
               status.type === 'success'
                 ? 'bg-green-50 text-green-700'
-                : 'bg-red-50 text-red-700'
+                : status.type === 'info'
+                  ? 'bg-amber-50 text-amber-800 border border-amber-200'
+                  : 'bg-red-50 text-red-700'
             }`}
           >
             {status.message}

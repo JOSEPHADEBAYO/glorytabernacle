@@ -38,6 +38,29 @@ export async function POST(request: NextRequest) {
     }
 
     const data = validation.data
+
+    // Duplicate-submission gate. The email column isn't unique at the DB
+    // level (legacy rows might already contain duplicates), so we do a
+    // case-insensitive lookup ourselves. If anything matches we short-
+    // circuit with 409 + the timestamp of the earlier submission so the
+    // form can tell the user when they last filled it.
+    const existing = await prisma.volunteerInterest.findFirst({
+      where: { email: { equals: data.email, mode: 'insensitive' } },
+      select: { id: true, createdAt: true },
+      orderBy: { createdAt: 'desc' },
+    })
+    if (existing) {
+      return NextResponse.json(
+        {
+          error:
+            "You've already submitted a volunteer interest form with this email. Our team has your details and will be in touch.",
+          alreadySubmitted: true,
+          submittedAt: existing.createdAt.toISOString(),
+        },
+        { status: 409 }
+      )
+    }
+
     const groups = await prisma.group.findMany({
       where: {
         id: { in: data.areaStrengthIds },
