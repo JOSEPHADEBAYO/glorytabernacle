@@ -258,7 +258,8 @@ function buildHtml({ name, subject, body, ctaLabel, ctaHref }: BuildHtmlArgs): s
             <td style="padding:24px 36px 32px 36px;">
               <p style="margin:0;font-size:14px;line-height:1.6;color:${BRAND.textMuted};">
                 In Christ,<br />
-                <strong style="color:${BRAND.text};">RCCG Glory Tabernacle, Barnstaple</strong>
+                Seye and Tolu Adebayo
+                <strong style="color:${BRAND.text};">Lead Pastors, RCCG Glory Tabernacle, Barnstaple</strong>
               </p>
             </td>
           </tr>
