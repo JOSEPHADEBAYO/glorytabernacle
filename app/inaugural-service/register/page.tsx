@@ -33,7 +33,7 @@ export default function InauguralRegisterPage() {
       <main className="bg-[#f4f4f4]">
         <section className="relative flex min-h-[24rem] items-center overflow-hidden pt-16">
           <Image
-            src="https://images.unsplash.com/photo-1438032005730-c779502df39b?w=1920&auto=format&fit=crop&q=80"
+            src="https://images.unsplash.com/photo-1778876089324-15f94de18275?w=1200&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8cGVudGVjb3N0YWwlMjBjaHJ1Y2glMjBpbmF1Z3VyYWwlMjBzZXJ2aWNlfGVufDB8fDB8fHww"
             alt=""
             fill
             priority
