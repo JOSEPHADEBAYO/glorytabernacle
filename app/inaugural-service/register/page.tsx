@@ -42,17 +42,17 @@ export default function InauguralRegisterPage() {
           />
           <div className="absolute inset-0 bg-[#000666]/82" />
           <div className="relative z-10 mx-auto w-full max-w-[var(--container-max)] px-[var(--section-padding-x)] py-16 text-white">
-            <p className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-white/70">
+            {/* <p className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-white/70">
               Glory Ahead
-            </p>
+            </p> */}
             <h1 className="max-w-3xl text-4xl font-extrabold leading-tight md:text-6xl">
-              Inaugural Service
+              INAUGURAL SERVICE
             </h1>
             <div className="mt-5 inline-flex items-baseline gap-3 rounded-full border border-white/20 bg-white/5 px-4 py-2 backdrop-blur-sm">
               <span className="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-[rgba(163,246,156,1)]">
-                Theme
+                theme: 
               </span>
-              <span className="font-serif text-lg font-bold text-white md:text-xl">
+              <span className="font-serif text-lg font-bold uppercase text-white md:text-xl">
                 {INAUGURAL_THEME.title}
               </span>
               <span className="text-xs italic text-white/70">

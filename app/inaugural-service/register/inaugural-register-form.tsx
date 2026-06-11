@@ -202,7 +202,7 @@ export function InauguralRegisterForm() {
       <section className="mt-6">
         <fieldset className="rounded-lg bg-gray-50 p-5">
           <legend className="mb-1 text-sm font-bold text-gray-900">
-            Are you bringing children?
+            Are you coming along with your children?
           </legend>
           <p className="mb-3 text-xs leading-relaxed text-gray-600">
             We&apos;d like to plan space, activities, and supervision in advance, so let us know if children will be joining you.

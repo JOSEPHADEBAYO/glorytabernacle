@@ -71,9 +71,9 @@ export default async function ProgrammePage({ searchParams }: PageProps) {
           />
           <div className="absolute inset-0 bg-[#000666]/85" />
           <div className="relative z-10 mx-auto w-full max-w-[var(--container-max)] px-[var(--section-padding-x)] py-16 text-center text-white">
-            <p className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-[rgba(163,246,156,1)]">
+            <h1 className="mb-4 text-lg font-bold uppercase tracking-[0.22em] text-[rgba(163,246,156,1)]">
               Inaugural Service · Programme
-            </p>
+            </h1>
             <h1 className="mx-auto max-w-3xl text-4xl font-extrabold leading-tight md:text-6xl">
               {registrant ? `Welcome, ${registrant.firstName}` : 'Welcome'}
             </h1>
