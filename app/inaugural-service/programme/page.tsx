@@ -89,7 +89,7 @@ export default async function ProgrammePage({ searchParams }: PageProps) {
               {registrant ? `Welcome, ${registrant.firstName}` : 'Welcome'}
             </h1>
             <p className="mx-auto mt-4 max-w-2xl font-serif text-lg italic text-white/90 md:text-2xl">
-              Theme: <span className="font-bold not-italic">{INAUGURAL_THEME.title}</span> · {INAUGURAL_THEME.scripture}
+              theme: <span className="font-bold uppercase tracking-wider not-italic">{INAUGURAL_THEME.title}</span> · {INAUGURAL_THEME.scripture}
             </p>
             <div className="mx-auto mt-6 grid max-w-4xl grid-cols-1 gap-3 text-left text-sm sm:grid-cols-2 lg:grid-cols-4">
               <div className="flex items-start gap-3 rounded-xl border border-white/20 bg-white/5 px-4 py-3 backdrop-blur-sm">
