@@ -256,11 +256,14 @@ function buildHtml({ name, subject, body, ctaLabel, ctaHref }: BuildHtmlArgs): s
           <!-- Sign-off -->
           <tr>
             <td style="padding:24px 36px 32px 36px;">
-              <p style="margin:0;font-size:14px;line-height:1.6;color:${BRAND.textMuted};">
-                In Christ,<br />
-                Seye and Tolu Adebayo
-                <strong style="color:${BRAND.text};">Lead Pastors, RCCG Glory Tabernacle, Barnstaple</strong>
-              </p>
+              <!-- Three separate paragraphs so the title sits tight under
+                   the name. A single <p>...<br />...</p> collapsed the
+                   whitespace between "Seye and Tolu Adebayo" and the
+                   title; this layout matches the volunteer + inaugural
+                   confirmation emails. -->
+              <p style="margin:0 0 8px 0;font-size:14px;line-height:1.5;color:${BRAND.textMuted};">In Christ,</p>
+              <p style="margin:0 0 2px 0;font-size:14px;line-height:1.4;color:${BRAND.text};font-weight:bold;">Seye and Tolu Adebayo</p>
+              <p style="margin:0;font-size:14px;line-height:1.4;color:${BRAND.text};font-weight:bold;">Lead Pastors, RCCG Glory Tabernacle, Barnstaple</p>
             </td>
           </tr>
 

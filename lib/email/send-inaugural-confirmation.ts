@@ -151,9 +151,9 @@ function buildHtml(args: SendInauguralConfirmationArgs): string {
 
                 <p style="margin:0 0 24px 0;"><a href="${escapeHtml(programmeUrl)}" style="display:inline-block;padding:12px 24px;background:rgba(27,109,36,1);color:#ffffff;text-decoration:none;border-radius:8px;font-weight:bold;font-size:14px;">View the programme</a></p>
 
-                <p style="margin:0 0 8px 0;font-size:14px;line-height:1.7;color:#555;">In Christ,</p>
-                <p style="margin:0 0 24px 0;font-size:14px;line-height:1.7;color:rgba(27,34,119,1);font-weight:bold;">Seye and Tolu Adebayo</p>
-                <p style="margin:0 0 24px 0;font-size:14px;line-height:1.7;color:rgba(27,34,119,1);font-weight:bold;">Lead Pastors, RCCG Glory Tabernacle, Barnstaple</p>
+                <p style="margin:0 0 8px 0;font-size:14px;line-height:1.5;color:#555;">In Christ,</p>
+                <p style="margin:0 0 2px 0;font-size:14px;line-height:1.4;color:rgba(27,34,119,1);font-weight:bold;">Seye and Tolu Adebayo</p>
+                <p style="margin:0 0 24px 0;font-size:14px;line-height:1.4;color:rgba(27,34,119,1);font-weight:bold;">Lead Pastors, RCCG Glory Tabernacle, Barnstaple</p>
 
                 <p style="margin:0;font-size:12px;line-height:1.6;color:#999;border-top:1px solid #eee;padding-top:16px;">You're receiving this because you registered on our website for the Inaugural Service. If this wasn't you, please ignore this email.</p>
               </td>

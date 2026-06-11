@@ -61,7 +61,6 @@ export function buildReportBody(input: ChildReportInput): {
   ]
 
   let entries: string[]
-  console.log("*888888888", input.checkIns, input)
   if (input.checkIns.length === 0) {
     entries = [
       `${input.childFirstName} was not signed in during this period. If you think this is a mistake, please reply to this email and we'll look into it.`,
@@ -79,9 +78,8 @@ export function buildReportBody(input: ChildReportInput): {
   const closing = [
     '',
     `We're thankful for the opportunity to walk alongside ${input.childFirstName} each Sunday. If there's anything you'd like us to know — a prayer request, an update, or something we should be aware of — just reply to this email.`,
-    '',
-    'In Christ,',
-    "RCCG Glory Tabernacle, Barnstaple Children's Ministry",
+    // Sign-off is owned by the broadcast template (Lead Pastors block) so
+    // recipients never see two signatures stacked. Don't add one here.
   ]
 
   const body = [...intro, ...entries, ...closing].join('\n\n')

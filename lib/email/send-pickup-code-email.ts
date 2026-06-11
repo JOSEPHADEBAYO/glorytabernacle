@@ -55,9 +55,8 @@ export async function sendPickupCodeEmail(
     `Please show this code to the children's leader when you come to collect ${input.childFirstName}. They cannot release ${input.childFirstName} without it.`,
     '',
     `If you didn't drop ${input.childFirstName} off or you didn't expect this email, reply right away and we'll look into it.`,
-    '',
-    "In Christ,",
-    "RCCG Glory Tabernacle, Barnstaple Children's Ministry",
+    // Sign-off is owned by the broadcast template (Lead Pastors block) so
+    // recipients never see two signatures stacked. Don't add one here.
   ].join('\n')
 
   const result = await sendBroadcastEmail({

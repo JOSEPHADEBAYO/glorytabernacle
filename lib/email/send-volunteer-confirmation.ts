@@ -115,9 +115,9 @@ function buildHtml(args: SendVolunteerConfirmationArgs): string {
 
                 ${strengthsList}
 
-                <p style="margin:0 0 8px 0;font-size:14px;line-height:1.7;color:#555;">In Christ,</p>
-                <p style="margin:0 0 24px 0;font-size:14px;line-height:1.7;color:rgba(27,34,119,1);font-weight:bold;">Seye and Tolu Adebayo</p>
-                <p style="margin:0 0 24px 0;font-size:14px;line-height:1.7;color:rgba(27,34,119,1);font-weight:bold;">Lead Pastors, RCCG Glory Tabernacle, Barnstaple</p>
+                <p style="margin:0 0 8px 0;font-size:14px;line-height:1.5;color:#555;">In Christ,</p>
+                <p style="margin:0 0 2px 0;font-size:14px;line-height:1.4;color:rgba(27,34,119,1);font-weight:bold;">Seye and Tolu Adebayo</p>
+                <p style="margin:0 0 24px 0;font-size:14px;line-height:1.4;color:rgba(27,34,119,1);font-weight:bold;">Lead Pastors, RCCG Glory Tabernacle, Barnstaple</p>
 
                 <p style="margin:0;font-size:12px;line-height:1.6;color:#999;border-top:1px solid #eee;padding-top:16px;">You're receiving this because you submitted the volunteer interest form on our website. If this wasn't you, please ignore this email.</p>
               </td>
