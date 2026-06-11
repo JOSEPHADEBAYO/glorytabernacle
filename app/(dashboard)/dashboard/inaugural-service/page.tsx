@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma'
 import {
   INAUGURAL_ADMIN_ROLES,
   CHILDREN_AGE_GROUPS,
-  formatRegistrationId,
+  formatBadgeId,
   type ChildrenAgeGroup,
 } from '@/lib/types/inaugural-registration'
 import {
@@ -62,7 +62,7 @@ export default async function InauguralServiceDashboardPage() {
 
   const initialRows: DashboardInauguralRegistration[] = rows.map((r) => ({
     ...r,
-    registrationId: formatRegistrationId(r.serialNumber),
+    registrationId: formatBadgeId(r),
     childrenAgeGroups: narrowAgeGroups(r.childrenAgeGroups),
   }))
 

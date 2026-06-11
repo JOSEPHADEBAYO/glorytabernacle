@@ -57,30 +57,87 @@ export const INAUGURAL_ID_YEAR = 2026
 export const INAUGURAL_ID_PREFIX = 'GT'
 
 /**
- * Format an auto-incrementing serialNumber from the database into the public
- * badge ID, e.g. 1 → "GT-2026-0001", 2843 → "GT-2026-2843".
+ * Format an auto-incrementing serialNumber from the database into the
+ * legacy public badge ID, e.g. 1 → "GT-2026-0001", 2843 → "GT-2026-2843".
+ *
+ * Kept for backwards compatibility with rows that pre-date the random
+ * publicCode column. Prefer `formatBadgeId(row)` everywhere so new rows
+ * automatically pick up their random code.
  */
 export function formatRegistrationId(serialNumber: number): string {
   return `${INAUGURAL_ID_PREFIX}-${INAUGURAL_ID_YEAR}-${String(serialNumber).padStart(4, '0')}`
 }
 
 /**
+ * Preferred badge formatter. Uses the randomly-allocated `publicCode`
+ * when present; falls back to the padded `serialNumber` for legacy rows
+ * created before randomised badge IDs landed.
+ *
+ * Accepts a partial row so it can be called with anything Prisma
+ * `select`ed — the only fields actually read are `serialNumber` and
+ * `publicCode`.
+ */
+export function formatBadgeId(row: {
+  serialNumber: number
+  publicCode: string | null
+}): string {
+  if (row.publicCode) {
+    return `${INAUGURAL_ID_PREFIX}-${INAUGURAL_ID_YEAR}-${row.publicCode}`
+  }
+  return formatRegistrationId(row.serialNumber)
+}
+
+/**
  * Parse a human-readable badge ID back into the serialNumber for DB lookups.
  * Returns null if the input doesn't match the expected pattern.
  * Lenient on case + whitespace so check-in staff can type roughly.
+ *
+ * Legacy thin wrapper around `parseBadgeId` — kept so any older call site
+ * keeps compiling. New code should call `parseBadgeId` and look up both
+ * `publicCode` and `serialNumber` (in that order).
  */
 export function parseRegistrationId(input: string): number | null {
+  const parsed = parseBadgeId(input)
+  return parsed ? parsed.serial : null
+}
+
+/** What `parseBadgeId` returns: enough to do a unique lookup on either
+ *  the new `publicCode` column or the legacy `serialNumber` column. */
+export interface ParsedBadgeId {
+  /** 4-character numeric code as a string, e.g. "0001" or "4827".
+   *  Used for the `publicCode` unique lookup. */
+  code: string
+  /** Numeric form of the trailing digits, e.g. 1 or 4827. Used for the
+   *  legacy `serialNumber` unique lookup. */
+  serial: number
+}
+
+/**
+ * Parse a human-readable badge ID into both its `publicCode` form (4-char
+ * zero-padded string) and its legacy `serialNumber` form (integer), so the
+ * caller can try both lookups without re-parsing.
+ *
+ * Lenient on case + whitespace so check-in staff can type roughly.
+ * Returns null if the input doesn't match `GT-YYYY-NNNN`.
+ */
+export function parseBadgeId(input: string): ParsedBadgeId | null {
   const cleaned = input.trim().toUpperCase()
   const match = cleaned.match(/^GT-(\d{4})-(\d{1,6})$/)
   if (!match) return null
-  const serial = Number(match[2])
-  return Number.isFinite(serial) && serial > 0 ? serial : null
+  const digits = match[2]
+  const serial = Number(digits)
+  if (!Number.isFinite(serial) || serial < 0) return null
+  // Pad to 4 chars so single-digit / 2-digit input still matches a stored
+  // `publicCode` like "0001". 5+ digit input keeps its length.
+  const code = digits.length < 4 ? digits.padStart(4, '0') : digits
+  return { code, serial }
 }
 
 /** Full registration record as it lives in the database. */
 export interface InauguralRegistration {
   id: string
   serialNumber: number
+  publicCode: string | null
   firstName: string
   lastName: string
   email: string

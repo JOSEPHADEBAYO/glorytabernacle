@@ -49,7 +49,7 @@ export default function InauguralRegisterPage() {
               INAUGURAL SERVICE
             </h1>
             <div className="mt-5 inline-flex items-baseline gap-3 rounded-full border border-white/20 bg-white/5 px-4 py-2 backdrop-blur-sm">
-              <span className="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-[rgba(163,246,156,1)]">
+              <span className="text-[0.7rem] font-bold tracking-[0.22em] text-[rgba(163,246,156,1)]">
                 theme: 
               </span>
               <span className="font-serif text-lg font-bold uppercase text-white md:text-xl">

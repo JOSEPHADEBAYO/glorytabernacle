@@ -163,7 +163,7 @@ export function InauguralRegisterForm() {
           Register your place
         </h1>
         <p className="mt-3 text-sm leading-relaxed text-gray-600 md:text-base">
-        We are delighted to invite you to this great banquet. The King of glory is here, come expectant
+        We are delighted to invite you to this great banquet. The King of glory is here, come expectant.
         </p>
       </div>
 

@@ -32,20 +32,20 @@ export function InauguralServiceCta() {
 
       <div className="relative mx-auto grid max-w-[var(--container-max)] grid-cols-1 items-center gap-8 md:grid-cols-[1fr_auto] md:gap-12">
         <div className="text-white">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-[rgba(163,246,156,1)] backdrop-blur-sm">
+          {/* <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-[rgba(163,246,156,1)] backdrop-blur-sm">
             <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
             Glory Ahead
-          </div>
+          </div> */}
 
           <h2
             id="inaugural-cta-heading"
-            className="mt-5 text-3xl font-extrabold leading-tight md:text-5xl"
+            className="mt-5 text-3xl uppercase font-extrabold leading-tight md:text-5xl"
           >
             Inaugural Service
           </h2>
 
           <p className="mt-3 font-serif text-lg italic text-white/90 md:text-xl">
-            Theme: <span className="font-bold not-italic">{INAUGURAL_THEME.title}</span> · {INAUGURAL_THEME.scripture}
+            Theme: <span className="font-bold not-italic uppercase tracking-wider ">{INAUGURAL_THEME.title}</span> · {INAUGURAL_THEME.scripture}
           </p>
 
           <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-semibold text-white/80 md:text-base">

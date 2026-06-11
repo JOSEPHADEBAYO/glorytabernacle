@@ -4,8 +4,8 @@ import { getSessionToken, getSessionUser } from '@/lib/auth/session'
 import { inauguralRegistrationQuerySchema } from '@/lib/validation/inaugural-registration'
 import {
   INAUGURAL_ADMIN_ROLES,
-  formatRegistrationId,
-  parseRegistrationId,
+  formatBadgeId,
+  parseBadgeId,
   type InauguralAdminRole,
 } from '@/lib/types/inaugural-registration'
 
@@ -64,10 +64,17 @@ export async function GET(request: NextRequest) {
     let where: WhereCondition = {}
 
     if (search) {
-      // If the search looks like a badge ID, jump straight to serialNumber.
-      const parsed = parseRegistrationId(search)
+      // If the search looks like a badge ID, try both the new random
+      // publicCode column and the legacy serialNumber column so the same
+      // search works for pre- and post-randomisation registrations.
+      const parsed = parseBadgeId(search)
       if (parsed !== null) {
-        where = { serialNumber: parsed }
+        where = {
+          OR: [
+            { publicCode: parsed.code },
+            { serialNumber: parsed.serial },
+          ],
+        }
       } else {
         const q = search
         where = {
@@ -94,7 +101,7 @@ export async function GET(request: NextRequest) {
       {
         registrations: rows.map((r) => ({
           ...r,
-          registrationId: formatRegistrationId(r.serialNumber),
+          registrationId: formatBadgeId(r),
         })),
         total,
         page,

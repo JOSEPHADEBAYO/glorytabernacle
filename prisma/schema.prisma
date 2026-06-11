@@ -656,6 +656,11 @@ model VolunteerInterest {
 model InauguralRegistration {
   id                    String   @id @default(cuid())
   serialNumber          Int      @default(autoincrement()) @unique
+  // Public-facing 4-digit badge code (e.g. "4827"). Randomly minted at
+  // registration time so the badge ID does not leak registration order.
+  // Nullable for backwards compatibility — rows created before this
+  // column existed fall back to the padded serialNumber when formatted.
+  publicCode            String?  @unique
   firstName             String
   lastName              String
   email                 String   @unique

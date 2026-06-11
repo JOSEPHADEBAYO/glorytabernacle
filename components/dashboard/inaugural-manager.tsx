@@ -10,6 +10,10 @@ export interface DashboardInauguralRegistration {
   id: string
   registrationId: string
   serialNumber: number
+  /** Random 4-digit code minted at registration time. Null for legacy
+   *  rows created before the random-ID change shipped — those still
+   *  show their serialNumber-derived registrationId. */
+  publicCode: string | null
   firstName: string
   lastName: string
   email: string

@@ -3,9 +3,10 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { createInauguralRegistrationSchema } from '@/lib/validation/inaugural-registration'
 import {
-  formatRegistrationId,
+  formatBadgeId,
   INAUGURAL_SERVICE_DATE,
 } from '@/lib/types/inaugural-registration'
+import { generateInauguralPublicCode } from '@/lib/inaugural/generate-public-code'
 import { sendInauguralConfirmation } from '@/lib/email/send-inaugural-confirmation'
 
 /**
@@ -55,9 +56,16 @@ export async function POST(request: NextRequest) {
       ? data.childrenSpecialNeeds?.trim() || null
       : null
 
+    // Mint the random 4-digit public code BEFORE the insert so the badge ID
+    // never reveals registration order. The generator guarantees the code
+    // collides with neither an existing publicCode nor an existing
+    // serialNumber, so "GT-2026-NNNN" is always unambiguous.
+    const publicCode = await generateInauguralPublicCode()
+
     try {
       const created = await prisma.inauguralRegistration.create({
         data: {
+          publicCode,
           firstName: data.firstName,
           lastName: data.lastName,
           email: normalisedEmail,
@@ -74,7 +82,7 @@ export async function POST(request: NextRequest) {
         },
       })
 
-      const registrationId = formatRegistrationId(created.serialNumber)
+      const registrationId = formatBadgeId(created)
 
       // Fire-and-forget email — never blocks the form's success response.
       void sendInauguralConfirmation({
@@ -115,15 +123,13 @@ export async function POST(request: NextRequest) {
       ) {
         const existing = await prisma.inauguralRegistration.findUnique({
           where: { email: normalisedEmail },
-          select: { serialNumber: true },
+          select: { serialNumber: true, publicCode: true },
         })
         return NextResponse.json(
           {
             error:
               'This email address is already registered for the inaugural service.',
-            registrationId: existing
-              ? formatRegistrationId(existing.serialNumber)
-              : null,
+            registrationId: existing ? formatBadgeId(existing) : null,
           },
           { status: 409 }
         )

@@ -4,8 +4,8 @@ import { TopNavBar } from '@/components/church/nav-bar'
 import { Footer } from '@/components/church/footer'
 import { prisma } from '@/lib/prisma'
 import {
-  formatRegistrationId,
-  parseRegistrationId,
+  formatBadgeId,
+  parseBadgeId,
   INAUGURAL_SERVICE_DATE,
   INAUGURAL_THEME,
   INAUGURAL_SERVICE_TIME,
@@ -39,17 +39,28 @@ export default async function ProgrammePage({ searchParams }: PageProps) {
     year: 'numeric',
   })
 
-  let registrant: { firstName: string; serialNumber: number } | null = null
+  let registrant:
+    | { firstName: string; serialNumber: number; publicCode: string | null }
+    | null = null
   let parsedId: string | null = null
   if (id) {
-    const serial = parseRegistrationId(id)
-    if (serial !== null) {
+    const parsed = parseBadgeId(id)
+    if (parsed) {
       try {
+        // Prefer the new random publicCode column. Fall back to the legacy
+        // serialNumber lookup so badges issued before randomisation still
+        // resolve to the correct registrant.
         registrant = await prisma.inauguralRegistration.findUnique({
-          where: { serialNumber: serial },
-          select: { firstName: true, serialNumber: true },
+          where: { publicCode: parsed.code },
+          select: { firstName: true, serialNumber: true, publicCode: true },
         })
-        if (registrant) parsedId = formatRegistrationId(registrant.serialNumber)
+        if (!registrant) {
+          registrant = await prisma.inauguralRegistration.findUnique({
+            where: { serialNumber: parsed.serial },
+            select: { firstName: true, serialNumber: true, publicCode: true },
+          })
+        }
+        if (registrant) parsedId = formatBadgeId(registrant)
       } catch (err) {
         console.error('Programme page: registrant lookup failed', err)
       }
