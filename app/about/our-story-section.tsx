@@ -60,7 +60,7 @@ const STORY_SEGMENTS: StorySegment[] = [
     text:
       'You may have come broken, but you will not leave broken. You may have come small, but you cannot remain small because nothing small is found in the Tabernacle.',
   },
-  { kind: 'bold', text: 'Welcome to RCCG Glory Tabernacle, Barnstaple' },
+  { kind: 'bold', text: 'Welcome to RCCG Glory Tabernacle,' },
 ]
 
 // ---------------------------------------------------------------------------
@@ -606,7 +606,7 @@ export function OurStorySection() {
                 </p>
               ))}
             </div>
-            <p className="mt-1 text-sm font-extrabold md:text-[0.95rem]" style={{ color: 'rgba(0, 6, 102, 1)' }}>Barnstaple, North Devon</p>
+            <p className="mt-1 text-sm font-extrabold md:text-[0.95rem]" style={{ color: 'rgba(0, 6, 102, 1)' }}>Barnstaple, England</p>
           </div>
         </div>
       </div>
