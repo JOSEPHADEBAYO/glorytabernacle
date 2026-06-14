@@ -51,6 +51,21 @@ function getLogoUrl(): string {
   )
 }
 
+/**
+ * Programme poster shown as the email's hero banner — the same image used
+ * on /inaugural-service/register and /inaugural-service/programme, so the
+ * email instantly reads as "Inaugural Service" the moment it's opened
+ * (recipients no longer have to scan a text header to know what it's about).
+ *
+ * Cloudinary transforms:
+ *   - w_1200,c_limit  → max 1200px wide (2x for retina at 600px email width)
+ *   - q_auto,f_auto   → automatic quality + format negotiation (JPG fallback
+ *                       for clients that don't accept WebP, which Gmail
+ *                       mobile + older Outlook still don't reliably).
+ */
+const POSTER_URL =
+  'https://res.cloudinary.com/deckwmsth/image/upload/w_1200,c_limit,q_auto,f_auto/v1781457692/WhatsApp_Image_2026-06-14_at_13.44.11_brtvwr.jpg'
+
 function getSiteUrl(): string {
   const url =
     process.env.SITE_URL ??
@@ -86,7 +101,6 @@ function buildHtml(args: SendInauguralConfirmationArgs): string {
   const safeFirstName = escapeHtml(args.firstName)
   const fullName = escapeHtml(`${args.firstName} ${args.lastName}`)
   const safeRegistrationId = escapeHtml(args.registrationId)
-  const logoUrl = getLogoUrl()
   const programmeUrl = `${getSiteUrl()}/inaugural-service/programme?id=${encodeURIComponent(args.registrationId)}`
   const dateLabel = escapeHtml(formatEventDate(args.eventDate))
 
@@ -101,13 +115,25 @@ function buildHtml(args: SendInauguralConfirmationArgs): string {
       <tr>
         <td align="center">
           <table role="presentation" cellpadding="0" cellspacing="0" width="600" style="max-width:600px;background:#ffffff;border-radius:12px;overflow:hidden;">
+            <!-- Hero banner: the same programme poster shown on the
+                 website /register and /programme pages. The image carries
+                 the event title, theme, date, and venue by design, so we
+                 deliberately don't layer any text on top of it.
+                 - font-size:0;line-height:0 on the cell removes the 4–5px
+                   ghost gap some email clients leave around <img>.
+                 - width="600" + style="width:100%;max-width:600px"
+                   together keep Outlook happy and Apple Mail responsive.
+                 - alt text mirrors what a sighted reader sees in the
+                   poster, so screen readers and image-blocked clients
+                   still get the event details. -->
             <tr>
-              <td align="center" style="padding:32px 32px 16px 32px;background:rgba(0,6,102,1);">
-                <img src="${escapeHtml(logoUrl)}" alt="RCCG Glory Tabernacle, Barnstaple" width="64" height="64" style="display:block;border-radius:12px;border:0;outline:none;text-decoration:none;" />
-                <p style="margin:14px 0 4px 0;font-size:11px;font-weight:bold;letter-spacing:0.22em;color:rgba(163,246,156,1);text-transform:uppercase;">Inaugural Service</p>
-                <p style="margin:0 0 6px 0;font-size:22px;font-weight:bold;color:#ffffff;font-family:Georgia,serif;">${escapeHtml(INAUGURAL_THEME.title)}</p>
-                <p style="margin:0 0 14px 0;font-size:12px;color:rgba(163,246,156,1);letter-spacing:0.08em;">${escapeHtml(INAUGURAL_THEME.scripture)}</p>
-                <p style="margin:0 0 24px 0;font-size:14px;color:#ffffff;">${dateLabel}</p>
+              <td style="padding:0;background:rgba(0,6,102,1);font-size:0;line-height:0;">
+                <img
+                  src="${escapeHtml(POSTER_URL)}"
+                  alt="Inaugural Service — ${escapeHtml(INAUGURAL_THEME.title)} (${escapeHtml(INAUGURAL_THEME.scripture)}), ${dateLabel} at ${escapeHtml(INAUGURAL_SERVICE_TIME)}, ${escapeHtml(INAUGURAL_SERVICE_VENUE.name)}"
+                  width="600"
+                  style="display:block;width:100%;max-width:600px;height:auto;border:0;outline:none;text-decoration:none;"
+                />
               </td>
             </tr>
             <tr>

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { TopNavBar } from '@/components/church/nav-bar'
@@ -13,8 +14,44 @@ import {
 } from '@/lib/types/inaugural-registration'
 import { Sparkles, CalendarDays, Clock3, MapPin, Car } from 'lucide-react'
 
-export const metadata = {
+const FORMATTED_SERVICE_DATE = INAUGURAL_SERVICE_DATE.toLocaleDateString(
+  'en-GB',
+  { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }
+)
+
+// See app/inaugural-service/register/page.tsx for the Cloudinary transform
+// rationale — same OG image is used across both pages so the link preview
+// looks identical no matter which URL someone shares.
+const OG_IMAGE_URL =
+  'https://res.cloudinary.com/deckwmsth/image/upload/c_pad,b_rgb:000666,w_1200,h_630,q_auto,f_jpg/v1781457692/WhatsApp_Image_2026-06-14_at_13.44.11_brtvwr.jpg'
+
+const PAGE_URL = 'https://www.glorytabernacle.co.uk/inaugural-service/programme'
+
+export const metadata: Metadata = {
   title: 'Inaugural Service — Programme | RCCG Glory Tabernacle, Barnstaple',
+  description: `Programme for the inaugural service — ${INAUGURAL_THEME.title} (${INAUGURAL_THEME.scripture}). ${FORMATTED_SERVICE_DATE} · ${INAUGURAL_SERVICE_TIME} · ${INAUGURAL_SERVICE_VENUE.name}, Barnstaple.`,
+  openGraph: {
+    title: `Inaugural Service — ${INAUGURAL_THEME.title}`,
+    description: `${FORMATTED_SERVICE_DATE} · ${INAUGURAL_SERVICE_TIME} · ${INAUGURAL_SERVICE_VENUE.name}, Barnstaple.`,
+    url: PAGE_URL,
+    siteName: 'RCCG Glory Tabernacle, Barnstaple',
+    images: [
+      {
+        url: OG_IMAGE_URL,
+        width: 1200,
+        height: 630,
+        alt: `Inaugural Service — ${INAUGURAL_THEME.title} (${INAUGURAL_THEME.scripture}), ${FORMATTED_SERVICE_DATE} at ${INAUGURAL_SERVICE_TIME}, ${INAUGURAL_SERVICE_VENUE.name}`,
+      },
+    ],
+    locale: 'en_GB',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `Inaugural Service — ${INAUGURAL_THEME.title}`,
+    description: `${FORMATTED_SERVICE_DATE} · ${INAUGURAL_SERVICE_TIME} · ${INAUGURAL_SERVICE_VENUE.name}, Barnstaple.`,
+    images: [OG_IMAGE_URL],
+  },
 }
 
 export const dynamic = 'force-dynamic'
