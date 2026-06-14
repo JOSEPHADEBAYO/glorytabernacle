@@ -71,27 +71,44 @@ export default async function ProgrammePage({ searchParams }: PageProps) {
     <>
       <TopNavBar />
       <main className="bg-[#f4f4f4]">
-        <section className="relative flex min-h-[28rem] items-center overflow-hidden pt-16">
-          <Image
-            src="https://images.unsplash.com/photo-1778876089324-15f94de18275?w=1200&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8cGVudGVjb3N0YWwlMjBjaHJ1Y2glMjBpbmF1Z3VyYWwlMjBzZXJ2aWNlfGVufDB8fDB8fHww"
-            alt=""
-            fill
-            priority
-            className="object-cover object-center"
-            sizes="100vw"
-          />
-          <div className="absolute inset-0 bg-[#000666]/85" />
-          <div className="relative z-10 mx-auto w-full max-w-[var(--container-max)] px-[var(--section-padding-x)] py-16 text-center text-white">
-            <h1 className="mb-4 text-lg font-bold uppercase tracking-[0.22em] text-[rgba(163,246,156,1)]">
-              Inaugural Service · Programme
-            </h1>
-            <h1 className="mx-auto max-w-3xl text-4xl font-extrabold leading-tight md:text-6xl">
-              {registrant ? `Welcome, ${registrant.firstName}` : 'Welcome'}
-            </h1>
-            <p className="mx-auto mt-4 max-w-2xl font-serif text-lg italic text-white/90 md:text-2xl">
-              theme: <span className="font-bold uppercase tracking-wider not-italic">{INAUGURAL_THEME.title}</span> · {INAUGURAL_THEME.scripture}
-            </p>
-            <div className="mx-auto mt-6 grid max-w-4xl grid-cols-1 gap-3 text-left text-sm sm:grid-cols-2 lg:grid-cols-4">
+        <section className="bg-[#000666] pb-12 pt-20 md:pt-24">
+          <div className="mx-auto w-full max-w-[var(--container-max)] px-[var(--section-padding-x)]">
+            {/* Poster carries the title, theme, date, and venue by design,
+                so we show it cleanly with NO overlay. The personalised
+                welcome + registration ID live below the image, then the
+                tappable info cards. */}
+            <div className="overflow-hidden rounded-2xl shadow-[0_24px_60px_rgba(0,0,0,0.35)]">
+              <Image
+                src="https://res.cloudinary.com/deckwmsth/image/upload/v1781457692/WhatsApp_Image_2026-06-14_at_13.44.11_brtvwr.jpg"
+                alt={`Inaugural Service — ${INAUGURAL_THEME.title} (${INAUGURAL_THEME.scripture}), ${eventDate} at ${INAUGURAL_SERVICE_TIME}, ${INAUGURAL_SERVICE_VENUE.name}`}
+                width={1600}
+                height={600}
+                priority
+                className="h-auto w-full"
+                sizes="(max-width: 1280px) 100vw, 1280px"
+              />
+            </div>
+
+            {/* Personalised welcome strip — only renders when we resolved a
+                registrant from the QR's ?id= param. Otherwise we just skip
+                straight to the info cards. */}
+            {registrant && (
+              <div className="mt-6 text-center text-white">
+                <p className="text-xs font-bold uppercase tracking-[0.22em] text-[rgba(163,246,156,1)]">
+                  You&apos;re registered
+                </p>
+                <h1 className="mt-2 text-3xl font-extrabold leading-tight md:text-4xl">
+                  Welcome, {registrant.firstName}
+                </h1>
+                {parsedId && (
+                  <p className="mt-3 inline-block rounded-full border border-white/30 px-4 py-1.5 font-mono text-sm tracking-wider text-white/90">
+                    {parsedId}
+                  </p>
+                )}
+              </div>
+            )}
+
+            <div className="mt-6 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
               <div className="flex items-start gap-3 rounded-xl border border-white/20 bg-white/5 px-4 py-3 backdrop-blur-sm">
                 <CalendarDays className="mt-0.5 h-4 w-4 shrink-0 text-[rgba(163,246,156,1)]" aria-hidden="true" />
                 <div className="min-w-0">
@@ -122,11 +139,6 @@ export default async function ProgrammePage({ searchParams }: PageProps) {
                 </div>
               </div>
             </div>
-            {parsedId && (
-              <p className="mt-4 inline-block rounded-full border border-white/30 px-4 py-1.5 font-mono text-sm tracking-wider text-white/90">
-                {parsedId}
-              </p>
-            )}
           </div>
         </section>
 

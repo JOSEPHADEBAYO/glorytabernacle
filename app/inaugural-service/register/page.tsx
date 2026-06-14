@@ -31,39 +31,26 @@ export default function InauguralRegisterPage() {
     <>
       <TopNavBar />
       <main className="bg-[#f4f4f4]">
-        <section className="relative flex min-h-[24rem] items-center overflow-hidden pt-16">
-          <Image
-            src="https://images.unsplash.com/photo-1778876089324-15f94de18275?w=1200&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8cGVudGVjb3N0YWwlMjBjaHJ1Y2glMjBpbmF1Z3VyYWwlMjBzZXJ2aWNlfGVufDB8fDB8fHww"
-            alt=""
-            fill
-            priority
-            className="object-cover object-center"
-            sizes="100vw"
-          />
-          <div className="absolute inset-0 bg-[#000666]/82" />
-          <div className="relative z-10 mx-auto w-full max-w-[var(--container-max)] px-[var(--section-padding-x)] py-16 text-white">
-            {/* <p className="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-white/70">
-              Glory Ahead
-            </p> */}
-            <h1 className="max-w-3xl text-4xl font-extrabold leading-tight md:text-6xl">
-              INAUGURAL SERVICE
-            </h1>
-            <div className="mt-5 inline-flex items-baseline gap-3 rounded-full border border-white/20 bg-white/5 px-4 py-2 backdrop-blur-sm">
-              <span className="text-[0.7rem] font-bold tracking-[0.22em] text-[rgba(163,246,156,1)]">
-                theme: 
-              </span>
-              <span className="font-serif text-lg font-bold uppercase text-white md:text-xl">
-                {INAUGURAL_THEME.title}
-              </span>
-              <span className="text-xs italic text-white/70">
-                {INAUGURAL_THEME.scripture}
-              </span>
+        <section className="bg-[#000666] pb-12 pt-20 md:pt-24">
+          <div className="mx-auto w-full max-w-[var(--container-max)] px-[var(--section-padding-x)]">
+            {/* The programme poster carries the title (INAUGURAL SERVICE),
+                theme (GLORY AHEAD · Haggai 2:9), date, and venue by design,
+                so we display it cleanly with NO overlay and no duplicate
+                text on top — the artwork is the hero. The tappable Date /
+                Time / Venue / Parking cards live below for scannable info. */}
+            <div className="overflow-hidden rounded-2xl shadow-[0_24px_60px_rgba(0,0,0,0.35)]">
+              <Image
+                src="https://res.cloudinary.com/deckwmsth/image/upload/v1781457692/WhatsApp_Image_2026-06-14_at_13.44.11_brtvwr.jpg"
+                alt={`Inaugural Service — ${INAUGURAL_THEME.title} (${INAUGURAL_THEME.scripture}), ${FORMATTED_SERVICE_DATE} at ${INAUGURAL_SERVICE_TIME}, ${INAUGURAL_SERVICE_VENUE.name}`}
+                width={1600}
+                height={600}
+                priority
+                className="h-auto w-full"
+                sizes="(max-width: 1280px) 100vw, 1280px"
+              />
             </div>
-            <p className="mt-5 max-w-2xl text-base leading-7 text-white/80">
-              Save your seat and pick up a personal printed badge at the door.
-            </p>
 
-            <div className="mt-6 grid max-w-4xl grid-cols-1 gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-6 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
               <div className="flex items-start gap-3 rounded-xl border border-white/20 bg-white/5 px-4 py-3 backdrop-blur-sm">
                 <CalendarDays className="mt-0.5 h-4 w-4 shrink-0 text-[rgba(163,246,156,1)]" aria-hidden="true" />
                 <div className="min-w-0">
