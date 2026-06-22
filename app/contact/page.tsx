@@ -260,7 +260,7 @@ function SocialSection() {
           <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
         </svg>
       ),
-      name: 'Facebook', description: 'Join our group and stay updated', href: 'https://www.facebook.com/share/1CDurcWmxG/?mibextid=wwXIfr', bg: '#1877F2',
+      name: 'Facebook', description: 'Join our group and stay updated', href: 'https://www.facebook.com/share/1BZ95ArbRf/?mibextid=wwXIfr', bg: '#1877F2',
     },
     {
       icon: (
@@ -270,7 +270,7 @@ function SocialSection() {
           <circle cx="17.5" cy="6.5" r="1" fill="white" stroke="none" />
         </svg>
       ),
-      name: 'Instagram', description: 'Follow our weekly life', href: 'https://www.instagram.com/glorytabernaclebarnstaple?igsh=MWkxaTF0Yjd1czk3Mg%3D%3D&utm_source=qr', bg: 'radial-gradient(circle at 30% 107%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285AEB 90%)',
+      name: 'Instagram', description: 'Follow our weekly life', href: 'https://www.instagram.com/rccgglorytabernaclebarnstaple?igsh=MWtiZDR3bmVydXp5OA%3D%3D&utm_source=qr', bg: 'radial-gradient(circle at 30% 107%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285AEB 90%)',
     },
     {
       icon: (
@@ -411,9 +411,9 @@ export default function ContactPage() {
           },
         ]}
         socialLinks={[
-          { platform: 'instagram', href: 'https://www.instagram.com/glorytabernaclebarnstaple?igsh=MWkxaTF0Yjd1czk3Mg%3D%3D&utm_source=qr' },
+          { platform: 'instagram', href: 'https://www.instagram.com/rccgglorytabernaclebarnstaple?igsh=MWtiZDR3bmVydXp5OA%3D%3D&utm_source=qr' },
           { platform: 'youtube', href: 'https://www.youtube.com/@glorytabernaclehq' },
-          { platform: 'facebook', href: 'https://www.facebook.com/share/1CDurcWmxG/?mibextid=wwXIfr' },
+          { platform: 'facebook', href: 'https://www.facebook.com/share/1BZ95ArbRf/?mibextid=wwXIfr' },
           { platform: 'x', href: 'https://x.com/rccggthq' },
           { platform: 'tiktok', href: 'https://www.tiktok.com/@rccgglorytabernaclebarns?_r=1&_t=ZN-965RffiNMP8X' },
         ]}

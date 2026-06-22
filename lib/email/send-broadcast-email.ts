@@ -99,7 +99,7 @@ const BRAND = {
 const SOCIAL_LINKS = [
   {
     name: 'Instagram',
-    href: 'https://www.instagram.com/glorytabernaclebarnstaple',
+    href: 'https://www.instagram.com/rccgglorytabernaclebarnstaple?igsh=MWtiZDR3bmVydXp5OA%3D%3D&utm_source=qr',
     iconUrl: 'https://cdn.simpleicons.org/instagram/ffffff',
   },
   {
@@ -109,7 +109,7 @@ const SOCIAL_LINKS = [
   },
   {
     name: 'Facebook',
-    href: 'https://www.facebook.com/share/1CDurcWmxG',
+    href: 'https://www.facebook.com/share/1BZ95ArbRf/?mibextid=wwXIfr',
     iconUrl: 'https://cdn.simpleicons.org/facebook/ffffff',
   },
 ]
