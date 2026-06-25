@@ -116,7 +116,7 @@ export default async function ProgrammePage({ searchParams }: PageProps) {
                 tappable info cards. */}
             <div className="overflow-hidden rounded-2xl shadow-[0_24px_60px_rgba(0,0,0,0.35)]">
               <Image
-                src="https://res.cloudinary.com/deckwmsth/image/upload/v1781457692/WhatsApp_Image_2026-06-14_at_13.44.11_brtvwr.jpg"
+                src="https://res.cloudinary.com/deckwmsth/image/upload/v1782403597/Inaugural_Service_Thumbnail_okeluk.png"
                 alt={`Inaugural Service — ${INAUGURAL_THEME.title} (${INAUGURAL_THEME.scripture}), ${eventDate} at ${INAUGURAL_SERVICE_TIME}, ${INAUGURAL_SERVICE_VENUE.name}`}
                 width={1600}
                 height={600}
