@@ -64,7 +64,7 @@ function getLogoUrl(): string {
  *                       mobile + older Outlook still don't reliably).
  */
 const POSTER_URL =
-  'https://res.cloudinary.com/deckwmsth/image/upload/w_1200,c_limit,q_auto,f_auto/v1781457692/WhatsApp_Image_2026-06-14_at_13.44.11_brtvwr.jpg'
+  'https://res.cloudinary.com/deckwmsth/image/upload/w_1200,c_limit,q_auto,f_auto/v1782403597/Inaugural_Service_Thumbnail_okeluk.png'
 
 function getSiteUrl(): string {
   const url =

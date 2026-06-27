@@ -35,7 +35,7 @@ const FORMATTED_SERVICE_DATE = INAUGURAL_SERVICE_DATE.toLocaleDateString(
  *                          choke on WebP / AVIF)
  */
 const OG_IMAGE_URL =
-  'https://res.cloudinary.com/deckwmsth/image/upload/c_pad,b_rgb:000666,w_1200,h_630,q_auto,f_jpg/v1781457692/WhatsApp_Image_2026-06-14_at_13.44.11_brtvwr.jpg'
+  'https://res.cloudinary.com/deckwmsth/image/upload/c_pad,b_rgb:000666,w_1200,h_630,q_auto,f_jpg/v1782403597/Inaugural_Service_Thumbnail_okeluk.png'
 
 const PAGE_URL = 'https://www.glorytabernacle.co.uk/inaugural-service/register'
 
